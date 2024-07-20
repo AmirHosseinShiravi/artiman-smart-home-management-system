@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home MQTT Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #log {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: scroll;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Home MQTT Monitor</h1>
+    <div id="log"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script>
+        const mqttBroker = "broker.hivemq.com";
+        const mqttPort = 8000;
+        const mqttClientId = "monitor-" + Math.random().toString(16).substr(2, 8);
+        const topic = "smart_home/lights/#";
+
+        let client;
+
+        function logMessage(message) {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function onConnect() {
+            logMessage("Connected to MQTT broker");
+            client.subscribe(topic);
+            logMessage(`Subscribed to topic: ${topic}`);
+        }
+
+        function onMessageArrived(message) {
+            logMessage(`Raw message received: ${message.payloadString}`);
+            try {
+                const payload = JSON.parse(message.payloadString);
+                logMessage(`Parsed JSON: Light ${payload.lightId} - ${payload.status}`);
+            } catch (error) {
+                logMessage(`Failed to parse JSON: ${error.message}`);
+            }
+        }
+
+        function initMQTT() {
+            client = new Paho.MQTT.Client(mqttBroker, mqttPort, mqttClientId);
+            client.onConnectionLost = (responseObject) => {
+                if (responseObject.errorCode !== 0) {
+                    logMessage(`Connection lost: ${responseObject.errorMessage}`);
+                }
+            };
+            client.onMessageArrived = onMessageArrived;
+
+            client.connect({
+                onSuccess: onConnect,
+                onFailure: (err) => logMessage(`Failed to connect: ${err.errorMessage}`)
+            });
+        }
+
+        initMQTT();
+    </script>
+</body>
+</html>

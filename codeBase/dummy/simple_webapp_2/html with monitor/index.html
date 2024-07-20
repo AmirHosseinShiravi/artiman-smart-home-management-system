@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home MQTT Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #lights-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .light-button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #log {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+        .sent {
+            color: blue;
+        }
+        .received {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Home MQTT Demo</h1>
+    <div id="lights-container"></div>
+    <h2>Log</h2>
+    <div id="log"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script>
+        const mqttBroker = "broker.hivemq.com";
+        const mqttPort = 8000;
+        const mqttClientId = "clientId-" + Math.random().toString(16).substr(2, 8);
+        const topic = "smart_home/lights";
+
+        let client;
+        const lights = [
+            { id: 1, name: "Living Room" },
+            { id: 2, name: "Kitchen" },
+            { id: 3, name: "Bedroom" }
+        ];
+
+        function logMessage(message, type) {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function createLightButtons() {
+            const container = document.getElementById('lights-container');
+            lights.forEach(light => {
+                const button = document.createElement('button');
+                button.textContent = light.name;
+                button.className = 'light-button';
+                button.onclick = () => toggleLight(light.id);
+                container.appendChild(button);
+            });
+        }
+
+        function toggleLight(lightId) {
+            const payload = JSON.stringify({
+                lightId: lightId,
+                status: "toggle"
+            });
+            const message = new Paho.MQTT.Message(payload);
+            message.destinationName = topic;
+            client.send(message);
+            logMessage(`Sent: ${payload}`, 'sent');
+        }
+
+        function onConnect() {
+            logMessage("Connected to MQTT broker", 'sent');
+            client.subscribe(topic);
+            logMessage(`Subscribed to topic: ${topic}`, 'sent');
+        }
+
+        function onMessageArrived(message) {
+            logMessage(`Received: ${message.payloadString}`, 'received');
+        }
+
+        function initMQTT() {
+            client = new Paho.MQTT.Client(mqttBroker, mqttPort, mqttClientId);
+            client.onConnectionLost = (responseObject) => {
+                if (responseObject.errorCode !== 0) {
+                    logMessage(`Connection lost: ${responseObject.errorMessage}`, 'sent');
+                }
+            };
+            client.onMessageArrived = onMessageArrived;
+
+            client.connect({
+                onSuccess: onConnect,
+                onFailure: (err) => logMessage(`Failed to connect: ${err.errorMessage}`, 'sent')
+            });
+        }
+
+        createLightButtons();
+        initMQTT();
+    </script>
+</body>
+</html>
