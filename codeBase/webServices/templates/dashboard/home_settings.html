@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Settings - {% endblock title %}
+
+{% block content %}
+
+  <div class="layout-fluid mt-4">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+              Home Settings
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+
+          <div class="row g-0" style="min-height: 25vw">
+            <div class="col card d-none d-md-block border-end" style="max-width: 12%;">
+              <div class="card-body">
+                <h4 class="subheader">Home settings Menu</h4>
+                <div class="list-group list-group-transparent">
+                  <a href="{% url 'dashboard:settings' %}" id="settings444" class="list-group-item list-group-item-action d-flex align-items-center active border-bottom border-top">General settings</a>
+                  <a href="{% url 'dashboard:settings' %}" id="settings" class="list-group-item list-group-item-action d-flex align-items-center border-bottom">Home Controllers</a>
+                  <a href="{% url 'dashboard:amir' %}" id="amir" class="list-group-item list-group-item-action d-flex align-items-center border-bottom">Home Devices</a>
+                  <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-bottom">Home Zones</a>
+                  <a href="{% url 'settings_plan' %}" class="list-group-item list-group-item-action d-flex align-items-center border-bottom">Home Users</a>
+<!--                  <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">Billing & Invoices</a>-->
+                </div>
+<!--                <h4 class="subheader mt-4">Experience</h4>-->
+<!--                <div class="list-group list-group-transparent">-->
+<!--                  <a href="#" class="list-group-item list-group-item-action">Give Feedback</a>-->
+<!--                </div>-->
+              </div>
+            </div>
+            <div class="col card d-flex flex-column">
+<!--              <div class="card-body" id="content-body">-->
+<!--                <h2 class="mb-4">My Account</h2>-->
+<!--                <h3 class="card-title">Profile Details</h3>-->
+<!--                <div class="row align-items-center">-->
+<!--                  <div class="col-auto"><span class="avatar avatar-xl" style="background-image: url({% static 'static/avatars/000m.jpg' %})"></span>-->
+<!--                  </div>-->
+<!--                  <div class="col-auto"><a href="#" class="btn">-->
+<!--                      Change avatar-->
+<!--                    </a></div>-->
+<!--                  <div class="col-auto"><a href="#" class="btn btn-ghost-danger">-->
+<!--                      Delete avatar-->
+<!--                    </a></div>-->
+<!--                </div>-->
+<!--                <h3 class="card-title mt-4">Business Profile</h3>-->
+<!--                <div class="row g-3">-->
+<!--                  <div class="col-md">-->
+<!--                    <div class="form-label">Business Name</div>-->
+<!--                    <input type="text" class="form-control" value="Tabler">-->
+<!--                  </div>-->
+<!--                  <div class="col-md">-->
+<!--                    <div class="form-label">Business ID</div>-->
+<!--                    <input type="text" class="form-control" value="560afc32">-->
+<!--                  </div>-->
+<!--                  <div class="col-md">-->
+<!--                    <div class="form-label">Location</div>-->
+<!--                    <input type="text" class="form-control"-->
+<!--          value="Peimei, China">-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <h3 class="card-title mt-4">Email</h3>-->
+<!--                <p class="card-subtitle">This contact will be shown to others publicly, so choose it carefully.</p>-->
+<!--                <div>-->
+<!--                  <div class="row g-2">-->
+<!--                    <div class="col-auto">-->
+<!--                      <input type="text" class="form-control w-auto" value="paweluna@howstuffworks.com">-->
+<!--                    </div>-->
+<!--                    <div class="col-auto"><a href="#" class="btn">-->
+<!--                        Change-->
+<!--                      </a></div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <h3 class="card-title mt-4">Password</h3>-->
+<!--                <p class="card-subtitle">You can set a permanent password if you don't want to use temporary login codes.</p>-->
+<!--                <div>-->
+<!--                  <a href="#" class="btn">-->
+<!--                    Set new password-->
+<!--                  </a>-->
+<!--                </div>-->
+<!--                <h3 class="card-title mt-4">Public profile</h3>-->
+<!--                <p class="card-subtitle">Making your profile public means that anyone on the Dashkit network will be able to find-->
+<!--                  you.</p>-->
+<!--                <div>-->
+<!--                  <label class="form-check form-switch form-switch-lg">-->
+<!--                    <input class="form-check-input" type="checkbox" >-->
+<!--                    <span class="form-check-label form-check-label-on">You're currently visible</span>-->
+<!--                    <span class="form-check-label form-check-label-off">You're-->
+<!--                      currently invisible</span>-->
+<!--                  </label>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="card-footer bg-transparent mt-auto">-->
+<!--                <div class="btn-list justify-content-end">-->
+<!--                  <a href="#" class="btn">-->
+<!--                    Cancel-->
+<!--                  </a>-->
+<!--                  <a href="#" class="btn btn-primary">-->
+<!--                    Submit-->
+<!--                  </a>-->
+<!--                </div>-->
+<!--              </div>-->
+            </div>
+          </div>
+      </div>
+    </div>
+    {% include 'includes/footer.html' %}
+  </div>
+
+{% endblock content %}
+
+
+{% block extrajs %}
+
+  <script>
+
+      var amir_link = document.getElementById("amir");
+      amir_link.addEventListener("click", function (event){
+        event.preventDefault();
+        fetch("{% url 'dashboard:amir' %}")
+        .then(response => response.json())
+        .then(data => {
+          // data.rendered_template contains the rendered HTML string
+          document.getElementById('content-body').innerHTML = data.rendered_template;
+        });
+      })
+
+      var settings_button_link = document.getElementById("settings");
+      settings_button_link.addEventListener("click", function (event){
+        event.preventDefault();
+        fetch("{% url 'dashboard:settings_button1' %}")
+        .then(response => response.json())
+        .then(data => {
+          // data.rendered_template contains the rendered HTML string
+          document.getElementById('content-body').innerHTML = data.rendered_template;
+        });
+      })
+
+  </script>
+
+{% endblock extrajs %}

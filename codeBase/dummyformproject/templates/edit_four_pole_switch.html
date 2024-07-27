@@ -1,0 +1,19 @@
+<!-- edit_four_pole_switch.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if device %}Edit{% else %}Create{% endif %} Four-Pole Switch</title>
+</head>
+<body>
+    <h1>{% if device %}Edit {{ device.name }}{% else %}Create Four-Pole Switch{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form }}
+        {% endfor %}
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>

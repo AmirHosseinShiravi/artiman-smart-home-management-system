@@ -28,6 +28,7 @@ export class LightControl {
         this.state = !this.state;
         this.smartHomeCore.toggleLight(this.lightId, this.state);
         this.updateButton();
+        this.smartHomeCore.
     }
 
     updateButton() {
