@@ -20,7 +20,7 @@ password = 'RLSdhQGpxR0QXWt8qZThPu2hF1TiyuptRzqFwU8GD5O'
 
 
 
-url = 'http://localhost:18083/api/v5/authorization/sources/built_in_database/rules/users/user1/'
+url = 'http://localhost:18083/'
 
 req = urllib.request.Request(url, method='PUT', data=json.dumps({
   "rules": [

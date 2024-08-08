@@ -3,6 +3,7 @@ django==4.2.9
 python-dotenv==1.0.1
 str2bool==1.1
 pillow
+requests
 # UI 
 django-admin-tabler==1.0.2
 
