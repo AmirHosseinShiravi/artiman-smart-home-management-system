@@ -1,0 +1,98 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+
+{% block right_side_card_content %}
+  <div class="card-body">
+    <form method="post" id="home_user_setting_form" action="{% if form_type == 'create_new_controller' %}
+                                                                      {% url 'dashboard:home_wizard_create_new_controller' project.uuid home.uuid %}
+                                                                    {% else %}
+                                                                      {% url 'dashboard:home_wizard_edit_controller' project.uuid home.uuid controller.uuid %}
+                                                                    {% endif %}">
+
+      {% csrf_token %}
+      <div class="row">
+        {% for field in controller_form %}
+          {% if field.name == 'name' or field.name == 'status' or field.name == 'descriptions' %}
+            <div class="col-4">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+      <h4 class="text-muted mt-5"> Network Properties:</h4>
+
+        {% for field in controller_form %}
+          {% if field.name == 'enable_internal_server' or field.name == 'ip_address' or field.name == 'port_number' %}
+            {% if field.name == 'enable_internal_server' %}
+            <div class="col-12">
+              <div class="form-label">{{ field.label}}</div>
+              <label class="form-check form-switch">
+                {{ field }}
+                <span class="form-check-label">If enabling this feature, you can run a local system that don't need to internet to work.</span>
+              </label>
+            </div>
+            {% else %}
+            <div class="col-4">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+      <h4 class="text-muted mt-5"> Internal Properties:</h4>
+
+        {% for field in controller_form %}
+          {% if field.name == 'uart_baud_rate' %}
+
+            <div class="col-3">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+
+          {% endif %}
+        {% endfor %}
+
+
+      <h4 class="text-muted mt-5"> MQTT Properties:</h4>
+
+        {% for field in controller_form %}
+          {% if field.name == 'mqtt_client_id' or field.name == 'mqtt_username' or field.name == 'mqtt_password' %}
+            <div class="col-4 mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if controller.uuid %}
+          <div class="col-12 mt-4">
+            <label class="form-label">controller ID</label>
+            <input class="form-control" type="text" value="{{ controller.uuid }}" disabled>
+          </div>
+        {% endif %}
+
+        {% for field in controller_credentials_form %}
+            <div class="col-6 mt-4 mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+        {% endfor %}
+
+
+
+
+      </div>
+    </form>
+  </div>
+  <div class="card-footer bg-transparent mt-auto">
+    <div class="btn-list justify-content-end">
+      <a href="{% url 'dashboard:home_wizard_all_controllers' project.uuid home.uuid %}" class="btn">Cancel</a>
+      <button type="submit" form="home_user_setting_form" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+

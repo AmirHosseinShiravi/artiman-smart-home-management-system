@@ -1,0 +1,37 @@
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div id="formset-container">
+        {% for form in formset %}
+            <div class="formset-form">
+                {{ form.as_p }}
+                <button type="button" class="remove-form">Remove</button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" id="add-form">Add Action</button>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let formsetContainer = document.getElementById('formset-container');
+    let addFormButton = document.getElementById('add-form');
+    let totalForms = document.querySelector('#id_form-TOTAL_FORMS');
+
+    addFormButton.addEventListener('click', function() {
+        let newForm = document.createElement('div');
+        newForm.classList.add('formset-form');
+        newForm.innerHTML = formsetContainer.querySelector('.formset-form').innerHTML.replace(/__prefix__/g, totalForms.value);
+        formsetContainer.appendChild(newForm);
+        totalForms.value = parseInt(totalForms.value) + 1;
+    });
+
+    formsetContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('remove-form')) {
+            event.target.parentElement.remove();
+            totalForms.value = parseInt(totalForms.value) - 1;
+        }
+    });
+});
+</script>

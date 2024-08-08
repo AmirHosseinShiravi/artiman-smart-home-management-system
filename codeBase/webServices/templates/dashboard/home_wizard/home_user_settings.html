@@ -1,0 +1,99 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+
+{% block right_side_card_content %}
+  <div class="card-body">
+    <form method="post" id="home_user_setting_form" action="{% if form_type == 'create_new_home_user' %}
+                                                                      {% url 'dashboard:home_wizard_create_new_user' project.uuid home.uuid %}
+                                                                    {% else %}
+                                                                      {% url 'dashboard:home_wizard_edit_user' project.uuid home.uuid home_user.uuid %}
+                                                                    {% endif %}">
+      {% csrf_token %}
+      <div class="row">
+        {% for field in user_form %}
+
+          {% if field.name == 'new_password' %}
+            <div class="col-6">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% else %}
+            <div class="col-6">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% for field in home_user_form %}
+          {% if field.name == 'is_tablet_user' %}
+            <div class="col-6 mt-4">
+              <div class="form-label mb-3">{{ field.label }}</div>
+              <label class="form-check form-switch">
+                {{ field }}
+                <span class="form-check-label">Enable if you want user have access to this home tablet dashboard application</span>
+              </label>
+            </div>
+            {% elif field.name == 'is_web_app_user' %}
+            <div class="col-6 mt-4">
+              <div class="form-label mb-3">{{ field.label }}</div>
+              <label class="form-check form-switch">
+                {{ field }}
+                <span class="form-check-label">Enable if you want user have access to this home web application</span>
+              </label>
+            </div>
+          {% elif field.name == 'desc' %}
+            <div class="col-12 mt-4 mb-4">
+              <label class="form-label">Description</label>
+              {{ field }}
+            </div>
+          {% else %}
+            <div class="col-6">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+      {% if home_user %}
+      <div class="col-3 mt-4 mb-4">
+        <label class="form-label">Client ID</label>
+        <input class="form-control" type="text" value="{{ home_user.mqtt_client_id }}" disabled>
+      </div>
+      <div class="col-3 mt-4 mb-4">
+        <label class="form-label">Username</label>
+        <input class="form-control" type="text" value="{{ home_user.mqtt_username }}" disabled>
+      </div>
+      <div class="col-3 mt-4 mb-4">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="text" value="{{ home_user.mqtt_password }}" disabled>
+      </div>
+
+      {% endif %}
+
+
+{#        {% if tablet %}#}
+{#          <div class="col-6 mt-4">#}
+{#            <label class="form-label">tablet ID</label>#}
+{#            <input class="form-control" type="text" value="{{ tablet.uuid }}" disabled>#}
+{#          </div>#}
+{#          <div class="col-6 mt-4">#}
+{#            <label class="form-label">home ID</label>#}
+{#            <input class="form-control" type="text" value="{{ tablet.parent_home.uuid }}" disabled>#}
+{#          </div>#}
+{##}
+{#        {% endif %}#}
+
+      </div>
+    </form>
+  </div>
+  <div class="card-footer bg-transparent mt-auto">
+    <div class="btn-list justify-content-end">
+      <a href="{% url 'dashboard:home_wizard_all_users' project.uuid home.uuid %}" class="btn">Cancel</a>
+      <button type="submit" form="home_user_setting_form" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+

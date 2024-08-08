@@ -1,8 +1,14 @@
+import base64
+import json
+import os
 import secrets
 import string
+import urllib.request
+from dotenv import load_dotenv
 
+import dashboard.models as dashboard_models
 
-def generate_random_id(length=8):
+def generate_random_id(length: int = 8) -> str:
     characters = string.ascii_letters + string.digits
     username = ''.join(secrets.choice(characters) for _ in range(length))
     return username
@@ -23,5 +29,21 @@ def generate_random_password(length=12):
     return password
 
 
-def generate_client_certificates():
+def generate_controller_credentials():
     pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

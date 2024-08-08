@@ -1,0 +1,191 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+
+  <script src="{% static 'DataTables/jQuery-3.7.0/jquery-3.7.0.min.js' %}" xmlns="http://www.w3.org/1999/html"></script>
+
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/jquery.dataTables.min.css' %}">
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/dataTables.bootstrap.min.css' %}">
+{#  <link rel="stylesheet" href="{% static 'DataTables/Select-1.7.0/css/select.bootstrap.min.css' %}">#}
+
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/dataTables.bootstrap.min.js' %}"></script>
+{#  <script src="{% static 'DataTables/Select-1.7.0/js/dataTables.select.min.js' %}"></script>#}
+
+{#  <link href="{% static 'custom/tom-select.css' %}" rel="stylesheet"/>#}
+
+{#  <script src="{% static 'custom/tom-select.complete.min.js' %}" defer></script>#}
+
+
+{% endblock extrahead %}
+
+{% block right_side_card_content %}
+  <div class="card-body">
+     <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+              Home Controllers
+            </h2>
+          </div>
+          <div class="col-auto ms-auto d-print-none">
+            <div class="btn-list">
+
+              <a href="{% url 'dashboard:home_wizard_create_new_controller' project.uuid home.uuid %}" class="btn btn-primary d-none d-sm-inline-block">
+                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 5l0 14"></path>
+                  <path d="M5 12l14 0"></path>
+                </svg>
+                Create new controller
+              </a>
+              <a href="{% url 'dashboard:home_wizard_create_new_controller' project.uuid home.uuid %}" class="btn btn-primary d-sm-none btn-icon"
+                 aria-label="Create new report">
+                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 5l0 14"></path>
+                  <path d="M5 12l14 0"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+        <!-- Content here -->
+
+
+            <table class="display hover row-border stripe" id="illnesses_table" style="width: 100%;">
+              <thead>
+              <tr>
+                <th>controller name</th>
+                <th>description</th>
+                <th>status</th>
+                <th>Local IP address</th>
+                <th>Port</th>
+                <th>mqtt client ID</th>
+                <th>settings</th>
+                <th>Download</th>
+                <th>creator</th>
+                <th>created at</th>
+                <th>editor</th>
+                <th>edited at</th>
+                <th>delete</th>
+              </tr>
+              </thead>
+
+              <tbody>
+
+              {% for controller in controllers%}
+                <tr>
+                  <td>{{ controller.name }}</td>
+                  <td class="text-truncate" style="max-width: 100px;">{{ controller.descriptions }}</td>
+                  <td>
+                    <span class="badge {% if controller.status == 'disable' %} bg-red
+                                       {% elif controller.status == 'error' %} bg-yellow
+                                       {% elif controller.status == 'enable' %} bg-green
+                                       {% endif %} badge-blink me-1"></span>{{ controller.status }}</td>
+
+                  <td>{{ controller.ip_address }}</td>
+                  <td>{{ controller.port_number }}</td>
+                  <td>{{ controller.mqtt_client_id }}</td>
+                  {% if perms.dashboard.change_homeUser %}
+                    <td><a href="{% url 'dashboard:home_wizard_edit_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                    {% else %}
+                    <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+
+                  {% endif %}
+
+                  <td><a href="{% url 'dashboard:home_wizard_download_controller_config' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-square-down" style="font-size: 23px"></i></a></td>
+
+                  <td>{{ controller.created_by }}</td>
+                  <td>{{ controller.created_at }}</td>
+                  <td>{{ controller.last_edited_by }}</td>
+                  <td>{{ controller.last_modified }}</td>
+                <td><a href="{% url 'dashboard:home_wizard_delete_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+
+
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bootstrap</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+
+      </div>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+
+
+
+
+
+{% block extrajs %}
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          let table = $("#illnesses_table").DataTable({
+              columnDefs: [
+                  {width: '10%', targets: 0, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "7.5%", targets: 1, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "10%",  targets: 2, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "10%", targets: 3, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 4, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "10%", targets: 5, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 6, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 7, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 8, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "15%", targets: 9, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "5%",  targets: 10, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "15%", targets: 11, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "2.5%",  targets: 12, className: 'dt-head-center dt-body-center', orderable: false},
+
+
+
+              ],
+              fixedColumns: true,
+              scrollX: true,
+              order:[[0,'desc']]
+          });
+
+
+          {% if message %}
+          const toastLiveExample = document.getElementById('liveToast');
+          const toast_body = document.getElementsByClassName("toast-body")[0];
+          toast_body.innerHTML = {{ message }};
+          const toast = new bootstrap.Toast(toastLiveExample);
+          toast.show();
+          {% endif %}
+      });
+
+  </script>
+
+{% endblock extrajs %}

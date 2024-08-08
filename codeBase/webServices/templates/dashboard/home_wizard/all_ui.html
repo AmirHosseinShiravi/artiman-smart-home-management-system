@@ -1,0 +1,212 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load admin_tabler %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+
+  <script src="{% static 'DataTables/jQuery-3.7.0/jquery-3.7.0.min.js' %}" xmlns="http://www.w3.org/1999/html"></script>
+
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/jquery.dataTables.min.css' %}">
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/dataTables.bootstrap.min.css' %}">
+{#  <link rel="stylesheet" href="{% static 'DataTables/Select-1.7.0/css/select.bootstrap.min.css' %}">#}
+
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/dataTables.bootstrap.min.js' %}"></script>
+{#  <script src="{% static 'DataTables/Select-1.7.0/js/dataTables.select.min.js' %}"></script>#}
+
+{#  <link href="{% static 'custom/tom-select.css' %}" rel="stylesheet"/>#}
+
+{#  <script src="{% static 'custom/tom-select.complete.min.js' %}" defer></script>#}
+
+
+{% endblock extrahead %}
+
+{% block right_side_card_content %}
+  <div class="card-body">
+     <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+              Home UI Elements
+            </h2>
+          </div>
+          <div class="col-auto ms-auto d-print-none">
+            <div class="btn-list">
+
+              <a href="#" class="btn btn-primary d-none d-sm-inline-block"
+              data-bs-toggle="modal" data-bs-target="#modal_add_new_ui_element">
+                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 5l0 14"></path>
+                  <path d="M5 12l14 0"></path>
+                </svg>
+                Create new UI element
+              </a>
+              <a href="#" class="btn btn-primary d-sm-none btn-icon"
+                 data-bs-toggle="modal" data-bs-target="#modal_add_new_ui_element" aria-label="Create new report">
+                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 5l0 14"></path>
+                  <path d="M5 12l14 0"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+        <!-- Content here -->
+
+
+            <table class="display hover row-border stripe" id="illnesses_table" style="width: 100%;">
+              <thead>
+              <tr>
+                <th>element name</th>
+                <th>button name</th>
+                <th>type</th>
+                <th>zone</th>
+                <th>settings</th>
+                <th>creator</th>
+                <th>created at</th>
+                <th>editor</th>
+                <th>edited at</th>
+                <th>delete</th>
+              </tr>
+              </thead>
+
+              <tbody>
+
+              {% for ui_element in ui_elements %}
+                <tr>
+                  <td>{{ ui_element.ui_base.name }}</td>
+                  <td>{{ ui_element.ui_base.button_name }}</td>
+                  <td>{{ ui_element.content_object.button_type|ui_button_type_name }}</td>
+                  <td>{{ ui_element.ui_base.parent_zone.zone_name }}</td>
+
+                  {% if perms.dashboard.change_uibase %}
+                      <td><a href="{% url 'dashboard:home_wizard_edit_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                      {% else %}
+                      <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+
+                    {% endif %}
+                  <td>{{ ui_element.ui_base.created_by }}</td>
+                  <td>{{ ui_element.ui_base.created_at }}</td>
+                  <td>{{ ui_element.ui_base.last_edited_by }}</td>
+                  <td>{{ ui_element.ui_base.last_modified }}</td>
+                <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+
+
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bootstrap</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+
+      </div>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+
+
+{% block modal %}
+<div class="modal modal-blur fade" id="modal_add_new_ui_element" tabindex="-1" style="display: none;" aria-hidden="true" >
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <form action="{% url 'dashboard:home_wizard_create_new_ui_element' project.uuid home.uuid %}" method="GET">
+                    {% csrf_token %}
+                  <div class="modal-header">
+                    <h5 class="modal-title">Add New Zone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row mb-3 align-items-end">
+
+                      <label class="form-label mt-3">Select Device Type</label>
+                    <select name="ui_element_type" class="form-select mb-4">
+                      {% for ui_element_type_value, ui_element_type_name in ui_element_types.items %}
+                        <option value="{{ ui_element_type_value }}">{{ ui_element_type_name }}</option>
+                      {% endfor %}
+                    </select>
+
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                      <button id="submitBtn" type="submit" class="btn btn-primary" >Add</button>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+
+{% endblock modal %}
+
+
+{% block extrajs %}
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          let table = $("#illnesses_table").DataTable({
+              columnDefs: [
+                  {width: '15%', targets: 0, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "15%", targets: 1, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "10%", targets: 2, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "10%", targets: 3, className: 'dt-head-center dt-body-center', orderable: true},
+                  {width: "5%",  targets: 4, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "10%", targets: 5, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "15%", targets: 6, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 7, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "15%", targets: 8, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 9, className: 'dt-head-center dt-body-center', orderable: false},
+
+
+
+
+
+              ],
+              fixedColumns: true,
+              scrollX: true,
+              order:[[3,'desc']]
+          });
+
+
+          {% if message %}
+          const toastLiveExample = document.getElementById('liveToast');
+          const toast_body = document.getElementsByClassName("toast-body")[0];
+          toast_body.innerHTML = {{ message }};
+          const toast = new bootstrap.Toast(toastLiveExample);
+          toast.show();
+          {% endif %}
+      });
+
+  </script>
+
+{% endblock extrajs %}

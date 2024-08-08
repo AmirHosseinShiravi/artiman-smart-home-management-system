@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FontAwesome Icon Copier</title>
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}">
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          margin: 50px;
+      }
+
+      .container {
+          position: relative;
+          display: inline-block;
+          border: 1px solid #ddd;
+          padding: 20px;
+          border-radius: 10px;
+      }
+
+      .icon-container {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          flex-wrap: wrap;
+          max-width: 500px;
+          margin-top: 50px;
+      }
+
+      i {
+          font-size: 2em;
+          cursor: pointer;
+      }
+
+      .badge {
+          display: none;
+          background-color: #4CAF50;
+          color: white;
+          padding: 5px 10px;
+          border-radius: 5px;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+      }
+
+  </style>
+</head>
+<body>
+
+<h1>Click an Icon to Copy its Code</h1>
+<div class="container">
+  <div class="icon-container">
+    <i class="fas fa-home icon"></i>
+    <i class="fas fa-user icon"></i>
+    <i class="fas fa-envelope icon"></i>
+    <i class="fas fa-camera icon"></i>
+    <i class="fa-thin fa-house"></i>
+    <i class="fal fa-bells"></i>
+    <i class="far fa-bells"></i>
+    <i class="fas fa-bells"></i>
+    <i class="fas fa-bells"></i>
+    <i class="fa-thin fa-bowl-hot"></i>
+    <i class="fa-regular fa-bird"></i>
+    <i class="fa-regular fa-dragon"></i>
+    <i class="fa-solid fa-house"></i>
+    <i class="fa-thin fa-house-lock"></i>
+    <i class="fa-solid fa-mouse-field"></i>
+    <i class="fa-regular fa-mouse-field"></i>
+    <i class="fa-light fa-mouse-field"></i>
+    <i class="fa-thin fa-mouse-field"></i>
+    <i class="fa-duotone fa-mouse-field"></i>
+    <i class="fa-solid fa-stapler"></i>
+    <i class="fa-regular fa-stapler"></i>
+    <i class="fa-light fa-stapler"></i>
+    <i class="fa-thin fa-stapler"></i>
+    <i class="fa-duotone fa-stapler"></i>
+    <i class="fa-solid fa-crosshairs-simple"></i>
+    <i class="fa-regular fa-crosshairs-simple"></i>
+    <i class="fa-light fa-crosshairs-simple"></i>
+    <i class="fa-thin fa-crosshairs-simple"></i>
+    <i class="fa-duotone fa-crosshairs-simple"></i>
+    <i class="fa-solid fa-lightbulb-cfl"></i>
+    <i class="fa-regular fa-lightbulb-cfl"></i>
+    <i class="fa-light fa-lightbulb-cfl"></i>
+    <i class="fa-thin fa-lightbulb-cfl"></i>
+    <i class="fa-duotone fa-lightbulb-cfl"></i>
+    <i class="fa-solid fa-lightbulb-cfl-on"></i>
+    <i class="fa-regular fa-lightbulb-cfl-on"></i>
+    <i class="fa-light fa-lightbulb-cfl-on"></i>
+    <i class="fa-thin fa-lightbulb-cfl-on"></i>
+    <i class="fa-duotone fa-lightbulb-cfl-on"></i>
+    <i class="fa-solid fa-toilet-paper-check"></i>
+    <i class="fa-regular fa-toilet-paper-check"></i>
+    <i class="fa-light fa-toilet-paper-check"></i>
+    <i class="fa-thin fa-toilet-paper-check"></i>
+    <i class="fa-solid fa-grill"></i>
+    <i class="fa-regular fa-grill"></i>
+    <i class="fa-light fa-grill"></i>
+    <i class="fa-thin fa-grill"></i>
+    <i class="fa-duotone fa-grill"></i>
+    <i class="fa-solid fa-grill-hot"></i>
+    <i class="fa-regular fa-grill-hot"></i>
+    <i class="fa-light fa-grill-hot"></i>
+    <i class="fa-thin fa-grill-hot"></i>
+    <i class="fa-duotone fa-grill-hot"></i>
+  </div>
+  <div class="badge" id="badge">Copied!</div>
+</div>
+
+<script>
+    document.querySelectorAll('.icon-container i').forEach(icon => {
+        icon.addEventListener('click', function () {
+            // Get the class list of the clicked icon
+            const classes = Array.from(this.classList).join(' ');
+            // Generate the HTML code
+            const code = `<i class="${classes}"></i>`;
+
+            // Copy the code to clipboard using Clipboard API
+            navigator.clipboard.writeText(code).then(() => {
+                // Show the badge
+                const badge = document.getElementById('badge');
+                badge.style.display = 'block';
+                setTimeout(() => {
+                    badge.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+{% load static %}
+  <title></title>
+  <link rel="stylesheet" href="{% static 'DataTables/Bootstrap-5-5.3.0/css/bootstrap.min.css' %}">
+  <script src="{% static 'DataTables/Bootstrap-5-5.3.0/js/bootstrap.bundle.min.js' %}"></script>
+
+</head>
+<body>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Switch Actions Formset -->
+    <div id="switch-formset-container">
+        {{ switch_formset.management_form }}
+        {% for form in switch_formset %}
+            <div class="switch-formset-form d-flex flex-row">
+                {{ form.as_p }}
+                <button type="button" class="remove-switch-formset-form">Remove</button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" id="add-switch-form">Add Switch Action</button>
+
+    <!-- Status Actions Formset -->
+    <div id="status-formset-container">
+        {{ status_formset.management_form }}
+        {% for form in status_formset %}
+            <div class="status-formset-form d-flex flex-row">
+                {{ form.as_p }}
+                <button type="button" class="remove-status-formset-form">Remove</button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" id="add-status-form">Add Status Action</button>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function addFormHandler(containerId, form_name, addButtonId, totalFormsSelector, prefix) {
+        let container = document.getElementById(containerId);
+        let addButton = document.getElementById(addButtonId);
+        let totalForms = document.querySelector(totalFormsSelector);
+
+        addButton.addEventListener('click', function() {
+            let newFormIdx = parseInt(totalForms.value);
+            let emptyForm = container.querySelector('.' + form_name + '-form').cloneNode(true);
+            let inputs = emptyForm.querySelectorAll('input, select, textarea');
+
+            // Clear the input values and update the names
+            inputs.forEach(input => {
+                input.name = input.name.replace(new RegExp(prefix + '-\\d+'), prefix + '-' + newFormIdx);
+                input.id = input.id.replace(new RegExp(prefix + '-\\d+'), prefix + '-' + newFormIdx);
+                if (!input.name.includes('ref_data_point')) {
+                    input.value = '';
+                }
+
+            });
+
+            container.appendChild(emptyForm);
+            totalForms.value = newFormIdx + 1;
+
+            // Enable all remove buttons when more than one form is present
+            updateRemoveButtons(form_name);
+        });
+
+        container.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-' + form_name + '-form')) {
+                if (container.querySelectorAll('.' + form_name + '-form').length > 1) {
+                    event.target.closest('.' + form_name + '-form').remove();
+                    let forms = container.querySelectorAll('.' + form_name + '-form');
+                    totalForms.value = forms.length;
+                    // Reindex form fields
+                    for (let i = 0; i < forms.length; i++) {
+                        let form = forms[i];
+                        let inputs = form.querySelectorAll('input, select, textarea');
+                        inputs.forEach(input => {
+                            input.name = input.name.replace(new RegExp(prefix + '-\\d+'), prefix + '-' + i);
+                            input.id = input.id.replace(new RegExp(prefix + '-\\d+'), prefix + '-' + i);
+                        });
+                    }
+                }
+                updateRemoveButtons(form_name);
+            }
+        });
+
+        function updateRemoveButtons(containerId) {
+            let forms = container.querySelectorAll('.' + containerId + '-form');
+            let removeButtons = container.querySelectorAll('.remove-' + containerId + '-form');
+            removeButtons.forEach(button => {
+                button.disabled = forms.length <= 1;
+            });
+        }
+
+        // Initial call to disable remove button if only one form is present
+        updateRemoveButtons(containerId);
+    }
+
+    addFormHandler('switch-formset-container', 'switch-formset', 'add-switch-form', '#id_switch-TOTAL_FORMS', 'switch');
+    addFormHandler('status-formset-container', 'status-formset', 'add-status-form', '#id_status-TOTAL_FORMS', 'status');
+});
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+
+
+{% block right_side_card_content %}
+  <div class="card-body">
+    <form method="post" id="home_setting_form">
+      {% csrf_token %}
+      <div class="row">
+        {% for field in forms %}
+          {% if field.name == 'status' %}
+            <div class="mt-4">
+              <div class="form-label mb-3">{{ field.label }}</div>
+              <label class="form-check form-switch">
+                {{ field }}
+                <span class="form-check-label">If enabled, this house equipment with Central Home Dashboard. Also specific User created in User section.</span>
+              </label>
+            </div>
+            {% elif field.name == 'tablet_has_internal_mqtt_broker' %}
+            <div class="mt-4">
+              <div class="form-label mb-3">Enable internal mqtt</div>
+              <label class="form-check form-switch">
+                {{ field }}
+                <span class="form-check-label">If enable this feature, Tablet application run an internal Mqtt Broker to communicate with controllers.</span>
+              </label>
+            </div>
+          {% elif field.name == 'descriptions' %}
+
+            <div class="col-12 mt-4 mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% else %}
+            <div class="col-6">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+        {% if tablet %}
+          <div class="col-6 mt-4">
+            <label class="form-label">tablet ID</label>
+            <input class="form-control" type="text" value="{{ tablet.uuid }}" disabled>
+          </div>
+          <div class="col-6 mt-4">
+            <label class="form-label">home ID</label>
+            <input class="form-control" type="text" value="{{ tablet.parent_home.uuid }}" disabled>
+          </div>
+
+        {% endif %}
+
+      </div>
+    </form>
+  </div>
+  <div class="card-footer bg-transparent mt-auto">
+    <div class="btn-list justify-content-end">
+      <a href="{% url 'dashboard:home_wizard_tablet_settings' project.uuid home.uuid %}" class="btn">Cancel</a>
+      <button type="submit" form="home_setting_form" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+

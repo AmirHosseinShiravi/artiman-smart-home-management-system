@@ -1,0 +1,67 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+
+
+{% block right_side_card_content %}
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row">
+        {% for field in forms %}
+          {% if field.name == 'building' or field.name == 'floor' or field.name == 'unit' or field.name == 'owner_phone_number' %}
+            <div class="col-3 mt-4">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% elif field.name == 'descriptions' %}
+
+            <div class="col-12 mt-4 mb-4">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% else %}
+            <div class="col-6">
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      <div class="col-6 mt-4">
+        <label class="form-label">home ID</label>
+        <input class="form-control" type="text" value="{{ home.uuid }}" disabled>
+      </div>
+      <div class="col-6 mt-4">
+        <label class="form-label">project name</label>
+        <input class="form-control" type="text" value="{{ home.parent_project.project_name }}" disabled>
+      </div>
+      <div class="col-3 mt-4">
+        <label class="form-label">created by</label>
+        <input class="form-control" type="text" value="{{ home.created_by.username }}" disabled>
+      </div>
+      <div class="col-3 mt-4">
+        <label class="form-label">created At</label>
+        <input class="form-control" type="text" value="{{ home.created_at }}" disabled>
+      </div>
+
+      <div class="col-3 mt-4">
+        <label class="form-label">last modified by</label>
+        <input class="form-control" type="text" value="{{ home.last_edited_by }}" disabled>
+      </div>
+      <div class="col-3 mt-4">
+        <label class="form-label">last modified At</label>
+        <input class="form-control" type="text" value="{{ home.last_modified }}" disabled>
+      </div>
+
+      </div>
+    </form>
+  </div>
+  <div class="card-footer bg-transparent mt-auto">
+    <div class="btn-list justify-content-end">
+      <a href="{% url 'dashboard:home_wizard_home_settings' project.uuid home.uuid %}" class="btn">Cancel</a>
+      <button type="submit" form="home_setting_form" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+

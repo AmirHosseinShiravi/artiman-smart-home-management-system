@@ -1,0 +1,161 @@
+{% extends 'dashboard/home_wizard.html' %}
+{% load static %}
+
+
+{% block right_side_card_content %}
+  <div class="card-body">
+
+    <form method="post" id="home_user_setting_form" action="{% if form_type == 'create_new_device' %}{% url 'dashboard:home_wizard_create_new_device' project.uuid home.uuid %}{% elif form_type == 'edit_device' %}{% url 'dashboard:home_wizard_edit_device' project.uuid home.uuid device.device_base.uuid %}{% endif %}?device_type={{ device_type }}">
+
+{#      <form method="post" id="home_user_setting_form" action="">#}
+
+      {% csrf_token %}
+
+
+
+        {{ switch_form.management_form }}
+        {% for field in switch_form %}
+
+{#            <div class="col-6">#}
+            <label class="form-label mt-4">{{ field.label }}</label>
+            {{ field }}
+
+
+        {% endfor %}
+
+        {{ thermostat_form.management_form }}
+        {% for field in thermostat_form %}
+
+
+            <label class="form-label mt-4">{{ field.label }}</label>
+            {{ field }}
+
+
+        {% endfor %}
+
+        <h4 class="text-muted mt-5"> Functions Properties:</h4>
+
+        <div class="row">
+          {% if switch_formset and  thermostat_formset %}
+            <div class="col-6">
+          {% else %}
+            <div class="col-12">
+          {% endif %}
+          <div class="accordion" id="switch-formset-accordion">
+
+        {{ switch_formset.management_form }}
+        {% for form1 in switch_formset %}
+          <div class="accordion-item">
+              <h2 class="accordion-header" style="background-color: rgba(252,246,189,0.7)" id="heading-1">
+                <button class="accordion-button " type="button" data-bs-toggle="collapse" data-bs-target="#collapse-switch-form-{{ forloop.counter }}" aria-expanded="true">
+                  {% for field in form1 %}
+                    {% if field.name == 'display_name' %}
+                      {{ field.value }}
+                    {% endif %}
+                  {% endfor %}
+                </button>
+              </h2>
+              <div id="collapse-switch-form-{{ forloop.counter }}" class="accordion-collapse collapse " data-bs-parent="#switch-formset-accordion">
+                <div class="accordion-body pt-3" style="background-color: rgba(255,249,187,0.15)">
+                   <div class="row">
+                  {% for field in form1 %}
+
+                    {% if switch_formset and  thermostat_formset %}
+                      <div class="col-4 pt-3">
+                    {% else %}
+                      <div class="col-3 pt-3">
+                    {% endif %}
+                      {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                      {% else %}
+                        <label class="form-label ">{{ field.label }}</label>
+                      {% endif %}
+                      {{ field }}
+                    </div>
+
+                  {% endfor %}
+                </div>
+
+                </div>
+              </div>
+            </div>
+
+        {% endfor %}
+
+          </div>
+          </div>
+
+
+        {% if switch_formset and  thermostat_formset %}
+            <div class="col-6">
+          {% else %}
+            <div class="col-12">
+          {% endif %}
+
+
+        <div class="accordion" id="thermostat-formset-accordion">
+
+        {{ thermostat_formset.management_form }}
+        {% for form in thermostat_formset %}
+
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" style="background-color: rgba(208,244,222,0.8)" id="heading-1">
+                <button class="accordion-button " type="button" data-bs-toggle="collapse" data-bs-target="#collapse-thermostat-form-{{ forloop.counter }}" aria-expanded="true">
+                  {% for field in form %}
+                    {% if field.name == 'display_name' %}
+
+                      {{ field.value }}
+                    {% endif %}
+                  {% endfor %}
+                </button>
+              </h2>
+              <div id="collapse-thermostat-form-{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#thermostat-formset-accordion">
+                <div class="accordion-body" style="background-color: rgba(208,244,222,0.21) ">
+                   <div class="row">
+                  {% for field in form %}
+
+
+                    <div class="col-4 pt-3">
+                      {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                      {% else %}
+                        <label class="form-label ">{{ field.label }}</label>
+                      {% endif %}
+                      {{ field }}
+                    </div>
+
+                  {% endfor %}
+                </div>
+
+                </div>
+              </div>
+            </div>
+
+        {% endfor %}
+
+        </div>
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+    </form>
+  </div>
+  <div class="card-footer bg-transparent mt-auto">
+    <div class="btn-list justify-content-end">
+      <a href="{% url 'dashboard:home_wizard_all_devices' project.uuid home.uuid %}" class="btn">Cancel</a>
+      <button type="submit" form="home_user_setting_form" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+{% endblock right_side_card_content %}
+
