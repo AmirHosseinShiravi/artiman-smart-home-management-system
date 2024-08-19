@@ -20,5 +20,6 @@ urlpatterns = [
     path('', include('home.urls')),
     path("admin/", admin.site.urls),
     path('', include('admin_tabler.urls')),
-    path("dashboard/", include('dashboard.urls', namespace="dashboard")),
+    path("dashboard/v1/", include('dashboard.urls', namespace="dashboard")),
+    path("web_app/v1/", include('web_app.urls', namespace="web_app")),
 ]

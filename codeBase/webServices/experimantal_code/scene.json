@@ -1,0 +1,163 @@
+[
+  {
+    "project_uuid": "150***",
+    "home_uuid": "150***",
+    "zone_uuid": "150***",
+    "creator_home_user_uuid": "150***",
+    "name": "Test Scene",
+    //  "type": "scene", tap-to-run
+    "type": "automation",
+    "decision_expr": "or",
+    "effective_time": {
+      "start": "00:00:00",
+      "end": "23:59:59",
+      "loops": "1111111",
+      "timezone_id": "Asia/Tehran"
+    },
+    "conditions": [
+      {
+        "code": 1,
+        "entity_type": "device_report",
+        "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+        "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+        "expr": {
+          "status_code": "switch_1",
+          "comparator": "==",
+          "status_value": true
+        }
+      },
+      {
+        "code": 2,
+        "entity_type": "timer",
+        "expr": {
+          "date": "",
+          "time": "",
+          "loops": "",
+          "timezone_id": "Asia/Tehran"
+        }
+      },
+      {
+        "code": 3,
+        "entity_type": "weather",
+        "expr": {
+          "comparator": "==, >, <",
+          "weather_code": "temp, wid, humidity, weather(cloudy,sunny,...), sunset/sunrise",
+          "weather_value": "",
+          "time_zone_id": ""
+        }
+      }
+    ],
+    "actions": [
+      {
+        "code": 1,
+        "action_executor": "device_issue",
+        "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+        "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+        "executor_property": {
+          "function_code": "switch_1",
+          "function_value": true
+        }
+      },
+      {
+        "code": 2,
+        "action_executor": "delay",
+        "executor_property": {
+          "delay_seconds": ""
+        }
+      },
+      {
+        "code": 3,
+        "entity_id": "****",
+        "action_executor": "device_issue",
+        "executor_property": {
+          "function_code": "switch_2",
+          "function_value": true
+        }
+      }
+    ]
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+  {
+    "project_uuid": "150***",
+    "home_uuid": "150***",
+    "zone_uuid": "150***",
+    "creator_home_user_uuid": "150***",
+    "rule_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+    "name": "Test Scene",
+    //  "type": "scene", tap-to-run
+    "type": "automation",
+    "decision_expr": "or",
+    "effective_time": {
+      "start": "00:00:00",
+      "end": "23:59:59",
+      "loops": "1111111",
+      "timezone_id": "Asia/Tehran"
+    },
+    "conditions": [
+      {
+        "code": 1,
+        "entity_type": "device_report",
+        "controller_uuid": "****",
+        "device_uuid": "****",
+        "expr": {
+          "status_code": "switch_1",
+          "comparator": "==",
+          "status_value": true,
+          "value_type": ""
+        }
+      },
+      {
+        "code": 2,
+        "entity_type": "timer",
+        "expr": {
+          "date": "",
+          "time": "",
+          "loops": "",
+          "timezone_id": "Asia/Tehran"
+        }
+      },
+      {
+        "code": 3,
+        "entity_type": "weather",
+        "expr": {
+          "comparator": "==, >, <",
+          "weather_code": "temp, wid, humidity, weather(cloudy,sunny,...), sunset/sunrise",
+          "weather_value": "",
+          "value_type": "",
+          "time_zone_id": ""
+        }
+      }
+    ],
+    "actions": [
+      {
+        "code": 1,
+        "entity_id": "****",
+        "action_executor": "device_issue",
+        "executor_property": {
+          "function_code": "switch_1",
+          "function_value": true
+        }
+      },
+      {
+        "code": 2,
+        "entity_id": "****",
+        "action_executor": "delay",
+        "executor_property": {
+          "delay_seconds": ""
+        }
+      }
+    ]
+  }
+]

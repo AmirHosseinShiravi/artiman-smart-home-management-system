@@ -1,0 +1,81 @@
+{
+    "name": "Test Scene",
+    "rule_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+    "project_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+    "home_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+    "type": "automation",
+    "decision_expr": "or",
+    "effective_time": {
+      "start": "06:00:00",
+      "end": "05:30:59",
+      "loops": "1111111",
+      "timezone_id": "Asia/Tehran"
+    },
+    "conditions": [
+        {
+            "code": 1,
+            "entity_type": "device_report",
+            "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+            "expr": {
+              "status_code": "switch_1",
+              "comparator": "==",
+              "status_value": "true",
+              "value_type": "BOOLEAN"
+            }
+        },
+        {
+            "code": 2,
+            "entity_type": "timer",
+            "expr": {
+                "date": "",
+                "time": "21:07:30",
+                "loops": "1111111",
+                "timezone_id": "Asia/Tehran"
+            }
+        },
+        {
+            "code": 3,
+            "entity_type": "device_report",
+            "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+            "expr": {
+                "status_code": "switch_2",
+                "comparator": "==",
+                "status_value": "true",
+                "value_type": "BOOLEAN"
+            }
+        }
+    ],
+    "actions": [
+        {
+            "code": 1,
+            "action_executor": "device_issue",
+            "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+            "executor_property": {
+                "function_code": "switch_1",
+                "function_value": "true"
+            }
+        },
+        {
+            "code": 2,
+            "action_executor": "delay",
+            "executor_property": {
+                "delay_seconds": "5"
+            }
+        },
+        {
+
+            "code": 3,
+            "action_executor": "device_issue",
+            "controller_uuid": "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            "device_uuid": "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+            "executor_property": {
+                "function_code": "switch_2",
+                "function_value": "true"
+            }
+        }
+
+    ]
+}

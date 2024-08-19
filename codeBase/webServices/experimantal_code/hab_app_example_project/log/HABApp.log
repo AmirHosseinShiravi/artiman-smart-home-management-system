@@ -1,0 +1,18 @@
+[2024-08-15 15:48:22,176] [                   HABApp]     INFO | HABApp Version 24.08.1
+[2024-08-15 15:48:22,224] [HABApp.connection.openhab]     INFO | Connection disabled (user/password missing)!
+[2024-08-15 15:48:22,240] [   HABApp.connection.mqtt]     INFO | Connecting to 127.0.0.1:18000
+[2024-08-15 15:48:22,266] [   HABApp.connection.mqtt]     INFO | Connection successful
+[2024-08-15 15:48:23,760] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:207: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 15:48:23,760] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:222: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 15:48:23,760] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:586: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 15:48:23,760] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:594: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 15:48:23,796] [             HABApp.Rules]     INFO | Added rule "Test Scene" from rules/hab_example_2.py
+[2024-08-15 15:55:11,487] [    HABApp.RuleParameters]     INFO | Updated D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\param\rule_params_cb5dea3c-4772-4565-a39a-1a9a8a0fae76.yml
+[2024-08-15 22:55:05,153] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:208: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 22:55:05,153] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:223: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 22:55:05,153] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:587: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 22:55:05,153] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\rules\hab_example_2.py:595: DeprecationWarning:invalid escape sequence '\/'
+[2024-08-15 22:55:05,182] [    HABApp.RuleParameters]     INFO | Updated D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\experimantal_code\hab_app_example_project\param\rule_params_cb5dea3c-4772-4565-a39a-1a9a8a0fae76.yml
+[2024-08-15 22:55:05,208] [             HABApp.Rules]     INFO | Added rule "Test Scene" from rules/hab_example_2.py
+[2024-08-15 23:01:16,479] [   HABApp.connection.mqtt]     INFO | Disconnected
+[2024-08-15 23:01:17,760] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\HABApp\runtime\shutdown.py:71: ResourceWarning:unclosed file <_io.TextIOWrapper name='D:\\artimanproject\\artiman_smart_home_management_system\\codeBase\\webServices\\experimantal_code\\hab_app_example_project\\log\\events.log' mode='a' encoding='utf-8'>
