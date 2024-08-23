@@ -1,25 +1,32 @@
+from admin_tabler.forms import LoginForm
+from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import render
 from dashboard.models import Project, Home, HomeUser
 from .models import LinkageRule
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 
-def login_view(request):
-    pass
+def intro(request):
+    return render(request, 'web_app/pages/intro.html')
 
+
+class LoginView(LoginView):
+  template_name = 'web_app/pages/login.html'
+  form_class = LoginForm
 
 def logout_view(request):
     logout(request)
 
 
 def home_page_view(request):
-    # when user authenticate, redirect to this view an load pwa app.
-    pass
+    # when user authenticate, redirect to this view to load pwa app.
+    return render(request, 'web_app/home_page.html')
 
-@login_required(login_url=reverse("web_app:login"))
+
+@login_required(login_url=reverse_lazy("web_app:login"))
 def all_linkage_rules_view(request):
     if HomeUser.objects.filter(user=request.user).exists():
         home_user = HomeUser.objects.filter(user=request.user).get()
@@ -32,7 +39,7 @@ def all_linkage_rules_view(request):
     else:
         return JsonResponse({"status": 404})
 
-@login_required(login_url=reverse("web_app:login"))
+@login_required(login_url=reverse_lazy("web_app:login"))
 def create_or_edit_linkage_rule_view(request, linkage_rule_uuid=None):
     if HomeUser.objects.filter(user=request.user).exists():
         home_user = HomeUser.objects.filter(user=request.user).get()
@@ -49,7 +56,6 @@ def create_or_edit_linkage_rule_view(request, linkage_rule_uuid=None):
             pass
 
 
-
-@login_required(login_url=reverse("web_app:login"))
+@login_required(login_url=reverse_lazy("web_app:login"))
 def delete_linkage_rule_view(request):
     pass

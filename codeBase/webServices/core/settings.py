@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     "home",
     "dashboard.apps.DashboardConfig",
+    "web_app",
 ]
 
 MIDDLEWARE = [

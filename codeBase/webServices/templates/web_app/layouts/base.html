@@ -1,0 +1,29 @@
+<!doctype html>
+{% load static %}
+
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock title %} Artiman Smart Home</title>
+    {% block extrastyle %}{% endblock extrastyle %}
+    {% include 'web_app/includes/head.html' %}
+    {% block extrahead %}{% endblock extrahead %}
+  </head>
+  <body class="{% block body %}{% endblock body %}">
+    <script src="{% static 'dist/js/demo-theme.min.js' %}?1684106062"></script>
+{#    <div class="page">#}
+
+        {% block content %}{% endblock content %}
+{#    </div>#}
+    <!-- Navbar -->
+        {% block navigation %}
+            {% include 'web_app/includes/navbar.html' %}
+        {% endblock navigation %}
+
+    {% block modal %}{% endblock modal %}
+    <!-- Tabler Core -->
+    {% block scripts %}
+        {% include 'web_app/includes/scripts.html' %}
+    {% endblock scripts %}
+    {% block extrajs %}{% endblock extrajs %}
+  </body>
+</html>

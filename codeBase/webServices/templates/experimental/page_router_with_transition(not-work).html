@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA with Page Transitions</title>
+    <style>
+        /* Basic styles for page elements */
+        .page {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Ensure pages are hidden by default */
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Forward and backward animations */
+        .page.enter {
+            transform: translateX(100%);
+        }
+        .page.enter-active {
+            transform: translateX(0);
+        }
+
+        .page.exit {
+            transform: translateX(0);
+        }
+        .page.exit-active {
+            transform: translateX(-100%);
+        }
+
+        .page.backward-enter {
+            transform: translateX(-100%);
+        }
+        .page.backward-enter-active {
+            transform: translateX(0);
+        }
+
+        .page.backward-exit {
+            transform: translateX(0);
+        }
+        .page.backward-exit-active {
+            transform: translateX(100%);
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/home" data-page="home">Home</a>
+        <a href="/about" data-page="about">About</a>
+        <a href="/contact" data-page="contact">Contact</a>
+    </nav>
+
+    <div id="home" class="page active">
+        <h1>Home Page</h1>
+        <p>Welcome to the home page.</p>
+    </div>
+
+    <div id="about" class="page">
+        <h1>About Page</h1>
+        <p>Information about us.</p>
+    </div>
+
+    <div id="contact" class="page">
+        <h1>Contact Page</h1>
+        <p>Contact us at: email@example.com</p>
+    </div>
+
+    <script src="https://unpkg.com/page/page.js"></script>
+    <script>
+      // app.js
+      document.addEventListener('DOMContentLoaded', () => {
+          let currentPage = 'home';
+          let historyStack = [];
+
+          function showPage(pageId, isBackward = false) {
+              if (pageId === currentPage) return;
+
+              const newPage = document.getElementById(pageId);
+              const oldPage = document.getElementById(currentPage);
+
+              if (!newPage || !oldPage) return;
+
+              // Ensure all pages except the current one are hidden initially
+              document.querySelectorAll('.page').forEach(page => {
+                  if (page !== oldPage) {
+                      page.style.display = 'none';
+                  }
+              });
+
+              // Set up initial states for the transition
+              newPage.style.display = 'block';
+              newPage.classList.add(isBackward ? 'backward-enter' : 'enter');
+              oldPage.classList.add(isBackward ? 'backward-exit' : 'exit');
+
+              // Trigger the transition by moving the element
+              requestAnimationFrame(() => {
+                  newPage.classList.add(isBackward ? 'backward-enter-active' : 'enter-active');
+                  oldPage.classList.add(isBackward ? 'backward-exit-active' : 'exit-active');
+              });
+
+              // After transition is complete, clean up
+              newPage.addEventListener('transitionend', () => {
+                  oldPage.className = 'page'; // Reset the old page's classes
+                  oldPage.style.display = 'none'; // Hide the old page
+
+                  newPage.className = 'page active'; // Set the new page as active
+                  currentPage = pageId; // Update the current page reference
+
+                  if (!isBackward) {
+                      historyStack.push(currentPage); // Update the history stack
+                  }
+              }, { once: true });
+          }
+
+          function navigateToPage(ctx, next) {
+              const targetPage = ctx.pathname.replace('/', '') || 'home';
+              const isBackward = historyStack.length > 0 && historyStack[historyStack.length - 1] === targetPage;
+              showPage(targetPage, isBackward);
+
+              if (isBackward) {
+                  historyStack.pop();
+              }
+          }
+
+          // Define routes using Page.js
+          page('/', navigateToPage);
+          page('/home', navigateToPage);
+          page('/about', navigateToPage);
+          page('/contact', navigateToPage);
+
+          // Start the router
+          page();
+      });
+
+
+    </script>
+</body>
+</html>

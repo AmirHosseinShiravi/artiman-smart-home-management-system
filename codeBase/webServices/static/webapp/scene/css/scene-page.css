@@ -1,0 +1,321 @@
+
+.top-bar-scene-mode-selector {
+    padding-top: 30px
+}
+
+.nav-link.add-scene {
+    color:black !important;
+}
+
+.scene-nav-link {
+    color: var(--color-snow);
+}
+
+.scene-nav-link i {
+    color: black;
+}
+
+.scene-nav-link.active {
+    color: black;
+}
+
+/*.scene_automation_rule_section {*/
+/*    display: block;*/
+/*}*/
+
+/*.scene_tap_to_run_rule_section {*/
+/*    display: none;*/
+/*}*/
+
+
+
+
+.scene-page {
+    /* background-image: url("files/blur-lights.png"); */
+    /* background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center; */
+    /* padding: 0; */
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* max-height: calc(100vh - 400px); */
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    /* padding-top: 5px; */
+
+
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent;
+
+}
+
+.scene-page::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scene-page::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+.scene-page::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+
+.scene-rule-card {
+    /* background-image: url("files/Rectangle\ 19.png");
+    background-size: contain;
+    background-repeat: no-repeat; */
+
+    background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+    /* background-color: #e9edc9; */
+    margin-bottom: calc(var(--bs-gutter-x) * .5);
+
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left:10px;
+    margin-right:10px;
+    /* background-position: center; */
+    /* height: 126px;
+    width: 304px; */
+    height: 120px;
+
+    /* width: 100%; */
+    /* scale: 0.7; */
+    /* transform: rotate(180deg); */
+    /* transform-origin: 0 0; */
+    /* width: 300px;  */
+    /* margin: 5px; */
+    border-radius: 16px 16px 16px 16px;
+    /* border-radius: 16px; */
+    /* border: 1px rgba(187, 185, 185, 0.171) solid; */
+    /* backdrop-filter: blur(16px) */
+}
+
+
+.icon-section {
+    /* width: 30%; */
+    /* text-align: center; */
+    /* padding: 30px 15px 30px 15px; */
+    justify-content: flex-start;
+    padding-left: 15px;
+    padding-top: 10px;
+
+}
+
+
+.icon-section svg {
+    width: 36px;
+    height: 36px;
+}
+
+
+
+.text-section {
+    /* width: 70%; */
+    direction: ltr;
+    padding-top: 15px;
+    padding-left: 0.5em;
+    padding-bottom: 5px;
+    font-family: vazir, sans-serif;
+}
+
+.big-text {
+
+    font-size: 0.9em;
+    font-weight: bold;
+    /* padding-left: 115px; */
+    padding-top: 5px;
+    padding-bottom: 2px;
+    /* padding-left: 0.5em; */
+    color: #8A8A8A;
+
+}
+
+.little-text {
+
+    font-size: 0.7em;
+    /* padding-left: 100px; */
+    color: #8A8A8A;
+    padding-bottom: 5px;
+    /* padding-right: 2px; */
+    /* padding-left: 0.5em; */
+
+
+}
+
+
+/* active cards */
+
+
+.scene-rule-card.active {
+
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left:10px;
+    margin-right:10px;
+    /* background-image: url("files/Rectangle\ 17.png");
+    background-size: contain;
+    background-repeat: no-repeat; */
+    /* background-position: center; */
+    /* height: 122px;
+    width: 295px; */
+
+    background-color: #fefae0;
+    margin-bottom: calc(var(--bs-gutter-x) * .5);
+
+    /* transform: rotate(180deg); */
+    /* transform-origin: 0 0; */
+    /* width: 300px;  */
+    /* margin: 5px; */
+    border-radius: 16px 16px 16px 16px;
+    /* border-radius: 16px; */
+    /* border: 1px rgba(178.97, 178.97, 178.97, 0.60) solid; */
+    backdrop-filter: blur(16px);
+}
+
+
+
+
+/* .col-6:nth-child(even) .scene-rule-card.active { */
+    /* background-image: linear-gradient(to top, #c1dfc4 0%, #deecdd 100%); */
+    /* border-radius: 16px 16px 16px 0px; */
+/* }  */
+
+
+/* .col-6:nth-child(odd) .scene-rule-card.active { */
+    /* background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%); */
+    /* border-radius: 16px 16px 0px 16px; */
+
+/* } */
+
+
+
+.scene-rule-card.active .big-text {
+    /* direction: rtl; */
+    font-size: 0.9em;
+    font-weight: bold;
+    /* padding-left: 111px; */
+    padding-top: 5px;
+    padding-bottom: 2px;
+    /* padding-left: 0.5em; */
+    color: #1b1b1b;
+
+}
+
+.scene-rule-card.active .little-text {
+    /* direction: rtl; */
+
+    font-size: 0.7em;
+    /* padding-left: 100px; */
+    color: #1a1a1a;
+    padding-bottom: 5px;
+    /* padding-left: 0.5em; */
+
+
+}
+
+
+.scene-rule-card.active svg path {
+    fill: #d8d50b;
+}
+
+
+.scene-rule-card svg path {
+    fill: #5B5B5B;
+}
+
+/*
+.scene-rule-card svg#cooling path {
+    fill: #fdfbfb;
+    stroke: #b1b1b1;
+
+} */
+
+.scene-rule-card.active svg#fan path {
+    /* fill: #b9b9b900; */
+    stroke: #B9B9B9;
+}
+
+.scene-rule-card svg#fan path {
+    fill: #00000000;
+    stroke: #5B5B5B;
+}
+
+
+.scene-rule-card.active svg#bed path {
+    /* fill: #b9b9b900; */
+    stroke: #B9B9B9;
+}
+
+.scene-rule-card svg#bed path {
+    fill: #00000000;
+    stroke: #5B5B5B;
+}
+
+
+
+/* rule edit button */
+
+.edit-icon {
+    width: 47px;
+    height: 55px;
+    display: flex;
+    justify-content: flex-end;
+    align-content: center;
+    align-items: center;
+
+}
+
+
+.rule-status-switch-container {
+    margin-right: 7px;
+}
+
+/* The switch - the box around the slider */
+.rule-status-switch {
+  width: 51px;
+  height: 31px;
+  position: relative;
+    bottom: -20px;
+}
+
+/* Hide default HTML checkbox */
+.rule-status-switch .checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.rule-status-switch .switch {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: #e9e9eb;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+/* The slider */
+.rule-status-switch .slider {
+  width: 27px;
+  height: 27px;
+  position: absolute;
+  left: calc(50% - 27px/2 - 10px);
+  top: calc(50% - 27px/2);
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15), 0px 3px 1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+}
+
+.rule-status-switch .checkbox:checked + .switch {
+  background-color: #086ce3;
+}
+
+.rule-status-switch .checkbox:checked + .switch .slider {
+  left: calc(50% - 27px/2 + 10px);
+  top: calc(50% - 27px/2);
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA with Page.js Router</title>
+    <style>
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/home">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/home/20#abc">amir 20</a>
+    </nav>
+
+    <div id="home" class="page">
+        <h1>Home Page</h1>
+        <p>Welcome to the home page.</p>
+    </div>
+
+    <div id="about" class="page">
+        <h1>About Page</h1>
+        <p>Information about us.</p>
+    </div>
+
+    <div id="contact" class="page">
+        <h1>Contact Page</h1>
+        <p>Contact us at: email@example.com</p>
+    </div>
+
+    <script src="https://unpkg.com/page/page.js"></script>
+    <script>
+      // app.js
+      document.addEventListener('DOMContentLoaded', () => {
+          function showPage(pageId) {
+              // Hide all pages
+              document.querySelectorAll('.page').forEach(page => {
+                  page.classList.remove('active');
+              });
+
+              // Show the selected page
+              const page = document.getElementById(pageId);
+              if (page) {
+                  page.classList.add('active');
+              }
+
+          }
+
+          // Define routes
+          page('/', () => showPage('home'));
+          page('/home', (ctx, next) => {
+              showPage('home');
+              console.log(ctx);
+              console.log(next);
+          });
+          page('/home/:amir', (ctx, next) => {
+              showPage('home');
+              console.log(ctx);
+              console.log(ctx.params);
+              console.log(next);
+          });
+          page('/about', () => showPage('about'));
+          page('/contact', () => showPage('contact'));
+
+          // Start the router
+          page();
+      });
+
+    </script>
+</body>
+</html>

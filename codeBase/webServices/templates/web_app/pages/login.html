@@ -1,0 +1,309 @@
+{% extends 'web_app/layouts/base-auth.html' %}
+{% load static %}
+
+{% block title %}Sign in - {% endblock title %}
+
+{% block body %}d-flex flex-column{% endblock body %}
+
+{% block extrastyle %}
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}">
+
+  <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap");
+
+      :root {
+          --bg: #000000;
+          --clr-1: #00c2ff;
+          --clr-2: #33ff8c;
+          --clr-3: #ffc640;
+          --clr-4: #e54cff;
+
+          --blur: 1rem;
+          --fs: clamp(3rem, 8vw, 7rem);
+          --ls: clamp(-1.75px, -0.25vw, -3.5px);
+      }
+
+      body {
+          display: grid;
+          place-items: center;
+          background-color: white !important;
+          color: #000000;
+          font-family: "Inter", "DM Sans", Arial, sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+          font-family: inherit;
+          box-sizing: border-box;
+      }
+
+      .login-field {
+          position: relative;
+          top: -35px;
+          z-index: 1;
+          background-color: white;
+          border-radius: 25px 25px 0 0 ;
+      }
+
+
+      .content1 {
+          text-align: center;
+          padding-top: 50px;
+          padding-bottom: 30px;
+      }
+
+      .title1 {
+          font-size: 30px;
+          font-weight: 800;
+          letter-spacing: var(--ls);
+          position: relative;
+          overflow: hidden;
+          {#background: var(--bg);#}
+          margin: 0;
+      }
+
+      .subtitle {
+      }
+
+      .aurora {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 2;
+          mix-blend-mode: lighten;
+          pointer-events: none;
+      }
+
+      .aurora__item {
+          overflow: hidden;
+          position: absolute;
+          width: 60vw;
+          height: 60vw;
+          background-color: var(--clr-1);
+          border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
+          filter: blur(var(--blur));
+          mix-blend-mode: overlay;
+      }
+
+      .aurora__item:nth-of-type(1) {
+          top: -50%;
+          animation: aurora-border 6s ease-in-out infinite,
+          aurora-1 12s ease-in-out infinite alternate;
+      }
+
+      .aurora__item:nth-of-type(2) {
+          background-color: var(--clr-3);
+          right: 0;
+          top: 0;
+          animation: aurora-border 6s ease-in-out infinite,
+          aurora-2 12s ease-in-out infinite alternate;
+      }
+
+      .aurora__item:nth-of-type(3) {
+          background-color: var(--clr-2);
+          left: 0;
+          bottom: 0;
+          animation: aurora-border 6s ease-in-out infinite,
+          aurora-3 8s ease-in-out infinite alternate;
+      }
+
+      .aurora__item:nth-of-type(4) {
+          background-color: var(--clr-4);
+          right: 0;
+          bottom: -50%;
+          animation: aurora-border 6s ease-in-out infinite,
+          aurora-4 24s ease-in-out infinite alternate;
+      }
+
+      @keyframes aurora-1 {
+          0% {
+              top: 0;
+              right: 0;
+          }
+
+          50% {
+              top: 100%;
+              right: 75%;
+          }
+
+          75% {
+              top: 100%;
+              right: 25%;
+          }
+
+          100% {
+              top: 0;
+              right: 0;
+          }
+      }
+
+      @keyframes aurora-2 {
+          0% {
+              top: -50%;
+              left: 0%;
+          }
+
+          60% {
+              top: 100%;
+              left: 75%;
+          }
+
+          85% {
+              top: 100%;
+              left: 25%;
+          }
+
+          100% {
+              top: -50%;
+              left: 0%;
+          }
+      }
+
+      @keyframes aurora-3 {
+          0% {
+              bottom: 0;
+              left: 0;
+          }
+
+          40% {
+              bottom: 100%;
+              left: 75%;
+          }
+
+          65% {
+              bottom: 40%;
+              left: 50%;
+          }
+
+          100% {
+              bottom: 0;
+              left: 0;
+          }
+      }
+
+      @keyframes aurora-4 {
+          0% {
+              bottom: -50%;
+              right: 0;
+          }
+
+          50% {
+              bottom: 0%;
+              right: 40%;
+          }
+
+          90% {
+              bottom: 50%;
+              right: 25%;
+          }
+
+          100% {
+              bottom: -50%;
+              right: 0;
+          }
+      }
+
+      @keyframes aurora-border {
+          0% {
+              border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
+          }
+
+          25% {
+              border-radius: 47% 29% 39% 49% / 61% 19% 66% 26%;
+          }
+
+          50% {
+              border-radius: 57% 23% 47% 72% / 63% 17% 66% 33%;
+          }
+
+          75% {
+              border-radius: 28% 49% 29% 100% / 93% 20% 64% 25%;
+          }
+
+          100% {
+              border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
+          }
+      }
+
+  </style>
+
+{% endblock extrastyle %}
+
+
+{% block content %}
+
+  <div class="bg-white">
+    <div class="text-center">
+      <a href="#" class="navbar-brand navbar-brand-autodark">
+        <img src="{% static 'webapp/images/1724246042670qnnpx84a.png' %}" alt=""></a>
+    </div>
+
+    <div class="login-field">
+      <div class="content1">
+          <h1 class="title1">Artiman Smart Home
+            <div class="aurora">
+              <div class="aurora__item"></div>
+              <div class="aurora__item"></div>
+              <div class="aurora__item"></div>
+              <div class="aurora__item"></div>
+            </div>
+          </h1>
+        </div>
+      <div class="ps-3 pe-3 pt-3">
+        <form method="post" id="login-form">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+              <span class="text-danger d-block mb-2">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
+
+          {% for field in form %}
+            {% if not field.name == 'password' %}
+              <label class="form-label">{{ field.label }}</label>
+              <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+                {{ field }}
+              </div>
+            {% else %}
+{#                            <div class="mb-2">#}
+{#                              <label class="form-label">#}
+{#                                {{ field.label }}#}
+{#              <!--                  <span class="form-label-description">-->#}
+{#              <!--                    <a href="{% url 'forgot_password' %}">I forgot password</a>-->#}
+{#              <!--                  </span>-->#}
+{#                              </label>#}
+{#                              <div class="input-group input-group-flat">#}
+{#                                {{ field }}#}
+{#              <!--                  <span class="input-group-text">-->#}
+{#              <!--                    <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">&lt;!&ndash; Download SVG icon from http://tabler-icons.io/i/eye &ndash;&gt;-->#}
+{#              <!--                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>-->#}
+{#              <!--                    </a>-->#}
+{#              <!--                  </span>-->#}
+{#                              </div>#}
+{#                            </div>#}
+              <label class="form-label">{{ field.label }}</label>
+              <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-light fa-key"></i></span>
+                {{ field }}
+              </div>
+
+            {% endif %}
+          {% endfor %}
+        </form>
+      </div>
+
+    </div>
+    <div class="ps-3 pe-3 fixed-bottom pb-4">
+      <button type="submit" form="login-form" class="btn btn-primary btn-lg w-100">Sign in</button>
+    </div>
+
+
+  </div>
+
+
+{% endblock content %}

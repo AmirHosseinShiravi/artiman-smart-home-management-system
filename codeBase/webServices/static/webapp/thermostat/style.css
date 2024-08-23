@@ -1,0 +1,505 @@
+:root {
+  --temp-hue: 200;
+  --temp-alpha: 100%;
+  --temp-rotation: 180deg;
+}
+
+/** {*/
+/*  box-sizing: border-box;*/
+/*}*/
+
+/*body {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  height: 100vh;*/
+/*  padding: 2rem;*/
+/*  margin: 0;*/
+/*  align-items: center;*/
+/*  justify-content: space-evenly;*/
+/*  background-color: #dcebf3;*/
+/*  font-family: "Work Sans";*/
+/*}*/
+
+
+.thermostat-modal-body {
+  max-height: 85vh;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+ }
+
+ .thermostat-modal-body::-webkit-scrollbar-track {
+      background: transparent;
+  }
+  .thermostat-modal-body::-webkit-scrollbar-thumb {
+      background: transparent;
+  }
+  .thermostat-modal-body::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+  }
+
+.temperature-knob-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 300px;
+  height: 260px;
+  /*border-radius: 40px;*/
+  /*background-color: #fff;*/
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dial-container {
+  position: relative;
+  top: -20px;
+}
+
+.dial {
+  filter: drop-shadow(
+    -20px 30px 40px hsla(var(--temp-hue), 85%, 80%, var(--temp-alpha))
+  );
+  position: relative;
+  z-index: 2;
+  user-select: none;
+}
+
+.dial__tick {
+  stroke: rgba(0, 0, 0, 0.6);
+  stroke-width: 1;
+}
+
+.dial__center {
+  fill: #fff;
+/*   filter: drop-shadow(20px 30px 40px rgb(10, 10, 10)); */
+}
+
+
+.darkMode-active  .dial__center {
+  fill: #e10f0f;
+}
+
+.dial__temp {
+  font-size: 2.5rem;
+  font-weight: 400;
+  background-color: var(--color-snow);
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+.dial__track {
+  fill: none;
+  transform-origin: 50% 50%;
+}
+
+.dial__temp-units {
+  fill: #b5b4bc;
+}
+
+.dial__dot {
+  fill: #29273e;
+  cursor: move;
+}
+
+.dial__control {
+  transform: rotate(var(--temp-rotation));
+  transform-origin: 50% 50%;
+}
+
+.slider-container {
+  padding: 0.5rem 2rem;
+}
+
+.slider {
+  display: block;
+  width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+:root {
+  --primary-color: #185ee0;
+  --secondary-color: rgba(191, 227, 245, 0.8);
+  --height-unit-size : calc(100vh / 100);
+  --width-unit-size : calc(100vw / 100);
+}
+/**,*/
+/**:after,*/
+/**:before {*/
+/*  box-sizing: border-box;*/
+/*}*/
+/*body {*/
+/*  font-family: "Inter", sans-serif;*/
+/*  background-color: rgba(230, 238, 249, 0.5);*/
+/*}*/
+
+
+
+.thermostat-control-buttons-container {
+  background-color: var(--bg-snow);
+  /*border: rgba(3,83,101,0.8) solid;*/
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  border: 1px solid rgba(17, 17, 26, 0.15);
+  border-top-left-radius: 36px;
+  border-top-right-radius: 36px;
+}
+
+.ccc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 5vh;
+}
+
+.fff {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80vw;
+}
+
+.container12 {
+  /*position: absolute;*/
+  /*left: 0;*/
+  /*top: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tabs12 {
+  /*transform: scale(0.53);*/
+  display: flex;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 0 1px 0 rgba(24, 94, 224, 0.15), 0 6px 12px 0 rgba(24, 94, 224, 0.15);
+  padding: 0.5rem;
+  border-radius: 20px;
+}
+.tabs12 * {
+  z-index: 2;
+}
+input[type="radio"] {
+  display: none;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5vh;
+  width: 20vw;
+  font-size: 0.9rem;
+  font-weight: 900;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: color 0.15s ease-in;
+}
+.notification12 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.75rem;
+  border-radius: 50%;
+  background-color: var(--secondary-color);
+  transition: 0.15s ease-in;
+}
+input[type="radio"]:checked + label {
+  color: var(--primary-color);
+}
+input[type="radio"]:checked + label > .notification {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+input[id="radio-heat"]:checked ~ .glider {
+  transform: translateX(0);
+  background-color: rgba(248,212,209,0.8);
+}
+input[id="radio-heat"]:checked + label {
+  color: #ef2f2f;
+}
+input[id="radio-cool"]:checked ~ .glider {
+  transform: translateX(100%);
+}
+
+
+
+
+input[id="radio-low"]:checked ~ .glider {
+  transform: translateX(0);
+}
+input[id="radio-medium"]:checked ~ .glider {
+  transform: translateX(100%);
+}
+input[id="radio-high"]:checked ~ .glider {
+  transform: translateX(200%);
+}
+input[id="radio-auto"]:checked ~ .glider {
+  transform: translateX(300%);
+}
+
+
+.glider {
+  position: absolute;
+  display: flex;
+  height: 5vh;
+  width: 20vw;
+  background-color: var(--secondary-color);
+  z-index: 1;
+  border-radius: 15px;
+  transition: 0.25s ease-out;
+}
+@media (max-width: 700px) {
+  .tabs {
+    transform: scale(0.6);
+  }
+}
+
+
+
+.bbb {
+  /*height: 50px;*/
+
+  width: calc(var(--width-unit-size) * 35);
+  height: calc(var(--height-unit-size) * 6.9);
+  background-color: #4adca6;
+  border-radius: 15px;
+  border: 0;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--color-white);
+}
+
+
+.thermostat-power-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+
+  /*background-color: var(--color-green);*/
+
+  /*background-color: var(--color-pink);*/
+
+}
+
+
+.bbb:active {
+
+  background-color: var(--color-pink);
+}
+
+
+
+
+
