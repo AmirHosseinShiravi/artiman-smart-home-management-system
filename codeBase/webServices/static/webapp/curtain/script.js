@@ -102,7 +102,7 @@ class CurtainAnimation {
         this.updateCurtainPosition();
     }
 }
-export {CurtainAnimation};
+
 
 
 

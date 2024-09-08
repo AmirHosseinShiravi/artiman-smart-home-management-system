@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'webapp/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'webapp/home/css/main.css' %}">
     <link rel="stylesheet" href="{% static 'webapp/scene/css/scene-page.css' %}">
+    <link rel="stylesheet" href="{% static 'webapp/libs/pickerjs-1.2.1/dist/picker.min.css' %}">
 
   {#    <link  rel="stylesheet/less" href="{{ url_for('static', filename='thermostat/control_buttons_style.scss') }}">#}
   {#    <script src="https://cdn.jsdelivr.net/npm/less" ></script>#}
@@ -19,12 +20,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Playfair+Display&display=swap" rel="stylesheet">
 
+
+    <script src="{% static 'webapp/libs/page.js/page.js' %}"></script>
+    <script src="{% static 'webapp/libs/sortable-1.14.0/Sortable.min.js' %}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'coloris/coloris.min.css' %}">
+
+
+
 {% endblock extrahead %}
 
 
 {% block content %}
     <div class="container-fluid">
-        <div class="main-page home-page" style="display: block;">
+
+      <div class="page main-page home-page active-page">
             <div class="top-container mt-2">
 
                 <div class="header-container d-flex justify-content-between pt-2">
@@ -68,24 +78,37 @@
 
                     <div class="d-flex flex-row ms-2 mt-3" style="overflow-x: auto;scrollbar-width: none;">
 
-                      <button type="button" class="btn btn-lg me-2" data-bs-toggle="modal" data-bs-target="#curtain-modal"
-                            style="background-color: #FFB703;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">
-                            Small button</button>
-
-                      <button type="button" class="btn btn-lg me-2" id="thermostat_modal_button" data-bs-toggle="modal" data-bs-target="#modaler"
-                            style="background-color: #219EBC;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">
-                            Small button</button>
-
-                      <div type="button" class="btn btn-lg me-2"
-                            style="background-color: #023047;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">
-                            Small button</div>
-                      <div type="button" class="btn btn-lg me-2"
-                            style="background-color: #FB8500;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">
-                            Small button</div>
-                      <div type="button" class="btn btn-lg me-2"
-                            style="background-color: #8ECAE6;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">
-                            Small button</div>
+{#                      <button type="button" class="btn btn-lg me-2" data-bs-toggle="modal" data-bs-target="#curtain-modal">#}
+{#                            Small button</button>#}
+{##}
+{#                      <button type="button" class="btn btn-lg me-2" id="thermostat_modal_button" data-bs-toggle="modal" data-bs-target="#modaler"#}
+{#                            style="background-color: #219EBC;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</button>#}
+{##}
+{#                      <div type="button" class="btn btn-lg me-2" data-bs-toggle="modal" data-bs-target="#automate_modal"#}
+{#                            style="background-color: #023047;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</div>#}
+{#                      <div type="button" class="btn btn-lg me-2" data-bs-toggle="modal" data-bs-target="#automate_modal1"#}
+{#                            style="background-color: #FB8500;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</div>#}
+{#                      <div type="button" class="btn btn-lg me-2" data-bs-toggle="modal" data-bs-target="#automate_modal2"#}
+{#                            style="background-color: #8ECAE6;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</div>#}
+{#                      <div type="button" class="btn btn-lg me-2" onclick="amir()"#}
+{#                            style="background-color: #8ECAE6;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</div>#}
+{#                      <div type="button" class="btn btn-lg me-2" onclick="amir3()"#}
+{#                            style="background-color: #8ECAE6;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</div>#}
+{#                      <button type="button" class="btn btn-lg me-2" id="" data-bs-toggle="modal" data-bs-target="#automate_modal_delay_action"#}
+{#                            style="background-color: #219EBC;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</button>#}
+{##}
+{#                      <button type="button" class="btn btn-lg me-2" id="" data-bs-toggle="modal" data-bs-target="#dpf-modal"#}
+{#                            style="background-color: #219EBC;color:seashell;border-radius: 20px;text-wrap: nowrap;font-weight: bold;font-size: small;">#}
+{#                            Small button</button>#}
                     </div>
+
                 </div>
 
 
@@ -2449,133 +2472,70 @@
             </div>
         </div>
 
-        <div class="main-page scene-page" style="display: none;">
-          <div class="top-bar-scene-mode-selector">
-            <ul class="nav">
-              <li class="nav-item">
-                <a class="scene-nav-link nav-link fw-bold fs-6 active" id="automation-scene-nav-link" aria-current="page" href="#">Automation</a>
-              </li>
-              <li class="nav-item">
-                <a class="scene-nav-link nav-link fw-bold fs-6" id="tap-to-run-scene-nav-link" href="#">Tap to Run</a>
-              </li>
-              <li class="nav-item ms-auto">
-                <a class="nav-link add-scene" href="#"><i class="fa-solid fa-plus fa-xl"></i></a>
-              </li>
+      <div class="page main-page scene-page">
 
-            </ul>
-          </div>
+            <div class="top-bar-scene-mode-selector">
+              <ul class="nav">
+                <li class="nav-item">
+                  <div class="scene-nav-link nav-link fw-bold fs-6 active" id="automation-scene-nav-link"
+                     aria-current="page" href="#">Automation</div>
+                </li>
+                <li class="nav-item">
+                  <div class="scene-nav-link nav-link fw-bold fs-6" id="tap-to-run-scene-nav-link" href="#">Tap to Run</div>
+                </li>
+                <li class="nav-item ms-auto">
+                  <a class="nav-link add-scene" id="add-scene" href="/web_app/v1/new-scene-wizard"><i class="fa-solid fa-plus fa-xl"></i></a>
+                </li>
 
-          <div class="scene-automation-rules-section mt-3">
-                <div class="row">
-                  <div class="col-12">
-                    <div class="scene-rule-card row" data-scene-automation-rule-id="1">
-                      <div class="col-9 scene-rule-card-detail-section">
+              </ul>
+            </div>
 
-                        <!-- Right Section (30%) for SVG Icon -->
-                        <div class="icon-section d-flex align-items-end">
-                          <!-- Replace the content below with your SVG code -->
-                          <svg width="48" height="48" viewBox="0 0 64 64" fill="none"
-                               xmlns="http://www.w3.org/2000/svg">
-                            <g id="Group 177">
-                              <path id="Vector"
-                                    d="M18.92 49.2235C18.1911 49.2235 17.5822 48.9771 17.0933 48.4843C16.6044 47.9893 16.36 47.3761 16.36 46.6447C16.36 45.9133 16.6056 45.3035 17.0967 44.8152C17.59 44.3246 18.2011 44.0793 18.93 44.0793C19.6589 44.0793 20.2667 44.3257 20.7533 44.8185C21.2422 45.3135 21.4867 45.9267 21.4867 46.6581C21.4867 47.3895 21.2411 47.9993 20.75 48.4876C20.2567 48.9782 19.6456 49.2235 18.9167 49.2235H18.92ZM31.9967 49.2235C31.2678 49.2235 30.6589 48.9771 30.17 48.4843C29.6811 47.9893 29.4367 47.3761 29.4367 46.6447C29.4367 45.9133 29.6822 45.3035 30.1733 44.8152C30.6667 44.3246 31.2778 44.0793 32.0067 44.0793C32.7356 44.0793 33.3433 44.3257 33.83 44.8185C34.3189 45.3135 34.5633 45.9267 34.5633 46.6581C34.5633 47.3895 34.3178 47.9993 33.8267 48.4876C33.3333 48.9782 32.7256 49.2235 31.9967 49.2235ZM45.0733 49.2235C44.3444 49.2235 43.7356 48.9771 43.2467 48.4843C42.7578 47.9893 42.5133 47.3761 42.5133 46.6447C42.5133 45.9133 42.7589 45.3035 43.25 44.8152C43.7433 44.3246 44.3544 44.0793 45.0833 44.0793C45.81 44.0793 46.4178 44.3257 46.9067 44.8185C47.3956 45.3135 47.64 45.9267 47.64 46.6581C47.64 47.3895 47.3944 47.9993 46.9033 48.4876C46.41 48.9782 45.7989 49.2235 45.07 49.2235H45.0733ZM12 36.1022V32.7575C12 27.4908 13.7711 22.952 17.3133 19.1413C20.8556 15.3283 25.1956 13.2034 30.3333 12.7663V6H33.6667V12.7663C38.8044 13.2034 43.1444 15.3283 46.6867 19.1413C50.2289 22.9542 52 27.493 52 32.7575V36.1022H12ZM15.3333 32.7575H48.6667C48.6667 28.1307 47.0411 24.1873 43.79 20.9274C40.5389 17.6674 36.6089 16.0363 32 16.0341C27.3889 16.0341 23.4589 17.6652 20.21 20.9274C16.9611 24.1896 15.3356 28.1329 15.3333 32.7575ZM18.92 59C18.1911 59 17.5822 58.7536 17.0933 58.2608C16.6044 57.7658 16.36 57.1526 16.36 56.4212C16.36 55.6899 16.6056 55.08 17.0967 54.5917C17.59 54.1011 18.2011 53.8559 18.93 53.8559C19.6589 53.8559 20.2667 54.1022 20.7533 54.595C21.2422 55.09 21.4867 55.7032 21.4867 56.4346C21.4867 57.1638 21.2411 57.7736 20.75 58.2642C20.2567 58.7547 19.6456 59 18.9167 59H18.92ZM31.9967 59C31.2678 59 30.6589 58.7536 30.17 58.2608C29.6811 57.7658 29.4367 57.1526 29.4367 56.4212C29.4367 55.6899 29.6822 55.08 30.1733 54.5917C30.6667 54.1011 31.2778 53.8559 32.0067 53.8559C32.7356 53.8559 33.3433 54.1022 33.83 54.595C34.3189 55.09 34.5633 55.7032 34.5633 56.4346C34.5633 57.1638 34.3178 57.7736 33.8267 58.2642C33.3333 58.7547 32.7256 59 31.9967 59ZM45.0733 59C44.3444 59 43.7356 58.7536 43.2467 58.2608C42.7578 57.7658 42.5133 57.1526 42.5133 56.4212C42.5133 55.6899 42.7589 55.08 43.25 54.5917C43.7433 54.1011 44.3544 53.8559 45.0833 53.8559C45.81 53.8559 46.4178 54.1022 46.9067 54.595C47.3956 55.09 47.64 55.7032 47.64 56.4346C47.64 57.1638 47.3944 57.7736 46.9033 58.2642C46.41 58.7547 45.7989 59 45.07 59H45.0733Z"
-                                    fill="" stroke=""/>
-                            </g>
-                          </svg>
+            <div class="scene-automation-rules-section sub-page active-sub-page mt-3">
+              <div class="row">
 
-                        </div>
-                        <!-- Left Section (70%) for Text -->
-                        <div class="text-section">
-                          <!-- Top Section for Big Text -->
-                          <div class="big-text">سناریو آبیاری</div>
+              </div>
+            </div>
 
-                          <!-- Below Section for Little Text -->
-                          <div class="little-text"><span id="status"></span>فعال &larr; هر هفته &larr; چهارشنبه‌ها
-                            &larr; ساعت ۷:۰۰ &larr;۳ دقیقه
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-3 d-flex  justify-content-end scene-rule-card-action-section">
-                        <div class="d-flex flex-column">
-                        <div class="edit-icon">
-{#                          <i class="fa-solid fa-angle-right fa-xl"></i>#}
-                          <i class="fa-solid fa-ellipsis-vertical fa-xl"></i>
-                        </div>
-                          <div class="rule-status-switch-container">
-                          <div class="rule-status-switch">
-                            <input type="checkbox" class="checkbox" id="checkbox">
-                            <label class="switch" for="checkbox">
-                              <span class="slider"></span>
-                            </label>
-                        </div>
+            <div class="scene-tap-to-run-rules-section sub-page mt-3">
+              <div class="row">
 
-                          </div>
-                          </div>
-
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-          </div>
-
-          <div class="scene-tap-to-run-rules-section mt-3" style="display: none;">
-                <div class="row">
-                  <div class="col-12">
-                    <div class="row scene-rule-card" data-scene-tap-to-run-rule-id="1">
-
-                      <div class="col-9 scene-rule-card-detail-section">
-                        <!-- Right Section (30%) for SVG Icon -->
-                        <div class="icon-section">
-                          <!-- Replace the content below with your SVG code -->
-                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                            <title>power</title>
-                            <path
-                                    d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"/>
-                          </svg>
-
-                        </div>
-                        <!-- Left Section (70%) for Text -->
-                        <div class="text-section d-flex flex-column align-items-start">
-                          <!-- Top Section for Big Text -->
-                          <div class="big-text">سناریو خاموشی کل</div>
-
-                          <!-- Below Section for Little Text -->
-                          <div class="little-text"><span id="status">خاموش</span></div>
-                        </div>
-                      </div>
-
-                      <div class="col-3 d-flex  justify-content-end scene-rule-card-status-switch-section">
-                        <div class="d-flex flex-column">
-                          <div class="edit-icon">
-                            {#                          <i class="fa-solid fa-angle-right fa-xl"></i>#}
-                            <i class="fa-solid fa-ellipsis-vertical fa-xl"></i>
-                          </div>
-                          <div class="rule-status-switch-container">
-                            <div class="rule-status-switch">
-                              <input type="checkbox" class="checkbox" id="checkbox1">
-                              <label class="switch" for="checkbox1">
-                                <span class="slider"></span>
-                              </label>
-                            </div>
-
-                          </div>
-                        </div>
-
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-          </div>
+              </div>
+            </div>
 
 
         </div>
-        <div class="main-page setting-page" style="display: none;"></div>
+
+
+      <div class="page scene-sub-page" id="device-selection-page">
+        <div class="scene-page-header mt-4">
+          <a href="/web_app/v1/scene-wizard" class="back-link">back</a>
+          <div class="scene-wizard-header-name">Select Device</div>
+        </div>
+{#        <div class="text-center fw-bold fs-5 mt-4 mb-3 color-black">Select Device</div>#}
+        <ul class="device-list mt-4" id="device-selection-list"></ul>
+      </div>
+
+      <div class="page scene-sub-page" id="dpf-selection-page">
+
+
+        <div class="scene-page-header mt-4">
+          <a href="/web_app/v1/scene-wizard-device-selection-page" class="back-link">back</a>
+          <div class="scene-wizard-header-name">Select DataPoint</div>
+        </div>
+{#          <div class="fw-bold fs-5 color-black text-center mt-4 mb-1">Select Data Point Functions</div>#}
+
+{#          <div class="divider"></div>#}
+
+        <div class="dpf-list mt-4" id="dpf-selection-list"></div>
+        <div class="fixed-bottom p-4" style="margin-bottom: 50px;height:6rem">
+        <button id="save-dpf-btn" class="btn btn-success w-100 h-100 fw-bold fs-6">Save</button>
+        </div>
+      </div>
+
+
+      <div class="page main-page setting-page"></div>
 
     </div>
-
-
 
     <!-- <nav class="navbar fixed-bottom navbar-light bg-light">
     <a class="navbar-brand" href="#">Fixed bottom</a>
@@ -2587,7 +2547,7 @@
 
     <!-- ----------------------- Thermostat modal -------------------------------- -->
 
-    <div class="card container mt-5" id="thermostat-modal" data-switch-id="null">
+  <div class="card container mt-5" id="thermostat-modal" data-switch-id="null">
 
         <div class="card-body">
             <div class="row">
@@ -2737,10 +2697,10 @@
     </div>
 
 
-    <div id="overlay"></div>
+  <div id="overlay"></div>
 
 
-    <div class="modal transition-bottom screenFull defaultModal fade" id="curtain-modal" tabindex="-1"
+  <div class="modal transition-bottom screenFull defaultModal fade" id="curtain-modal" tabindex="-1"
             aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -2835,8 +2795,7 @@
         </div>
 
 
-
-    <div class="modal transition-bottom screenFull defaultModal fade" id="modaler" tabindex="-1"
+  <div class="modal transition-bottom screenFull defaultModal fade" id="modaler" tabindex="-1"
             aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -2953,40 +2912,436 @@
             </div>
         </div>
 
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="automate_modal" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-0">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Add Condition</h1>
+          </div>
+          <!-- here is close button -->
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+          <div class="padding-1">
+
+            <ul class="if-condition-options-list">
+              <li data-option-type="tap-to-run">
+                <div class="item-card">
+                  <div class="item-icon-section">
+                    <i class="fa-regular fa-hand-back-point-up fa-xl" style="color: #74C0FC;"></i>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-title truncate-responsive">Launch Tap to run</div>
+                  </div>
+                  <div class="edit-section">
+                    <div class="edit-icon">
+                      <i class="fa-solid fa-angle-right fa-lg"></i>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li data-option-type="schedule">
+                <div class="item-card">
+                  <div class="item-icon-section">
+                    <i class="fa-regular fa-clock fa-xl" style="color: #63E6BE;"></i>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-title truncate-responsive">Scehdule</div>
+                  </div>
+                  <div class="edit-section">
+                    <div class="edit-icon">
+                      <i class="fa-solid fa-angle-right fa-lg"></i>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li data-option-type="select-device-status">
+                <div class="item-card">
+                  <div class="item-icon-section">
+                    <i class="fa-sharp fa-regular fa-microchip fa-xl" style="color: #FFD43B;"></i>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-title truncate-responsive">When device status changes</div>
+                  </div>
+                  <div class="edit-section">
+                    <div class="edit-icon">
+                      <i class="fa-solid fa-angle-right fa-lg"></i>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+            </ul>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="automate_modal_action_options" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-0">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Add Action</h1>
+          </div>
+          <!-- here is close button -->
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body"  style="padding:0;">
+          <div class="padding-1">
+
+            <ul class="then-actions-options-list">
+
+              <li data-option-type="delay">
+                <div class="item-card">
+                  <div class="item-icon-section">
+                    <i class="fa-regular fa-hourglass-start fa-xl" style="color: #63E6BE;"></i>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-title truncate-responsive">Delay the action</div>
+                  </div>
+                  <div class="edit-section">
+                    <div class="edit-icon">
+                      <i class="fa-solid fa-angle-right fa-lg"></i>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li data-option-type="control-single-device">
+                <div class="item-card">
+                  <div class="item-icon-section">
+                    <i class="fa-sharp fa-regular fa-microchip fa-xl" style="color: #FFD43B;"></i>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-title truncate-responsive">Control single device</div>
+                  </div>
+                  <div class="edit-section">
+                    <div class="edit-icon">
+                      <i class="fa-solid fa-angle-right fa-lg"></i>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+            </ul>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="automate_modal_delay_action" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-0">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Set Delay Action</h1>
+          </div>
+          <!-- here is close button -->
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body"  style="padding:0;">
+          <div class="padding-1">
+{#            <label >fdfdfdf</label>#}
+{#            <input type="text" class="form-control js-full-picker">#}
+            <h6 class="text-center mb-3 mt-2">Time Delay</h6>
+            <div class="delay-modal-inline-picker ms-2 me-2 mb-4">00:00:00</div>
+
+{#            <div class="divider"></div>#}
+
+          </div>
+
+        </div>
+{#        <div class="modal-footer">#}
+{#          <button type="button" data-dismiss="modal" data-toggle="modal"#}
+{#                  data-target="#mdllConfirm-transfer"#}
+{#                  class="btn w-100 bg-primary m-0 color-white h-52 d-flex align-items-center rounded-8 justify-content-center">#}
+{#            Send!#}
+{#          </button>#}
+{##}
+{#        </div>#}
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="automate_modal_scheduler" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-0">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Set Scheduler</h1>
+          </div>
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+          <div class="padding-1">
+            <h6 class="text-center mb-3 mt-2">Select date and time</h6>
+            <div class="scheduler-modal-inline-picker ms-2 me-2 mb-4"></div>
+            <style>
+                .weekday-checkbox-container {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-rows: repeat(2, auto);
+                    gap: 10px;
+                    font-family: Arial, sans-serif;
+                    max-width: 600px;
+                    margin: 0 20px;
+                }
+                .weekday-checkbox-container label {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #f0f0f0;
+                    padding: 10px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    transition: background-color 0.3s, color 0.3s;
+                    text-align: center;
+                    font-size: 11px;
+                    min-height: 33px;
+                    user-select: none;
+                }
+                .weekday-checkbox-container input[type="checkbox"] {
+                    display: none;
+                }
+                .weekday-checkbox-container input[type="checkbox"]:checked + label {
+                    background-color: #007bff;
+                    color: white;
+                }
+                @media (max-width: 480px) {
+                    .weekday-checkbox-container {
+                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-rows: repeat(2, auto);
+                    }
+                }
+            </style>
+            <div class="mt-4 mb-4">
+              <h6 class="text-center mb-3">Repeat</h6>
+              <div class="weekday-checkbox-container">
+                <input type="checkbox" id="once" name="weekday" value="once">
+                <label for="once">Once</label>
+                <input type="checkbox" id="monday" name="weekday" value="monday">
+                <label for="monday">Monday</label>
+                <input type="checkbox" id="tuesday" name="weekday" value="tuesday">
+                <label for="tuesday">Tuesday</label>
+                <input type="checkbox" id="wednesday" name="weekday" value="wednesday">
+                <label for="wednesday">Wednesday</label>
+                <input type="checkbox" id="thursday" name="weekday" value="thursday">
+                <label for="thursday">Thursday</label>
+                <input type="checkbox" id="friday" name="weekday" value="friday">
+                <label for="friday">Friday</label>
+                <input type="checkbox" id="saturday" name="weekday" value="saturday">
+                <label for="saturday">Saturday</label>
+                <input type="checkbox" id="sunday" name="weekday" value="sunday">
+                <label for="sunday">Sunday</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="dpf-modal" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-bottom">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Set Scheduler</h1>
+          </div>
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+          <div class="padding-1">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal transition-bottom screenFull defaultModal fade" id="tap-to-run-actions-status-modal" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header padding-l-20 padding-r-20 justify-content-center border-bottom">
+          <div class="itemProduct_sm">
+            <h1 class="size-18 weight-900 color-secondary m-0">Tap to Run Actions</h1>
+          </div>
+          <div class="absolute right-0 padding-r-20">
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
     <!-- <div id="consoleLog"></div> -->
 
 {% endblock modal %}
 
 
 {% block extrajs %}
-  <script src="{% static 'webapp/home/js/main.js' %}"></script>
-  <script src="{% static 'webapp/scene/js/scene-page.js' %}"></script>
+  <script>
+  const web_app_base_url = "/web_app/v1";
+  const linkage_rule_base_url =  "{% url 'web_app:create_new_linkage_rule' %}"
 
-  <script type="module">
-      import {CurtainAnimation} from "{% static 'webapp/curtain/script.js' %}";
+  const mqtt_broker_host = '{{ mqtt_broker_host }}';
+  const mqtt_port = {{ mqtt_broker_port }};
+  const mqtt_ws_path = '{{ mqtt_broker_ws_path }}';
+  const mqtt_transport = '{{ mqtt_broker_transport }}';
+  const mqtt_client = '{{ user.mqtt_client_id }}';
+  const mqtt_username = '{{ user.mqtt_username }}';
+  const mqtt_password = '{{ user.mqtt_password }}';
 
+  const home_uuid= '{{ user.parent_home.uuid }}';
+  const project_uuid= '{{ user.parent_project.uuid }}';
+
+
+  let all_home_controllers = {{ home_controllers }};
+  let all_home_zones = {{ home_zones }};
+  let all_home_ui_elements;
+
+
+
+
+  </script>
+  <script type="application/javascript" src="{% static 'webapp/home/js/main.js' %}"></script>
+  <script type="application/javascript" src="{% static 'coloris/coloris.min.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/libs/tinycolor/tinycolor-min.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/scene/js/scene-page.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/libs/pickerjs-1.2.1/dist/picker.min.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/scene/js/variables.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/js/global_variables.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/libs/mqttjs-5.10.1/mqtt.min.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/mqttEventBus/eventBus.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/mqttClient/client.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/scene/js/scene_cards_generator.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/scene/js/scene_wizard.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/curtain/script.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/thermostat/script.js' %}"></script>
+  <script type="application/javascript" src="{% static 'webapp/js/main.js' %}"></script>
+
+
+{#<script>#}
+{##}
+{#      #}
+{##}
+{#  </script>#}
+  <script>
+      {#function amir() {#}
+      {#    console.log('amir');#}
+      {#    var myModalEl = document.querySelector('#automate_modal2');#}
+      {#    var modal = bootstrap.Modal.getOrCreateInstance(myModalEl); // Returns a Bootstrap modal instanc#}
+      {#    modal.show();#}
+      {#}#}
+  </script>
+  <script>
+        {#function getWeekLoop() {#}
+        {#    const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];#}
+        {#    const onceCheckbox = document.getElementById('once');#}
+        {#    const resultElement = document.getElementById('result');#}
+        {##}
+        {#    if (onceCheckbox.checked) {#}
+        {#        return 'Week Loop: "once"';#}
+        {##}
+        {#    }#}
+        {##}
+        {#    let week_loop = '';#}
+        {#    for (let day of weekdays) {#}
+        {#        week_loop += document.getElementById(day).checked ? '1' : '0';#}
+        {#    }#}
+        {##}
+        {#    return `Week Loop: "${week_loop}"`;#}
+        {#}#}
+        {##}
+        {#// Add event listener to 'Once' checkbox#}
+        {#document.getElementById('once').addEventListener('change', function() {#}
+        {#    const weekdayCheckboxes = document.querySelectorAll('.weekday-checkbox-container input[type="checkbox"]:not(#once)');#}
+        {#    if (this.checked) {#}
+        {#        weekdayCheckboxes.forEach(cb => {#}
+        {#            cb.checked = false;#}
+        {#            cb.disabled = true;#}
+        {#        });#}
+        {#    } else {#}
+        {#        weekdayCheckboxes.forEach(cb => {#}
+        {#            cb.disabled = false;#}
+        {#        });#}
+        {#    }#}
+        {#});#}
+        {##}
+        {#var myModalEl = document.getElementById('automate_modal2')#}
+        {#      myModalEl.addEventListener('hidden.bs.modal', function (event) {#}
+        {##}
+        {#  console.log(getWeekLoop());#}
+        {#  })#}
+    </script>
+
+  <script>
       document.addEventListener('DOMContentLoaded', () => {
-          const myCurtainAnimation = new CurtainAnimation({
-              curtainLeftSelector: '.curtain-left',
-              curtainRightSelector: '.curtain-right',
-              openButtonSelector: '#openButton',
-              closeButtonSelector: '#closeButton',
-              animationDuration: 5000, // 5 seconds
-          });
-          myCurtainAnimation.openProgress = 0.5;
-          myCurtainAnimation.updateCurtainPosition();
+          {#new Picker(document.querySelector('.js-full-picker'), {#}
+          {#    controls: true,#}
+          {#    format: 'MM-DD HH:mm',#}
+          {#    headers: true,#}
+          {#});#}
+          {#const a = new Picker(document.querySelector('.js-inline-picker'), {#}
+          {#    controls: true,#}
+          {#    format: 'MM-DD HH:mm',#}
+          {#    headers: true,#}
+          {#    inline: true,#}
+          {#    rows:3#}
+          {#});#}
+          {##}
+          {#const b = new Picker(document.querySelector('.js-inline-picker2'), {#}
+          {#    controls: true,#}
+          {#    format: 'HH:mm:ss',#}
+          {#    headers: true,#}
+          {#    inline: true,#}
+          {#    rows:3#}
+          {#});#}
+          {##}
+          {#var myModalEl = document.getElementById('automate_modal2')#}
+          {#    myModalEl.addEventListener('hidden.bs.modal', function (event) {#}
+          {##}
+          {#console.log(a.getDate(true));#}
+          {#})#}
+
       });
   </script>
 
-  <script type="module">
-      import {TemperatureDial} from "{% static 'webapp/thermostat/script.js' %}";
 
-      document.addEventListener('DOMContentLoaded', () => {
-
-
-          const thermostat_modla_themperature_knob = new TemperatureDial("#temp-display", "#temp-handle", "#dial-center", "#thermostat_modal_button");
-      });
-  </script>
 
 {% endblock extrajs %}
 

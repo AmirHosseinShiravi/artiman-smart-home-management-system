@@ -1,0 +1,168 @@
+<html>
+ <head>
+  <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .profile-img img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        .profile-name {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .profile-email {
+            text-align: center;
+            color: gray;
+            margin-bottom: 20px;
+        }
+        .edit-profile-btn {
+            display: block;
+            width: 150px;
+            margin: 0 auto 30px;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .section-title {
+            margin-left: 20px;
+            margin-bottom: 10px;
+            color: gray;
+        }
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: none;
+            border-radius: 10px;
+            margin: 5px 20px;
+            padding: 15px;
+            background-color: white;
+        }
+        .list-group-item i {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        .badge {
+            background-color: #00c853;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+        }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+        .toggle-switch input {
+            margin-left: 10px;
+        }
+        .logout {
+            color: red;
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="profile-img">
+    <img alt="Profile image of a person with short hair and a beard" height="80" src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-RcpoXHkzChYnDbFAyeQ8tamr/user-ehrvabJ3DufsCu8YJ7PqY5gl/img-8ZO1G8iMIKtFYKefzBZbo0Vt.png?st=2024-09-06T22%3A04%3A42Z&amp;se=2024-09-07T00%3A04%3A42Z&amp;sp=r&amp;sv=2024-08-04&amp;sr=b&amp;rscd=inline&amp;rsct=image/png&amp;skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&amp;sktid=a48cca56-e6da-484e-a814-9c849652bcb3&amp;skt=2024-09-06T21%3A41%3A48Z&amp;ske=2024-09-07T21%3A41%3A48Z&amp;sks=b&amp;skv=2024-08-04&amp;sig=lqASiI80S9cxl%2BkiZHPwRWKlPJdM9%2BDYjLWor5p%2B%2Bs8%3D" width="80"/>
+   </div>
+   <div class="profile-name">
+    Coffeestories
+   </div>
+   <div class="profile-email">
+    mark.brock@icloud.com
+   </div>
+   <button class="edit-profile-btn">
+    Edit profile
+   </button>
+   <div class="section-title">
+    Inventories
+   </div>
+   <div class="list-group">
+    <div class="list-group-item">
+     <div>
+      <i class="fas fa-home">
+      </i>
+      My stores
+     </div>
+     <div class="toggle-switch">
+      <span class="badge">
+       2
+      </span>
+      <i class="fas fa-chevron-right">
+      </i>
+     </div>
+    </div>
+    <div class="list-group-item">
+     <div>
+      <i class="fas fa-life-ring">
+      </i>
+      Support
+     </div>
+     <i class="fas fa-chevron-right">
+     </i>
+    </div>
+   </div>
+   <div class="section-title">
+    Preferences
+   </div>
+   <div class="list-group">
+    <div class="list-group-item">
+     <div>
+      <i class="fas fa-bell">
+      </i>
+      Push notifications
+     </div>
+     <div class="toggle-switch">
+      <input checked="" type="checkbox"/>
+     </div>
+    </div>
+    <div class="list-group-item">
+     <div>
+      <i class="fas fa-face-id">
+      </i>
+      Face ID
+     </div>
+     <div class="toggle-switch">
+      <input checked="" type="checkbox"/>
+     </div>
+    </div>
+    <div class="list-group-item">
+     <div>
+      <i class="fas fa-key">
+      </i>
+      PIN Code
+     </div>
+     <i class="fas fa-chevron-right">
+     </i>
+    </div>
+    <div class="list-group-item logout">
+     <div>
+      <i class="fas fa-sign-out-alt">
+      </i>
+      Logout
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>

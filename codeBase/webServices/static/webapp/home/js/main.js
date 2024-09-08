@@ -1404,6 +1404,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // console.log("gfgfgg");
 
 
+
+
+
     // Get all elements with the class 'menu-button'
     var navButtons = document.querySelectorAll('.nav-button');
     // Add a click event listener to each menu-button element
@@ -1421,71 +1424,17 @@ document.addEventListener('DOMContentLoaded', function () {
             var clickedNavButtonpage_name = this.getAttribute("data-page");
 
             // Hide all content blocks
-            var allMainPages = document.querySelectorAll(".main-page");
-            for (var l = 0; l < allMainPages.length; l++) {
-                allMainPages[l].style.display = "none";
-            }
+            // var allMainPages = document.querySelectorAll(".main-page");
+            // for (var l = 0; l < allMainPages.length; l++) {
+            //     allMainPages[l].classList.remove('active-page');
+            // }
+            //
+            // // Show the relevant content block based on the clicked menu button
+            // var relevantContent = document.querySelector("." + clickedNavButtonpage_name.toString());
+            // if (relevantContent) {
+            //     relevantContent.classList.add('active-page');
+            // }
 
-            // Show the relevant content block based on the clicked menu button
-            var relevantContent = document.querySelector("." + clickedNavButtonpage_name.toString());
-            if (relevantContent) {
-                relevantContent.style.display = "block";
-
-                ///////////////////////////////////////
-                // var containers = document.querySelectorAll('div[data-menu-content="' + clickedMenuButtonIndex.toString() + '"]' + "  div.animation-text-container");
-                // for (var m = 0; m < containers.length; m++) {
-                //     var text = containers[m].querySelector("span");
-                //     if (containers[m].clientWidth + 50 < text.clientWidth) {
-                //         text.classList.add("animate");
-                //     }
-                //     else if(containers[m].clientWidth < text.clientWidth) {
-                //         text.classList.add("animate1");
-                //     }
-                // }
-                //////////////////////////////////////
-                // if(garden_valve_get_interval){
-                //     clearInterval(garden_valve_get_interval);
-                // }
-                // if(get_switchs_state_interval){
-                //     clearInterval(get_switchs_state_interval);
-                // }
-
-
-                // if (clickedMenuButtonIndex === '9'){
-                //     // get first time immediately
-                //     receiveFromServer_garden_valve();
-                //     garden_valve_get_interval = setInterval(function () {
-                //         receiveFromServer_garden_valve();
-                //     }, get_interval_ms);
-                // }
-                // else if (clickedMenuButtonIndex === '10'){
-                //     // get first time immediately
-                //     receiveFromServer_turn_off_home_automation();
-                //     garden_valve_get_interval = setInterval(function () {
-                //         receiveFromServer_turn_off_home_automation();
-                //     }, get_interval_ms);
-                // }
-                // else{
-                //     // get first time immediately
-                //     for (var i = 0; i < menu_switch_ids[clickedMenuButtonIndex].length; i++) {
-                //         var switchId = menu_switch_ids[clickedMenuButtonIndex][i];
-                //         receiveFromServer(switchId);
-                //     }
-
-                //     get_switchs_state_interval = setInterval(function () {
-                //         // Assuming switch IDs are numeric, adjust as needed
-                //         for (var i = 0; i < menu_switch_ids[clickedMenuButtonIndex].length; i++) {
-
-                //             var switchId = menu_switch_ids[clickedMenuButtonIndex][i];
-                //             receiveFromServer(switchId);
-
-                //         }
-
-                //     }, get_interval_ms);
-                // }
-
-
-            }
         });
     }
 });

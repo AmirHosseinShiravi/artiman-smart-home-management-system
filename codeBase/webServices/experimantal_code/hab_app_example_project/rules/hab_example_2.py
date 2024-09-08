@@ -1,4 +1,5 @@
 import re
+import re
 import os
 import json
 import pytz
@@ -209,7 +210,10 @@ class LinkageRule(HABApp.Rule):
         self.linkage_rule_execution_status = Item.get_create_item(name=item_new_name)
 
         self.linkage_rule_execution_status.listen_event(callback=self.get_rule_execution_status, event_filter=ValueChangeEventFilter())
-        self.linkage_rule_execution_status.post_value(LinkageRuleExecutionStatus.ENABLE)
+        if self.config.get('status') == "enable":
+            self.linkage_rule_execution_status.post_value(LinkageRuleExecutionStatus.ENABLE)
+        elif self.config.get('status') == "disable":
+            self.linkage_rule_execution_status.post_value(LinkageRuleExecutionStatus.DISABLE)
 
     def set_rule_execution_status(self, event: ValueUpdateEvent):
         if event.value == LinkageRuleExecutionStatus.ENABLE.value:
@@ -607,11 +611,12 @@ class LinkageRule(HABApp.Rule):
             print("Can't find action code")
 
     def tap_to_run_execute_actions(self, event: ValueUpdateEvent):
-        print("********* Tap To Run Command ***********")
-        for action in self.actions:
-            action_code = action["code"]
-            self.actions_status[action_code].post_value(ActionStatus.PENDING)
-        self.execute_actions()
+        if str(self.linkage_rule_execution_status.value) not in [str(LinkageRuleExecutionStatus.DISABLE), str(LinkageRuleExecutionStatus.IN_PROGRESS)]:
+            print("********* Tap To Run Command ***********")
+            for action in self.actions:
+                action_code = action["code"]
+                self.actions_status[action_code].post_value(ActionStatus.PENDING)
+            self.execute_actions()
 
     def execute_actions(self):
         if str(self.linkage_rule_execution_status.value) != str(LinkageRuleExecutionStatus.DISABLE):

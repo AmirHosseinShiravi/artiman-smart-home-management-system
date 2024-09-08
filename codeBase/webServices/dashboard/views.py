@@ -1,5 +1,6 @@
 import json
 import time
+from typing import Any
 
 from django.contrib.auth.models import Permission
 from django.db import transaction
@@ -9,6 +10,8 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+
+from .mqtt_manager import initialize_mqtt , subscribe_to_topic, publish_message
 
 from .utils import (generate_random_username,
                     generate_random_password,
@@ -70,6 +73,7 @@ from .forms import (ProjectForm,
                     five_pole_switch_data_point_function_formset_initial,
                     switches_of_ten_pole_thermostat_data_point_function_formset_initial,
                     thermostat_data_point_formset_initial)
+
 
 
 ############## Projects Section ###############
@@ -530,7 +534,6 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                     mqtt_username=home_user_instance.mqtt_username,
                     mqtt_password=home_user_instance.mqtt_password)
 
-
         else:
             user_form = UserForm(request.POST, request.FILES)
             home_user_form = HomeUserForm(request.POST, request.FILES)
@@ -561,7 +564,7 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                         set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(home_user_uuid=home_user.uuid)
                 else:
 
-                    if home_user_instance.is_tablet_user == False and home_user_instance.is_web_app_user == False:
+                    if home_user_instance.is_tablet_user is False and home_user_instance.is_web_app_user is False:
                         home_user_instance.is_tablet_user = False
                         home_user_instance.is_web_app_user = True
                     home_user_instance = HomeUser.objects.create(user=user_instance,
@@ -1527,6 +1530,41 @@ def delete_home_ui_element_view(request, project_uuid=None, home_uuid=None, ui_e
 
     return redirect('dashboard:home_wizard_all_ui_elements', project.uuid, home.uuid)
 
+
+############### MQTT manager ###################
+
+# Example usage in a Django view
+# def my_view(request):
+    # Publish a message
+def handle_message(topic: str, payload: Any):
+    print(f"Received message on {topic}: {payload}")
+    # Process the message as needed
+
+
+initialize_mqtt()
+
+publish_message("test/topic", {"message": "Hello from Django!"})
+
+# Subscribe to a topic
+subscribe_to_topic("test/topic", handle_message)
+
+# Your view logic here
+# return HttpResponse("MQTT message published and subscribed!")
+
+
+
+
+
+# from .mqtt_manager_v2 import mqtt_manager
+#
+#
+# def handle_message(topic: str, payload: Any):
+#     print(f"Received message on {topic}: {payload}")
+#     # Process the message as needed
+#
+#
+# mqtt_manager.publish("test/topic", {"message": "Hello from Django!"})
+# mqtt_manager.subscribe("test/topic", handle_message)
 
 ############### Users Section ##################
 

@@ -12,11 +12,14 @@ dotenv.load_dotenv()
 
 
 class MQTTManager:
-    def __init__(self, broker: str, port: int = 1883, client_id: str = None, username: str = None, password: str = None):
+    def __init__(self, broker: str, port: int = 1883, client_id: str = None, username: str = None, password: str = None,
+                 transport: str = "tcp", websocket_path: str = "/mqtt"):
         self.broker = broker
         self.port = port
         self.client_id = client_id or f'python-mqtt-{uuid.uuid4().hex[:8]}'
-        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2, self.client_id, clean_session=False)
+        self.transport = transport
+        self.websocket_path = websocket_path
+        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2, self.client_id, clean_session=False, transport=self.transport)
         self.client.username_pw_set(username, password)
         self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
@@ -26,6 +29,7 @@ class MQTTManager:
         self.RECONNECT_RATE = 2
         self.MAX_RECONNECT_COUNT = 12
         self.MAX_RECONNECT_DELAY = 60
+
     def _on_connect(self, client, userdata, flags, rc, properties):
         if rc == 0 and self.client.is_connected():
             print(f"Connected to MQTT Broker: {self.broker}")
@@ -46,18 +50,18 @@ class MQTTManager:
             except Exception as e:
                 print(f"Error in callback for topic {topic}: {e}")
 
-    def _on_disconnect(self, client, userdata, rc):
+    def _on_disconnect(self, client, userdata, reason_code, properties, rc):
 
         # logging.info("Disconnected with result code: %s", rc)
         reconnect_count, reconnect_delay = 0, self.FIRST_RECONNECT_DELAY
         while reconnect_count < self.MAX_RECONNECT_COUNT:
             # logging.info("Reconnecting in %d seconds...", reconnect_delay)
-            print("Reconnecting in %d seconds...", reconnect_delay)
+            print(f"Reconnecting in {reconnect_delay} seconds...")
             time.sleep(reconnect_delay)
 
             try:
                 client.reconnect()
-                # logging.info("Reconnected successfully!")
+                print("Reconnected successfully!")
                 return
             except Exception as err:
                 # logging.error("%s. Reconnect failed. Retrying...", err)
@@ -70,9 +74,10 @@ class MQTTManager:
     def connect(self):
         try:
             if not self.client.is_connected():
+                if self.transport == "websockets":
+                    self.client.ws_set_options(path=self.websocket_path)
                 self.client.connect(self.broker, self.port)
                 self.client.loop_start()
-
         except Exception as e:
             print(f"Occur error when making connection to MQTT broker with error:: {e}")
 
@@ -93,11 +98,14 @@ class MQTTManager:
             print(f"Failed to send message to topic {topic}")
 
     def subscribe(self, topic: str, callback: Callable):
-        if not self.client.is_connected():
-            raise ConnectionError("Not connected to MQTT broker")
-        self.client.subscribe(topic)
-        self.subscriptions[topic] = callback
-        print(f"Subscribed to topic: {topic}")
+        try:
+            if not self.client.is_connected():
+                raise ConnectionError("Not connected to MQTT broker")
+            self.client.subscribe(topic)
+            self.subscriptions[topic] = callback
+            print(f"Subscribed to topic: {topic}")
+        except Exception as e:
+            print(f"exception in subscribe method:: error: {e}")
 
 
 # Usage in Django
@@ -106,16 +114,21 @@ mqtt_manager = None
 
 def initialize_mqtt():
     global mqtt_manager
-    emqx_broker_tcp_host = os.environ.get('emqx_broker_tcp_host')
-    emqx_broker_tcp_port = int(os.environ.get('emqx_broker_tcp_port'))
+    emqx_broker_host = os.environ.get('emqx_broker_host')
+    emqx_broker_port = int(os.environ.get('emqx_broker_port'))
+    emqx_broker_ws_path = os.environ.get('emqx_broker_ws_path')
+    emqx_broker_transport = os.environ.get('emqx_broker_transport')
+    dashboard_mqtt_client_id = os.environ.get('dashboard_mqtt_clientId')
     dashboard_mqtt_username = os.environ.get('dashboard_mqtt_username')
     dashboard_mqtt_password = os.environ.get('dashboard_mqtt_password')
 
-    mqtt_manager = MQTTManager(broker=emqx_broker_tcp_host,
-                               port=emqx_broker_tcp_port,
-                               client_id="amir",
+    mqtt_manager = MQTTManager(broker=emqx_broker_host,
+                               port=emqx_broker_port,
+                               client_id=dashboard_mqtt_client_id,
                                username=dashboard_mqtt_username,
-                               password=dashboard_mqtt_password)
+                               password=dashboard_mqtt_password,
+                               transport=emqx_broker_transport,
+                               websocket_path=emqx_broker_ws_path)
     mqtt_manager.connect()
 
 
@@ -131,8 +144,8 @@ def publish_message(topic: str, message: Any):
     try:
         if mqtt_manager is None:
             raise RuntimeError("MQTT Manager not initialized")
-        elif not mqtt_manager.client.is_connected():
-            raise RuntimeError("MQTT Manager not connected to broker")
+        # elif not mqtt_manager.client.is_connected():
+        #     raise RuntimeError("MQTT Manager not connected to broker")
         mqtt_manager.publish(topic, message)
     except Exception as e:
         print(f"Have error while publishing mqtt message with error:: {e}")
@@ -143,8 +156,8 @@ def subscribe_to_topic(topic: str, callback: Callable):
     try:
         if mqtt_manager is None:
             raise RuntimeError("MQTT Manager not initialized")
-        elif not mqtt_manager.client.is_connected() :
-            raise RuntimeError("MQTT Manager not connected to broker")
+        # elif not mqtt_manager.client.is_connected() :
+        #     raise RuntimeError("MQTT Manager not connected to broker")
         else:
             mqtt_manager.subscribe(topic, callback)
     except Exception as e:

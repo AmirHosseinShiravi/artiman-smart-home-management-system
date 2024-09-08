@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Div Layout with Inner Positioned Divs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+
+        .box {
+            flex: 1;
+            min-width: 0;
+            height: 300px;
+            color: white;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .box1 { background-color: #3498db; }
+        .box2 { background-color: #e74c3c; }
+        .box3 { background-color: #2ecc71; }
+
+        /* Box 1 inner divs */
+        .box1 .top-left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .box1 .bottom-right {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .box1 .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Box 2 inner divs */
+        .box2 {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .box2 .top, .box2 .bottom {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Box 3 inner divs */
+        .box3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+        }
+        .box3 .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .inner-div {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .box {
+                height: 200px;
+            }
+            .inner-div {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box box1">
+            <div class="inner-div top-left">Top Left</div>
+            <div class="inner-div bottom-right">Bottom Right</div>
+            <div class="inner-div center">Center</div>
+        </div>
+        <div class="box box2">
+            <div class="top">
+                <div class="inner-div">Top Left</div>
+                <div class="inner-div">Top Right</div>
+            </div>
+            <div class="bottom">
+                <div class="inner-div">Bottom Left</div>
+                <div class="inner-div">Bottom Right</div>
+            </div>
+        </div>
+        <div class="box box3">
+            <div class="inner-div">Top Left</div>
+            <div class="inner-div">Top Right</div>
+            <div class="inner-div full-width">Bottom Full Width</div>
+        </div>
+    </div>
+</body>
+</html>

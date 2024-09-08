@@ -91,7 +91,7 @@
                 <tr>
                   <td>{{ zone.zone_name }}</td>
                   <td>{{ zone.description|default_if_none:'' }}</td>
-                  <td>{{ zone.zone_devices|length }}</td>
+                  <td>{{ zone.zone_devices.count }}</td>
                   {% if perms.dashboard.change_homeUser %}
                     <td>
                       <a href="#" data-zone-uuid="{{ zone.uuid }}"

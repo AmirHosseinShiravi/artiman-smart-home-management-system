@@ -29,7 +29,7 @@ def generate_random_password(length=12):
     if length < 4:
         raise ValueError("Password length should be at least 4 characters to ensure complexity")
 
-    characters = string.ascii_letters + string.digits + string.punctuation
+    characters = string.ascii_letters + string.digits #+ string.punctuation
     password = ''.join(secrets.choice(characters) for _ in range(length))
     return password
 
@@ -325,14 +325,14 @@ def set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(home
                                 "retain": "all"
                             })
 
-                        # will message
+                        # controller will message
                         client_rules_message["rules"].append({
                             "action": "subscribe",
                             "topic": f"v1/controllers/{controller_uuid}/status",
                             "permission": "allow",
                         })
 
-                    # will message
+                    # client will message
                     client_rules_message["rules"].append({
                         "action": "all",
                         "topic": f"v1/users/home_users/{home_user_mqtt_client_id}/status",
@@ -728,23 +728,9 @@ def delete_all_tablet_client_authorization_rules(tablet_user_uuid=None):
             return False
 
 
+# Update all user and controller of all project rules and rewrite them to mqtt broker backend when web service start to work
+# to sure all parts are authorized in broker.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Update all user and controller of all project mqtt users and rewrite them to mqtt broker backend when web service start to work
+# # to sure all parts are authenticated in broker.
 

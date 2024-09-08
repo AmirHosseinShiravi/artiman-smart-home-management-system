@@ -1,5 +1,4 @@
 import uuid
-
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -42,15 +41,15 @@ class Project(models.Model):
     descriptions = models.CharField(max_length=1000, blank=True, null=True)
     # used for web app/tablet. set default icon to artiman company icon.
     # project_icon = models.ImageField(upload_to="project_icons/")
-    city = models.ForeignKey(CityCoordinates, on_delete=models.PROTECT)
+    city = models.ForeignKey(CityCoordinates, on_delete=models.CASCADE)
     address = models.CharField(max_length=255, blank=True, null=True)
     project_lock = models.BooleanField(blank=False, null=False, default=False)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="project_created_by")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="project_created_by")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="project_edited_by")
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="project_edited_by")
     last_modified = models.DateTimeField(auto_now=True)
     # is_deleted = models.BooleanField(blank=False, null=False)
-    # deleted_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    # deleted_by = models.ForeignKey(User, on_delete=models.CASCADE))
     status = models.CharField(max_length=50, choices=ProjectStatusChoices.choices, default=ProjectStatusChoices.DISABLE)
 
     # class Meta:
@@ -74,12 +73,12 @@ class Home(models.Model):
     unit = models.CharField(max_length=100, blank=True, null=True)
 
     # has_webapp = models.BooleanField(blank=False, null=False, default=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='home_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='home_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='home_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='home_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
     # is_deleted = models.BooleanField(blank=False, null=False)
-    # deleted_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    # deleted_by = models.ForeignKey(User, on_delete=models.CASCADE))
 
 
 class HomeUser(models.Model):
@@ -88,7 +87,7 @@ class HomeUser(models.Model):
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE)
     parent_home = models.ForeignKey(Home, on_delete=models.CASCADE, related_name="homeUsers")
     # is_deleted = models.BooleanField(blank=False, null=False)
-    # deleted_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    # deleted_by = models.ForeignKey(User, on_delete=models.CASCADE))
     desc = models.CharField(max_length=500, blank=True)
     is_tablet_user = models.BooleanField(blank=False, null=False, default=False)
     is_web_app_user = models.BooleanField(blank=False, null=False, default=False)
@@ -96,9 +95,9 @@ class HomeUser(models.Model):
     # avatar_thumbnail = AdvanceThumbnailField(source_field='avatar', upload_to='users_avatar/thumbnail_files/',
     #                                          null=True, blank=True, size=(300, 300))
 
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='homeUser_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='homeUser_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='homeUser_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='homeUser_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
 
     mqtt_client_id = models.CharField(max_length=100, blank=False, null=False, default=generate_rand_id_for_client)
@@ -163,12 +162,12 @@ class Controller(models.Model):
     descriptions = models.CharField(max_length=1000, blank=True, null=True)
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE)
     parent_home = models.ForeignKey(Home, on_delete=models.CASCADE, related_name="controllers")
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='controller_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='controller_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='controller_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='controller_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
     # is_deleted = models.BooleanField(blank=False, null=False)
-    # deleted_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    # deleted_by = models.ForeignKey(User, on_delete=models.CASCADE))
 
     # general properties
     enable_internal_server = models.BooleanField(blank=False, null=False, default=False)
@@ -202,9 +201,9 @@ class Zone(models.Model):
     description = models.CharField(max_length=1000, blank=True, null=True)
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE)
     parent_home = models.ForeignKey(Home, on_delete=models.CASCADE, related_name="home_zones")
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='zone_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='zone_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='zone_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='zone_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -220,9 +219,9 @@ class DeviceBase(models.Model):
     parent_home = models.ForeignKey(Home, on_delete=models.CASCADE, related_name="home_devices")
     parent_zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="zone_devices")
     parent_controller = models.ForeignKey(Controller, on_delete=models.CASCADE, related_name="controller_devices")
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='device_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='device_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='device_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='device_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
 
     modbus_id = models.IntegerField(blank=True, null=True)
@@ -362,9 +361,9 @@ class UIBase(models.Model):
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE)
     parent_home = models.ForeignKey(Home, on_delete=models.CASCADE, related_name="home_ui_elements")
     parent_zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="zone_ui_elements")
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='ui_created_by')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ui_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    last_edited_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='ui_edited_by')
+    last_edited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ui_edited_by')
     last_modified = models.DateTimeField(auto_now=True)
 
     button_name = models.CharField(max_length=100, blank=False, null=False)
@@ -376,7 +375,6 @@ class UIBase(models.Model):
     on_icon = models.CharField(max_length=255, blank=False, null=False)
     off_icon = models.CharField(max_length=255, blank=False, null=False)
     add_to_home = models.BooleanField(blank=False, null=False, default=False)
-
 
 
 class SwitchUI(UIBase):
@@ -413,18 +411,6 @@ class UIProxy(models.Model):
 
     def __str__(self):
         return f"{self.ui_base.name} ({self.content_type})"
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # class FourPoleSwitch(models.Model):

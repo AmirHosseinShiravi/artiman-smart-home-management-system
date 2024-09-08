@@ -132,8 +132,8 @@ div.curtain-area {
 .curtain-element {
     width: calc((var(--curtain-container-width) * 0.05) - 1px);
     float: left;
-    border-bottom-right-radius: 45px;
-    border-bottom-left-radius: 45px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     height: 100%;
     /*box-shadow:  0 0 1px 0 rgb(213, 213, 213);*/
 }

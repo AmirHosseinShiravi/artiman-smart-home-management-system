@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Rule Wizard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .device-list, .dpf-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .device-card, .dpf-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .navigation {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .selected-value {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .number-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .number-selector input {
+            width: 50px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .number-selector button {
+            font-size: 24px;
+            padding: 0 10px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <button id="back-btn" style="display: none;">&lt; Back</button>
+            <button id="forward-btn" style="display: none;">Forward &gt;</button>
+        </div>
+
+        <div id="main-page" class="page active">
+            <h1>Smart Home Rule Wizard</h1>
+            <button id="create-rule-btn">Create Rule</button>
+            <h2>Device List</h2>
+            <div id="device-list" class="device-list"></div>
+        </div>
+
+        <div id="rule-wizard-page" class="page">
+            <h1>Create Rule</h1>
+            <h2>If Conditions</h2>
+            <div id="if-conditions-list"></div>
+            <button id="add-if-condition-btn">Add Condition</button>
+            <h2>Then Actions</h2>
+            <div id="then-actions-list"></div>
+            <button id="add-then-action-btn">Add Action</button>
+            <button id="save-rule-btn">Save Rule</button>
+        </div>
+
+        <div id="device-selection-page" class="page">
+            <h1>Select Device</h1>
+            <div id="device-selection-list" class="device-list"></div>
+        </div>
+
+        <div id="dpf-selection-page" class="page">
+            <h1>Select Data Point Function</h1>
+            <div id="dpf-selection-list" class="dpf-list"></div>
+            <button id="save-dpf-btn">Save</button>
+        </div>
+
+        <div id="dpf-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="dpf-modal-title"></h2>
+                <div id="dpf-modal-content"></div>
+                <button id="dpf-modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample device data
+        const devices = [
+            {
+                id: 1,
+                name: "Living Room Light",
+                dataPointFunctions: [
+                    {name: "Switch", type: "boolean", typeEnum: ["ON", "OFF"]}
+                ]
+            },
+            {
+                id: 2,
+                name: "Kitchen Switch",
+                dataPointFunctions: [
+                    {name: "Switch 1", type: "boolean", typeEnum: ["ON", "OFF"]},
+                    {name: "Switch 2", type: "boolean", typeEnum: ["ON", "OFF"]},
+                    {name: "Switch 3", type: "boolean", typeEnum: ["ON", "OFF"]},
+                    {name: "Switch 4", type: "boolean", typeEnum: ["ON", "OFF"]}
+                ]
+            },
+            {
+                id: 3,
+                name: "Thermostat",
+                dataPointFunctions: [
+                    {name: "Temperature", type: "number", typeEnum: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]}
+                ]
+            }
+        ];
+
+        // DOM elements
+        const mainPage = document.getElementById("main-page");
+        const ruleWizardPage = document.getElementById("rule-wizard-page");
+        const deviceSelectionPage = document.getElementById("device-selection-page");
+        const dpfSelectionPage = document.getElementById("dpf-selection-page");
+        const dpfModal = document.getElementById("dpf-modal");
+        const dpfModalTitle = document.getElementById("dpf-modal-title");
+        const dpfModalContent = document.getElementById("dpf-modal-content");
+        const dpfModalSave = document.getElementById("dpf-modal-save");
+        const createRuleBtn = document.getElementById("create-rule-btn");
+        const addIfConditionBtn = document.getElementById("add-if-condition-btn");
+        const addThenActionBtn = document.getElementById("add-then-action-btn");
+        const saveRuleBtn = document.getElementById("save-rule-btn");
+        const saveDPFBtn = document.getElementById("save-dpf-btn");
+        const backBtn = document.getElementById("back-btn");
+        const forwardBtn = document.getElementById("forward-btn");
+
+        let currentMode = "if"; // "if" or "then"
+        let selectedDevice = null;
+        let selectedDPF = null;
+        let pageHistory = [];
+        let currentPageIndex = -1;
+
+        // Initialize device list
+        function initDeviceList() {
+            const deviceList = document.getElementById("device-list");
+            deviceList.innerHTML = devices.map(device => `
+                <div class="device-card">
+                    <h3>${device.name}</h3>
+                    <p>ID: ${device.id}</p>
+                    <p>Data Points: ${device.dataPointFunctions.length}</p>
+                </div>
+            `).join("");
+        }
+
+        // Show page
+        function showPage(pageId) {
+            document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+            document.getElementById(pageId).classList.add("active");
+
+            // Update page history
+            if (pageHistory[currentPageIndex] !== pageId) {
+                currentPageIndex++;
+                pageHistory = pageHistory.slice(0, currentPageIndex);
+                pageHistory.push(pageId);
+            }
+
+            updateNavigationButtons();
+        }
+
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            backBtn.style.display = currentPageIndex > 0 ? "inline-block" : "none";
+            forwardBtn.style.display = currentPageIndex < pageHistory.length - 1 ? "inline-block" : "none";
+        }
+
+        // Event listeners
+        createRuleBtn.addEventListener("click", () => showPage("rule-wizard-page"));
+
+        addIfConditionBtn.addEventListener("click", () => {
+            currentMode = "if";
+            showDeviceSelectionPage();
+        });
+
+        addThenActionBtn.addEventListener("click", () => {
+            currentMode = "then";
+            showDeviceSelectionPage();
+        });
+
+        saveRuleBtn.addEventListener("click", () => {
+            // Implement rule saving logic here
+            alert("Rule saved!");
+            showPage("main-page");
+        });
+
+        saveDPFBtn.addEventListener("click", () => {
+            showPage("rule-wizard-page");
+        });
+
+        backBtn.addEventListener("click", () => {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                showPage(pageHistory[currentPageIndex]);
+            }
+        });
+
+        forwardBtn.addEventListener("click", () => {
+            if (currentPageIndex < pageHistory.length - 1) {
+                currentPageIndex++;
+                showPage(pageHistory[currentPageIndex]);
+            }
+        });
+
+        // Show device selection page
+        function showDeviceSelectionPage() {
+            const deviceSelectionList = document.getElementById("device-selection-list");
+            deviceSelectionList.innerHTML = devices.map(device => `
+                <div class="device-card" data-device-id="${device.id}">
+                    <h3>${device.name}</h3>
+                    <p>ID: ${device.id}</p>
+                    <p>Data Points: ${device.dataPointFunctions.length}</p>
+                </div>
+            `).join("");
+
+            deviceSelectionList.addEventListener("click", (e) => {
+                if (e.target.closest(".device-card")) {
+                    const deviceId = e.target.closest(".device-card").dataset.deviceId;
+                    selectedDevice = devices.find(d => d.id === parseInt(deviceId));
+                    showDPFSelectionPage();
+                }
+            });
+
+            showPage("device-selection-page");
+        }
+
+        // Show DPF selection page
+        function showDPFSelectionPage() {
+            const dpfSelectionList = document.getElementById("dpf-selection-list");
+            dpfSelectionList.innerHTML = selectedDevice.dataPointFunctions.map(dpf => `
+                <div class="dpf-card" data-dpf-name="${dpf.name}">
+                    <h3>${dpf.name}</h3>
+                    <p>Type: ${dpf.type}</p>
+                    <p class="selected-value" data-dpf-value></p>
+                </div>
+            `).join("");
+
+            dpfSelectionList.addEventListener("click", (e) => {
+                if (e.target.closest(".dpf-card")) {
+                    const dpfName = e.target.closest(".dpf-card").dataset.dpfName;
+                    selectedDPF = selectedDevice.dataPointFunctions.find(d => d.name === dpfName);
+                    showDPFModal();
+                }
+            });
+
+            showPage("dpf-selection-page");
+        }
+
+        // Show DPF modal
+        function showDPFModal() {
+            dpfModalTitle.textContent = `${selectedDevice.name} - ${selectedDPF.name}`;
+            dpfModalContent.innerHTML = generateModalContent(selectedDPF);
+            dpfModal.style.display = "block";
+        }
+
+        // Generate modal content based on DPF type
+        function generateModalContent(dpf) {
+            switch (dpf.type) {
+                case "boolean":
+                    return dpf.typeEnum.map(value => `
+                        <label>
+                            <input type="radio" name="booleanValue" value="${value}">
+                            ${value}
+                        </label>
+                    `).join("");
+                case "number":
+                    const minValue = Math.min(...dpf.typeEnum);
+                    const maxValue = Math.max(...dpf.typeEnum);
+                    return `
+                        <div class="number-selector">
+                            <button class="decrease">-</button>
+                            <input type="number" min="${minValue}" max="${maxValue}" value="${minValue}">
+                            <button class="increase">+</button>
+                        </div>
+                    `;
+                default:
+                    return `<select>${dpf.typeEnum.map(value => `<option value="${value}">${value}</option>`).join("")}</select>`;
+            }
+        }
+
+        // Close modal
+        document.querySelector(".close").addEventListener("click", () => {
+            dpfModal.style.display = "none";
+        });
+
+        // Save DPF value
+        dpfModalSave.addEventListener("click", () => {
+            const selectedValue = getSelectedValue(selectedDPF.type);
+            updateDPFValue(selectedValue);
+            dpfModal.style.display = "none";
+        });
+
+        // Get selected value based on DPF type
+        function getSelectedValue(type) {
+            switch (type) {
+                case "boolean":
+                    return document.querySelector('input[name="booleanValue"]:checked').value;
+                case "number":
+                    return document.querySelector('.number-selector input').value;
+                default:
+                    return document.querySelector('select').value;
+            }
+        }
+
+        // Update DPF value in the selection list
+        function updateDPFValue(value) {
+            const dpfCard = document.querySelector(`.dpf-card[data-dpf-name="${selectedDPF.name}"]`);
+            const valueElement = dpfCard.querySelector('.selected-value');
+            valueElement.textContent = `Selected: ${value}`;
+            valueElement.dataset.dpfValue = value;
+        }
+
+        // Initialize the app
+        initDeviceList();
+
+        // Add event listeners for number selector
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('decrease')) {
+                const input = e.target.nextElementSibling;
+                if (input.value > input.min) input.value--;
+            } else if (e.target.classList.contains('increase')) {
+                const input = e.target.previousElementSibling;
+                if (input.value < input.max) input.value++;
+            }
+        });
+    </script>
+</body>
+</html>

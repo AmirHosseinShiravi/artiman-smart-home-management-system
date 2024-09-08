@@ -1,4 +1,4 @@
-export class TemperatureDial {
+class TemperatureDial {
   constructor(tempDisplaySelector, tempHandleSelector, dialCenterSelector, modalButtonSelector) {
     this.tempDisplay = document.querySelector(tempDisplaySelector);
     this.tempHandle = document.querySelector(tempHandleSelector);
@@ -73,6 +73,7 @@ export class TemperatureDial {
       setTimeout(()=>{
         this.origin = this.calculateRotationOrigin();
       }, 500);
+      return true;
 
     });
 
@@ -84,6 +85,7 @@ export class TemperatureDial {
 
     window.addEventListener("resize", () => {
       this.origin = this.calculateRotationOrigin();
+      return true;
     });
   }
 }

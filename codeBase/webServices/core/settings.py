@@ -34,7 +34,7 @@ DEBUG = str2bool(os.environ.get('DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:100', 'http://127.0.0.1:5085']
+CSRF_TRUSTED_ORIGINS = ['http://192.168.125.150:500', 'http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:100', 'http://127.0.0.1:5085']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:    
@@ -176,6 +176,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Path to media file storage
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/v1/projects/all/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

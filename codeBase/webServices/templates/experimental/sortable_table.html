@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sortable List with SortableJS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: move;
+        }
+        li:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+    <h1>Sortable List</h1>
+    <p>Drag and drop items to reorder the list. The index will update automatically.</p>
+    <ul id="sortable-list">
+        <li>Item 1 <span class="index">(0)</span></li>
+        <li>Item 2 <span class="index">(1)</span></li>
+        <li>Item 3 <span class="index">(2)</span></li>
+        <li>Item 4 <span class="index">(3)</span></li>
+        <li>Item 5 <span class="index">(4)</span></li>
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const list = document.getElementById('sortable-list');
+
+            new Sortable(list, {
+                animation: 150,
+                onEnd: function() {
+                    updateIndexes();
+                }
+            });
+
+            function updateIndexes() {
+                const items = list.querySelectorAll('li');
+                items.forEach((item, index) => {
+                    const indexSpan = item.querySelector('.index');
+                    indexSpan.textContent = `(${index})`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Automation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .card button {
+            background-color: #008CBA;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Home Automation</h1>
+        <div id="scenePage">
+            <h2>Scenes</h2>
+            <button onclick="showRuleWizard()">Add New Rule</button>
+            <div id="rulesList"></div>
+        </div>
+        <div id="ruleWizard" style="display: none;">
+            <h2>Rule Wizard</h2>
+            <h3>Conditions</h3>
+            <button onclick="showModal('conditionTypeModal')">Add Condition</button>
+            <div id="conditionsList"></div>
+            <h3>Actions</h3>
+            <button onclick="showModal('actionTypeModal')">Add Action</button>
+            <div id="actionsList"></div>
+            <button onclick="saveRule()">Save Rule</button>
+        </div>
+    </div>
+
+    <div id="conditionTypeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('conditionTypeModal')">&times;</span>
+            <h2>Select Condition Type</h2>
+            <button onclick="addCondition('tap-to-run')">Tap-to-Run</button>
+            <button onclick="showDeviceStatusPage()">Device Status</button>
+            <button onclick="showSchedulerPage()">Scheduler</button>
+        </div>
+    </div>
+
+    <div id="actionTypeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('actionTypeModal')">&times;</span>
+            <h2>Select Action Type</h2>
+            <button onclick="showDeviceControlPage()">Control Single Device</button>
+            <button onclick="showDelayActionModal()">Delay the Action</button>
+        </div>
+    </div>
+
+    <div id="delayActionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('delayActionModal')">&times;</span>
+            <h2>Set Delay</h2>
+            <input type="number" id="delaySeconds" placeholder="Delay in seconds">
+            <button onclick="addDelayAction()">Save</button>
+        </div>
+    </div>
+
+    <script>
+        let config = {
+            name: "Test Scene",
+            rule_uuid: "cb5dea3c-4772-4565-a39a-1a9a8a0fae76",
+            project_uuid: "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            home_uuid: "08e92a74-2f96-46cb-9883-82df1bd19cb8",
+            type: "automation",
+            decision_expr: "or",
+            effective_time: {
+                start: "06:00:00",
+                end: "05:30:59",
+                loops: "1111111",
+                timezone_id: "Asia/Tehran"
+            },
+            conditions: [],
+            actions: []
+        };
+
+        let rules = [];
+
+        function showRuleWizard() {
+            document.getElementById('scenePage').style.display = 'none';
+            document.getElementById('ruleWizard').style.display = 'block';
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function addCondition(type) {
+            if (type === 'tap-to-run') {
+                config.conditions.push({
+                    code: config.conditions.length + 1,
+                    entity_type: "tap-to-run"
+                });
+                renderConditions();
+                document.querySelector('#conditionTypeModal button').disabled = true;
+            }
+            closeModal('conditionTypeModal');
+        }
+
+        function showDeviceStatusPage() {
+            // Implement device status page logic
+            closeModal('conditionTypeModal');
+        }
+
+        function showSchedulerPage() {
+            // Implement scheduler page logic
+            closeModal('conditionTypeModal');
+        }
+
+        function showDeviceControlPage() {
+            // Implement device control page logic
+            closeModal('actionTypeModal');
+        }
+
+        function showDelayActionModal() {
+            showModal('delayActionModal');
+            closeModal('actionTypeModal');
+        }
+
+        function addDelayAction() {
+            const delaySeconds = document.getElementById('delaySeconds').value;
+            config.actions.push({
+                code: config.actions.length + 1,
+                action_executor: "delay",
+                executor_property: {
+                    delay_seconds: delaySeconds
+                }
+            });
+            renderActions();
+            closeModal('delayActionModal');
+        }
+
+        function renderConditions() {
+            const conditionsList = document.getElementById('conditionsList');
+            conditionsList.innerHTML = '';
+            config.conditions.forEach((condition, index) => {
+                const conditionCard = document.createElement('div');
+                conditionCard.className = 'card';
+                conditionCard.innerHTML = `
+                    <span>Condition ${index + 1}: ${condition.entity_type}</span>
+                    <button onclick="editCondition(${index})">Edit</button>
+                `;
+                conditionsList.appendChild(conditionCard);
+            });
+        }
+
+        function renderActions() {
+            const actionsList = document.getElementById('actionsList');
+            actionsList.innerHTML = '';
+            config.actions.forEach((action, index) => {
+                const actionCard = document.createElement('div');
+                actionCard.className = 'card';
+                actionCard.innerHTML = `
+                    <span>Action ${index + 1}: ${action.action_executor}</span>
+                    <button onclick="editAction(${index})">Edit</button>
+                `;
+                actionsList.appendChild(actionCard);
+            });
+        }
+
+        function editCondition(index) {
+            // Implement edit condition logic
+        }
+
+        function editAction(index) {
+            // Implement edit action logic
+        }
+
+        function saveRule() {
+            rules.push(JSON.parse(JSON.stringify(config)));
+            renderRules();
+            document.getElementById('scenePage').style.display = 'block';
+            document.getElementById('ruleWizard').style.display = 'none';
+            // Reset config for new rule
+            config.conditions = [];
+            config.actions = [];
+        }
+
+        function renderRules() {
+            const rulesList = document.getElementById('rulesList');
+            rulesList.innerHTML = '';
+            rules.forEach((rule, index) => {
+                const ruleCard = document.createElement('div');
+                ruleCard.className = 'card';
+                ruleCard.innerHTML = `
+                    <span>${rule.name}</span>
+                    <button onclick="editRule(${index})">Edit</button>
+                `;
+                rulesList.appendChild(ruleCard);
+            });
+        }
+
+        function editRule(index) {
+            config = JSON.parse(JSON.stringify(rules[index]));
+            renderConditions();
+            renderActions();
+            showRuleWizard();
+        }
+    </script>
+</body>
+</html>

@@ -4,6 +4,11 @@ python-dotenv==1.0.1
 str2bool==1.1
 pillow
 requests
+paho-mqtt==2.1.0
+HABApp==24.08.1
+pytz
+jinja2==3.1.4
+
 # UI 
 django-admin-tabler==1.0.2
 

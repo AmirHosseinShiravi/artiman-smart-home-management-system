@@ -351,21 +351,21 @@
   border-top-right-radius: 36px;
 }
 
-.ccc {
+.thermostat-control-buttons-container .ccc {
   display: flex;
   align-items: center;
   justify-content: center;
   padding-bottom: 5vh;
 }
 
-.fff {
+.thermostat-control-buttons-container .fff {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 80vw;
 }
 
-.container12 {
+.thermostat-control-buttons-container .container12 {
   /*position: absolute;*/
   /*left: 0;*/
   /*top: 0;*/
@@ -376,7 +376,7 @@
   align-items: center;
   justify-content: center;
 }
-.tabs12 {
+.thermostat-control-buttons-container .tabs12 {
   /*transform: scale(0.53);*/
   display: flex;
   position: relative;
@@ -385,13 +385,13 @@
   padding: 0.5rem;
   border-radius: 20px;
 }
-.tabs12 * {
+.thermostat-control-buttons-container .tabs12 * {
   z-index: 2;
 }
-input[type="radio"] {
+.thermostat-control-buttons-container input[type="radio"] {
   display: none;
 }
-.tab {
+.thermostat-control-buttons-container .tab {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -403,7 +403,7 @@ input[type="radio"] {
   cursor: pointer;
   transition: color 0.15s ease-in;
 }
-.notification12 {
+.thermostat-control-buttons-container .notification12 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -414,42 +414,42 @@ input[type="radio"] {
   background-color: var(--secondary-color);
   transition: 0.15s ease-in;
 }
-input[type="radio"]:checked + label {
+.thermostat-control-buttons-container input[type="radio"]:checked + label {
   color: var(--primary-color);
 }
-input[type="radio"]:checked + label > .notification {
+.thermostat-control-buttons-container input[type="radio"]:checked + label > .notification {
   background-color: var(--primary-color);
   color: #fff;
 }
-input[id="radio-heat"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-heat"]:checked ~ .glider {
   transform: translateX(0);
   background-color: rgba(248,212,209,0.8);
 }
-input[id="radio-heat"]:checked + label {
+.thermostat-control-buttons-container input[id="radio-heat"]:checked + label {
   color: #ef2f2f;
 }
-input[id="radio-cool"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-cool"]:checked ~ .glider {
   transform: translateX(100%);
 }
 
 
 
 
-input[id="radio-low"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-low"]:checked ~ .glider {
   transform: translateX(0);
 }
-input[id="radio-medium"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-medium"]:checked ~ .glider {
   transform: translateX(100%);
 }
-input[id="radio-high"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-high"]:checked ~ .glider {
   transform: translateX(200%);
 }
-input[id="radio-auto"]:checked ~ .glider {
+.thermostat-control-buttons-container input[id="radio-auto"]:checked ~ .glider {
   transform: translateX(300%);
 }
 
 
-.glider {
+.thermostat-control-buttons-container .glider {
   position: absolute;
   display: flex;
   height: 5vh;
@@ -460,14 +460,14 @@ input[id="radio-auto"]:checked ~ .glider {
   transition: 0.25s ease-out;
 }
 @media (max-width: 700px) {
-  .tabs {
+  .thermostat-control-buttons-container .tabs {
     transform: scale(0.6);
   }
 }
 
 
 
-.bbb {
+.thermostat-control-buttons-container .bbb {
   /*height: 50px;*/
 
   width: calc(var(--width-unit-size) * 35);
@@ -481,7 +481,7 @@ input[id="radio-auto"]:checked ~ .glider {
 }
 
 
-.thermostat-power-switch {
+.thermostat-control-buttons-container .thermostat-power-switch {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -494,7 +494,7 @@ input[id="radio-auto"]:checked ~ .glider {
 }
 
 
-.bbb:active {
+.thermostat-control-buttons-container .bbb:active {
 
   background-color: var(--color-pink);
 }

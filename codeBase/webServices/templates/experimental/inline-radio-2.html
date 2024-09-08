@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekday Radio Buttons</title>
+    <style>
+        .weekday-radio {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 10px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .weekday-radio label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            min-height: 44px; /* Ensuring touchable area for mobile */
+        }
+        .weekday-radio input[type="radio"] {
+            display: none;
+        }
+        .weekday-radio input[type="radio"]:checked + label {
+            background-color: #007bff;
+            color: white;
+        }
+        @media (max-width: 480px) {
+            .weekday-radio {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, auto);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="weekday-radio">
+        <input type="radio" id="monday" name="weekday" value="monday">
+        <label for="monday">Monday</label>
+
+        <input type="radio" id="tuesday" name="weekday" value="tuesday">
+        <label for="tuesday">Tuesday</label>
+
+        <input type="radio" id="wednesday" name="weekday" value="wednesday">
+        <label for="wednesday">Wednesday</label>
+
+        <input type="radio" id="thursday" name="weekday" value="thursday">
+        <label for="thursday">Thursday</label>
+
+        <input type="radio" id="friday" name="weekday" value="friday">
+        <label for="friday">Friday</label>
+
+        <input type="radio" id="saturday" name="weekday" value="saturday">
+        <label for="saturday">Saturday</label>
+
+        <input type="radio" id="sunday" name="weekday" value="sunday">
+        <label for="sunday">Sunday</label>
+
+        <input type="radio" id="once" name="weekday" value="once">
+        <label for="once">Once</label>
+    </div>
+</body>
+</html>

@@ -39,9 +39,10 @@
       }
 
       .login-field {
-          position: relative;
-          top: -35px;
-          z-index: 1;
+          {#position: relative;#}
+          {#top: -50vh;#}
+          {#z-index: 1;#}
+          {#height: 50vh;#}
           background-color: white;
           border-radius: 25px 25px 0 0 ;
       }
@@ -238,10 +239,10 @@
   <div class="bg-white">
     <div class="text-center">
       <a href="#" class="navbar-brand navbar-brand-autodark">
-        <img src="{% static 'webapp/images/1724246042670qnnpx84a.png' %}" alt=""></a>
+        <img src="{% static 'webapp/images/img.webp' %}" alt=""></a>
     </div>
-
-    <div class="login-field">
+<div class="fixed-bottom login-field">
+    <div class="pb-5">
       <div class="content1">
           <h1 class="title1">Artiman Smart Home
             <div class="aurora">
@@ -298,10 +299,11 @@
       </div>
 
     </div>
-    <div class="ps-3 pe-3 fixed-bottom pb-4">
+    <div class="ps-3 pe-3 pb-4">
       <button type="submit" form="login-form" class="btn btn-primary btn-lg w-100">Sign in</button>
     </div>
 
+</div>
 
   </div>
 
