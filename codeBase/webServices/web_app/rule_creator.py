@@ -797,7 +797,7 @@ LinkageRule(config)
                     # rules_field is point to rules filed of all_client_rules, so each changes on it, seen on
                     # all_client_rules. So we have cleaned all_client_rules now.
                     put_client_rule_endpoint = base_url + f"/api/v5/authorization/sources/built_in_database/rules/clients/{home_user.mqtt_client_id}"
-                    response = requests.put(put_client_rule_endpoint, data=json.dumps(all_client_rules).encode('utf-8'), headers=header)
+                    response = requests.put(put_client_rule_endpoint, data=json.dumps(all_client_rules).encode('utf-8'),headers=header)
                     if response.status_code == 204:
                         print(f"Successfully remove client linkage rules. client id:: {home_user.mqtt_client_id}.")
 

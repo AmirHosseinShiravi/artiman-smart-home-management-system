@@ -152,5 +152,5 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
 
 
-    // const thermostat_modla_themperature_knob = new TemperatureDial("#temp-display", "#temp-handle", "#dial-center", "#thermostat_modal_button");
+    const thermostat_modla_themperature_knob = new TemperatureDial("#temp-display", "#temp-handle", "#dial-center", "#thermostat_modal_button");
 });

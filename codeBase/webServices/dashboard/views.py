@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
-from .mqtt_manager import initialize_mqtt , subscribe_to_topic, publish_message
+from .mqtt_manager import initialize_mqtt, subscribe_to_topic, publish_message
 
 from .utils import (generate_random_username,
                     generate_random_password,
@@ -74,6 +74,19 @@ from .forms import (ProjectForm,
                     switches_of_ten_pole_thermostat_data_point_function_formset_initial,
                     thermostat_data_point_formset_initial)
 
+from django.contrib.auth.views import LoginView as dashboardLogin
+from admin_tabler.forms import RegistrationForm, LoginForm, UserPasswordResetForm, UserSetPasswordForm, UserPasswordChangeForm
+from django.contrib.auth import logout
+
+
+class LoginView(dashboardLogin):
+    template_name = 'pages/sign-in.html'
+    form_class = LoginForm
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('dashboard:login')
 
 
 ############## Projects Section ###############
@@ -486,7 +499,7 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
         home_user = None
 
     if request.method == "GET":
-        if home_user and home and project:
+        if home_user:
             user_form = UserForm(instance=home_user.user)
             home_user_form = HomeUserForm(instance=home_user)
             return render(request, 'dashboard/home_wizard/home_user_settings.html',
@@ -497,6 +510,7 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
         else:
             user_form = UserForm()
             home_user_form = HomeUserForm()
+            user_form.fields["new_password"].initial = generate_random_password()
             return render(request, 'dashboard/home_wizard/home_user_settings.html',
                           context={'user_form': user_form, 'home_user_form': home_user_form,
                                    'project': project, 'home': home,
@@ -1543,10 +1557,10 @@ def handle_message(topic: str, payload: Any):
 
 initialize_mqtt()
 
-publish_message("test/topic", {"message": "Hello from Django!"})
+# publish_message("test/topic", {"message": "Hello from Django!"})
 
 # Subscribe to a topic
-subscribe_to_topic("test/topic", handle_message)
+# subscribe_to_topic("test/topic", handle_message)
 
 # Your view logic here
 # return HttpResponse("MQTT message published and subscribed!")

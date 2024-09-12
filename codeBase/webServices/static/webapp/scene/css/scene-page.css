@@ -18,15 +18,16 @@
 
 
 .top-bar-scene-mode-selector {
-    padding-top: 20px;
+    padding-top: 2rem;
 }
 
 .nav-link.add-scene {
-    color:black !important;
+    color:var(--tblr-body-color) !important;
 }
 
 .scene-nav-link {
-    color: var(--color-snow);
+    color: var(--tblr-gray);
+
 }
 
 .scene-nav-link i {
@@ -34,7 +35,7 @@
 }
 
 .scene-nav-link.active {
-    color: black;
+    color: var(--tblr-body-color);
 }
 
 /*.scene_automation_rule_section {*/
@@ -61,7 +62,6 @@
     padding-left: calc(var(--bs-gutter-x) * .5);
     padding-right: calc(var(--bs-gutter-x) * .5);
     /* padding-top: 5px; */
-
 
     scrollbar-width: none;
     scrollbar-color: transparent transparent;
@@ -104,6 +104,7 @@
 .scene-rule-card .icon-section i {
     width: 36px;
     height: 36px;
+    /*color: var(--tblr-body-bg);*/
 }
 
 
@@ -121,6 +122,7 @@
     font-weight: bold;
     padding-top: 5px;
     padding-bottom: 2px;
+    /*color: var(--tblr-body-bg);*/
 }
 
 .scene-rule-card .summary-text {
@@ -285,7 +287,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  background-color: #e9e9eb;
+  /*background-color: #e9e9eb;*/
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s ease-out;
@@ -306,7 +308,7 @@
 }
 
 .rule-status-switch .checkbox:checked + .switch {
-  background-color: #086ce3;
+  /*background-color: #086ce3;*/
 }
 
 .rule-status-switch .checkbox:checked + .switch .slider {
@@ -329,7 +331,7 @@
 }
 .scene-page-header .back-link {
     flex: 0 0 auto; /* Prevent the div from growing */
-    color: black;
+    color: var(--tblr-body-color);;
     text-decoration: none !important;
     font-size: 0.9rem;
     font-weight: bold;
@@ -1291,4 +1293,54 @@
     text-wrap: none;
     font-weight: bold;
     font-size: small;
+}
+
+
+
+
+
+
+.empty-scene-page-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background-color: var(--tblr-body-bg);
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+.empty-scene-page-content .container {
+    max-width: 400px;
+}
+.empty-scene-page-content .message-image {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto 20px;
+    mix-blend-mode: normal;
+}
+.empty-scene-page-content .message-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 10px;
+}
+.empty-scene-page-content .message-description {
+    font-size: 12px;
+    color: #666666;
+    margin-bottom: 20px;
+    padding-right: 3rem;
+    padding-left: 3rem;
+}
+.empty-scene-page-content .btn-custom {
+    border: 2px solid #00bfa5;
+    color: #00bfa5;
+    margin-top: 0.5rem;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.empty-scene-page-content .btn-custom:hover {
+    background-color: #00bfa5;
+    color: #ffffff;
 }

@@ -3,6 +3,7 @@ import os
 import time
 from typing import Callable, Any, Dict
 from paho.mqtt import client as mqtt_client
+from paho.mqtt.enums import MQTTProtocolVersion
 import uuid
 from django.core.signals import request_finished
 from django.dispatch import receiver
@@ -19,7 +20,9 @@ class MQTTManager:
         self.client_id = client_id or f'python-mqtt-{uuid.uuid4().hex[:8]}'
         self.transport = transport
         self.websocket_path = websocket_path
-        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2, self.client_id, clean_session=False, transport=self.transport)
+        self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2,
+                                         self.client_id,
+                                         clean_session=True)
         self.client.username_pw_set(username, password)
         self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
@@ -30,11 +33,11 @@ class MQTTManager:
         self.MAX_RECONNECT_COUNT = 12
         self.MAX_RECONNECT_DELAY = 60
 
-    def _on_connect(self, client, userdata, flags, rc, properties):
-        if rc == 0 and self.client.is_connected():
+    def _on_connect(self, client, userdata, reason_code, properties, rc):
+        if self.client.is_connected():
             print(f"Connected to MQTT Broker: {self.broker}")
         else:
-            print(f"Failed to connect, return code {rc}")
+            print(f"Failed to connect, return code {reason_code}")
 
     def _on_message(self, client, userdata, msg):
         topic = msg.topic
@@ -52,7 +55,7 @@ class MQTTManager:
 
     def _on_disconnect(self, client, userdata, reason_code, properties, rc):
 
-        # logging.info("Disconnected with result code: %s", rc)
+        print(f"Disconnected with result code: {reason_code}")
         reconnect_count, reconnect_delay = 0, self.FIRST_RECONNECT_DELAY
         while reconnect_count < self.MAX_RECONNECT_COUNT:
             # logging.info("Reconnecting in %d seconds...", reconnect_delay)
@@ -124,7 +127,6 @@ def initialize_mqtt():
 
     mqtt_manager = MQTTManager(broker=emqx_broker_host,
                                port=emqx_broker_port,
-                               client_id=dashboard_mqtt_client_id,
                                username=dashboard_mqtt_username,
                                password=dashboard_mqtt_password,
                                transport=emqx_broker_transport,
@@ -132,7 +134,7 @@ def initialize_mqtt():
     mqtt_manager.connect()
 
 
-@receiver(request_finished)
+
 def close_mqtt_connection(sender, **kwargs):
     global mqtt_manager
     if mqtt_manager:

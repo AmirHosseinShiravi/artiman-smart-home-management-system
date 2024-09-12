@@ -24,10 +24,10 @@
       }
 
       body {
-          display: grid;
+          {#display: grid;#}
           place-items: center;
-          background-color: white !important;
-          color: #000000;
+          background-color: var(--tblr-body-bg) !important;
+          color: var(--tblr-body-color);
           font-family: "Inter", "DM Sans", Arial, sans-serif;
       }
 
@@ -43,7 +43,7 @@
           {#top: -50vh;#}
           {#z-index: 1;#}
           {#height: 50vh;#}
-          background-color: white;
+          background-color: var(--tblr-bg-surface);
           border-radius: 25px 25px 0 0 ;
       }
 
@@ -77,6 +77,18 @@
           mix-blend-mode: lighten;
           pointer-events: none;
       }
+
+
+      [data-bs-theme="dark"] .aurora {
+              mix-blend-mode: darken;
+          }
+
+
+      [data-bs-theme="dark"] .aurora {
+              mix-blend-mode: lighten;
+          }
+
+
 
       .aurora__item {
           overflow: hidden;
@@ -309,3 +321,7 @@
 
 
 {% endblock content %}
+
+{% block extrajs %}
+  <script type="application/javascript" src="{% static 'webapp/home/js/theme-mode.js' %}"></script>
+{% endblock extrajs %}

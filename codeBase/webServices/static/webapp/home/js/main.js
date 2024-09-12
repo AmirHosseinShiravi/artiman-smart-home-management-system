@@ -31,16 +31,46 @@ remove_tomorrow_link_interval = setInterval(remove_tomorrow_link, 100);
 var remove_tomorrow_link_interval_2;
 
 function remove_tomorrow_internal_link() {
-    var iframe = document.querySelector(".tomorrow iframe");
-    var elmnt = iframe.contentWindow.document.getElementsByTagName("a");
+    let iframe = document.querySelector(".tomorrow iframe");
+    if (iframe) {
 
-    if (elmnt) {
-        elmnt[0].href = "#";
-        elmnt[0].target = "_top";
+        let elmnt = iframe.contentWindow.document.getElementsByTagName("a");
+
+        if (elmnt) {
+            elmnt[0].href = "#";
+            elmnt[0].target = "_top";
+        }
     }
 }
 
-remove_tomorrow_link_interval_2 = setInterval(remove_tomorrow_internal_link, 10000);
+remove_tomorrow_link_interval_2 = setInterval(remove_tomorrow_internal_link, 1000);
+
+
+let remove_tomorrow_boundary_color_interval;
+let counter = 0;
+function set_iframe_boundary_color() {
+
+    let iframe = document.querySelector(".tomorrow iframe");
+    if (iframe) {
+        const html = iframe.contentWindow.document.querySelector('html');
+        if(html) {
+            const preferred_theme = localStorage.getItem('theme');
+            console.log(preferred_theme)
+            if (preferred_theme === 'dark') {
+                html.style.backgroundColor = "#040a11";
+            } else {
+                html.style.backgroundColor = "#f6f8fb";
+            }
+            html.style.transition = "0.17s";
+            counter = counter + 1;
+            if(counter === 1000){
+                clearInterval(remove_tomorrow_boundary_color_interval);
+            }
+        }
+    }
+}
+
+remove_tomorrow_boundary_color_interval = setInterval(set_iframe_boundary_color, 10);
 
 
 function updateDateTime() {
@@ -689,10 +719,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (littletextElement_status) {
             if (currentState === '1') {
                 littletextElement_status.innerHTML = 'on';
-                set_button_color(parameter);
+                // set_button_color(parameter);
             } else {
                 littletextElement_status.innerHTML = 'off';
-                restore_button_color(parameter);
+                // restore_button_color(parameter);
             }
         }
         setTimeout(function () {

@@ -5,4 +5,86 @@
     <script src="{% static 'webapp/libs/bootstrap-5.0.2/popper.min.js' %}"></script>
     <script src="{% static 'webapp/libs/bootstrap-5.0.2/bootstrap.min.js' %}"></script>
 
+<script src="{% static 'dist/js/tabler.min.js' %}?1684106062" defer></script>
+
+
 {#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>#}
+
+{#<script>#}
+{#    function setTheme(theme) {#}
+{#        document.documentElement.setAttribute('data-bs-theme', theme);#}
+{#    }#}
+{##}
+{#    function getSystemTheme() {#}
+{#        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';#}
+{#    }#}
+{##}
+{#    function applyTheme() {#}
+{#        setTheme(getSystemTheme());#}
+{#    }#}
+{##}
+{#    // Apply theme on load#}
+{#    applyTheme();#}
+{##}
+{#    // Listen for system preference changes#}
+{#    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);#}
+{#</script>#}
+
+
+{#<script>#}
+{#    document.addEventListener('DOMContentLoaded', (event) => {#}
+{#        const switchElement = document.querySelector('#theme-switch');#}
+{##}
+{#        function setTheme(theme) {#}
+{#            document.documentElement.setAttribute('data-bs-theme', theme);#}
+{#            localStorage.setItem('theme', theme);#}
+{#        }#}
+{##}
+{#        function getPreferredTheme() {#}
+{#            const storedTheme = localStorage.getItem('theme');#}
+{#            if (storedTheme) {#}
+{#                return storedTheme;#}
+{#            }#}
+{#            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';#}
+{#        }#}
+{##}
+{#        function getSystemTheme() {#}
+{#            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';#}
+{#        }#}
+{##}
+{#        function applyTheme() {#}
+{#            // Set the default theme to dark if no setting is found in local storage#}
+{#            const currentTheme = getPreferredTheme();#}
+{#            document.documentElement.setAttribute('data-bs-theme', currentTheme);#}
+{#            switchElement.checked = currentTheme === 'dark';#}
+{#            setTheme(currentTheme);#}
+{#        }#}
+{##}
+{#        function toggleTheme(event) {#}
+{#            console.log('in toggle')#}
+{#            console.log(event)#}
+{#            if (event.currentTarget.checked) {#}
+{#                setTheme('dark');#}
+{#            } else {#}
+{#                setTheme('light');#}
+{#            }#}
+{##}
+{#        }#}
+{##}
+{#        // Apply theme on load#}
+{#        applyTheme();#}
+{##}
+{#        // Listen for system preference changes#}
+{#        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {#}
+{#            if (!localStorage.getItem('theme')) {#}
+{#                setTheme(e.matches ? 'dark' : 'light');#}
+{#            } else {#}
+{#                setTheme(getPreferredTheme());#}
+{#            }#}
+{#        });#}
+{##}
+{#        // Add event listener to theme toggle button#}
+{#        document.querySelector('#theme-switch').addEventListener('click', e => toggleTheme(e));#}
+{##}
+{#    });#}
+{#</script>#}

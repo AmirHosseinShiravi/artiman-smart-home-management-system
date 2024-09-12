@@ -5,7 +5,7 @@ from admin_tabler.forms import LoginForm
 from django.contrib.auth.views import LoginView as AuthLoginView
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from dashboard.models import Project, Home, HomeUser, Controller, Zone
+from dashboard.models import Project, Home, HomeUser, Controller, Zone, DeviceProxy
 from .models import LinkageRule
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -40,14 +40,23 @@ class LoginView(AuthLoginView):
 
 def logout_view(request):
     logout(request)
+    return redirect("web_app:login")
 
 
 @login_required(login_url=reverse_lazy("web_app:login"))
 def home_page_view(request):
+    if not HomeUser.objects.filter(user=request.user).exists():
+        return redirect(reverse("web_app:login"))
     user = HomeUser.objects.filter(user=request.user).get()
     home_controllers = Controller.objects.filter(parent_home=user.parent_home, parent_project=user.parent_project).all()
     home_zones = Zone.objects.filter(parent_project=user.parent_project, parent_home=user.parent_home).all()
-    # home_devices =
+    home_devices = DeviceProxy.objects.filter(device_base__parent_project=user.parent_project, device_base__parent_home=user.parent_home).all()
+
+    for device in home_devices:
+        device_type = device.content_type
+        device_object = device.device_base
+        device_functions = list(device.device_base.functions.all())
+        pass
 
 
     emqx_broker_web_app_host = os.environ.get('emqx_broker_web_app_host')
@@ -62,12 +71,12 @@ def home_page_view(request):
         "mqtt_broker_transport": emqx_broker_web_app_transport,
         "user": user,
         "home_controllers": [{"controller_name": controller.name,
-                              "controller_uuid": controller.uuid,
+                              "controller_uuid": str(controller.uuid),
                               "status": controller.status,
                               "enable_internal_server": controller.enable_internal_server,
                               "ip_address": controller.ip_address,
                               "port_number": controller.port_number} for controller in home_controllers],
-        "home_zones": [{"zone_name": zone.zone_name, "zone_uuid": zone.uuid} for zone in home_zones]
+        "home_zones": [{"zone_name": zone.zone_name, "zone_uuid": str(zone.uuid)} for zone in home_zones]
 
     }
     # when user authenticate, redirect to this view to load pwa app.
@@ -116,10 +125,11 @@ def create_or_edit_linkage_rule_view(request, linkage_rule_uuid=None):
                     # 4. subscribe to enable/disable rule topic and call a function to set to database
 
                     rule_config = json.loads(request.body)
-                    LinkageRule.objects.update(name=rule_config["name"],
-                                              status=rule_config["status"],
-                                              rule_config=rule_config,
-                                              last_edited_by=request.user)
+
+                    LinkageRule.objects.filter(id=linkage_rule.id).update(name=rule_config["name"],
+                                                                          status=rule_config["status"],
+                                                                          rule_config=rule_config,
+                                                                          last_edited_by=request.user)
 
                     created_rule = LinkageRule.objects.get(uuid=rule_config["rule_uuid"])
                     linkage_rule_creator_instance = LinkageRuleCreator(rule_uuid=rule_config["rule_uuid"])
@@ -203,5 +213,9 @@ def delete_linkage_rule_view(request, linkage_rule_uuid=None):
                     return JsonResponse({"status": "success", "rule_uuid": linkage_rule_uuid})
                 else:
                     return JsonResponse({"status": "error", "rule_uuid": linkage_rule_uuid, "error": "rule file deletion error"})
+            else:
+                return JsonResponse({"status": "error", "rule_uuid": linkage_rule_uuid, "error": f"Rule not found"},
+                                    status=404)
+
     except Exception as e:
         return JsonResponse({"status": "error", "rule_uuid": linkage_rule_uuid, "error": f"{e}"})

@@ -2,11 +2,13 @@ from django.urls import path
 
 from . import views
 
-from admin_tabler.views import LoginView as adminTablerLoginView
+
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('accounts/login/', adminTablerLoginView.as_view(), name='login'),
+    path('accounts/login/', views.LoginView.as_view(), name='login'),
+    path('accounts/logout/', views.logout_view, name='logout'),
+
     path('amir/', views.amir, name='amir'),
     path('settings/', views.settings, name='settings'),
     path('settings_button1/', views.settings_button, name='settings_button1'),

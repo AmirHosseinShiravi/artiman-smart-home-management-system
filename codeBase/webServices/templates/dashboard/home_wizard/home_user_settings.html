@@ -44,7 +44,7 @@
               </label>
             </div>
           {% elif field.name == 'desc' %}
-            <div class="col-12 mt-4 mb-4">
+            <div class="col-6 mt-4 mb-4">
               <label class="form-label">Description</label>
               {{ field }}
             </div>
@@ -57,15 +57,15 @@
         {% endfor %}
 
       {% if home_user %}
-      <div class="col-3 mt-4 mb-4">
+      <div class="col-4 mt-5 mb-4">
         <label class="form-label">Client ID</label>
         <input class="form-control" type="text" value="{{ home_user.mqtt_client_id }}" disabled>
       </div>
-      <div class="col-3 mt-4 mb-4">
+      <div class="col-4 mt-5 mb-4">
         <label class="form-label">Username</label>
         <input class="form-control" type="text" value="{{ home_user.mqtt_username }}" disabled>
       </div>
-      <div class="col-3 mt-4 mb-4">
+      <div class="col-4 mt-5 mb-4">
         <label class="form-label">Password</label>
         <input class="form-control" type="text" value="{{ home_user.mqtt_password }}" disabled>
       </div>

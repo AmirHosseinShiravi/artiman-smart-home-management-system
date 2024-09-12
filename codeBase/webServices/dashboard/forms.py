@@ -55,7 +55,8 @@ class TabletForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
-    new_password = forms.CharField(required=False, label='New Password', initial=generate_random_password)
+    # new_password = forms.CharField(required=False, label='New Password', initial=generate_random_password)
+    new_password = forms.CharField(required=False, label='New Password')
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name']
@@ -81,7 +82,7 @@ class UserForm(forms.ModelForm):
 class HomeUserForm(forms.ModelForm):
     class Meta:
         model = HomeUser
-        fields = ['desc', 'is_tablet_user', 'is_web_app_user']
+        fields = ['desc', 'avatar', 'is_tablet_user', 'is_web_app_user']
 
     def __init__(self, *args, **kwargs):
         super(HomeUserForm, self).__init__(*args, **kwargs)
