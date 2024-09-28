@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Circular Gauge KPI Change Indicator Arrow Widgets | JSCharting</title>
+    <meta http-equiv="content-type" content="text-html; charset=utf-8" />
+
+    <script type="text/javascript" src="../jsc/jscharting.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+    <style>
+      #widgetsWrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        background: #eeeeee;
+      }
+      .chartDiv {
+        width: 100%;
+        background: white;
+        margin: 8px;
+        padding: 15px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="widgetsWrapper">
+      <div id="chartDiv1" class="chartDiv" style="max-width: 300px; height: 110px;"></div>
+      <div id="chartDiv2" class="chartDiv" style="max-width: 150px; height: 180px;"></div>
+      <div id="chartDiv3" class="chartDiv" style="max-width: 300px; height: 110px;"></div>
+    </div>
+
+    <script type="text/javascript">
+      /*
+Circular Gauge widgets with KPI value change indicator arrows.
+Learn how to:
+
+  - Use KPI value change indicator arrows in circular gauge widgets.
+*/
+      // JS
+
+      var chart1, chart2, chart3;
+
+      /* WIDGET DEFINITION */
+
+      /* Default Widget Options */
+      var circularKpiWidgetDefaults = {
+        title: '',
+        orientation: 'horizontal',
+        data: { name: 'Value', value: 10, prevValue: 15, maxValue: undefined, icon: false },
+        color: 'black',
+        valueFormat: 'n',
+        valueLabel: '',
+        showPercent: false,
+        indicator: { enabled: false, position: 'top' },
+      };
+
+      /* Widget Constructor */
+      function CircularGaugeKpiWidget(div, options) {
+        /* Config refers to JSC options, options refers to widget options. */
+        this.currentConfig = this.normalizeOptions(JSC.merge({}, circularKpiWidgetDefaults, options));
+        this.chart = new JSC.chart(
+          div,
+          JSC.merge(
+            {
+              legend_visible: false,
+              xAxis_defaultTick_gridLine_color: '#ECEFF1',
+              yAxis_visible: false,
+              defaultSeries: {
+                type: 'gauge column roundcaps',
+                angle: { sweep: 360, start: -90 },
+                mouseTracking_enabled: false,
+                shape_innerSize: '80%',
+                defaultPoint: {
+                  tooltip: '<b>%seriesName</b> %yValue% of Goal',
+                  altColor: 'currentColor',
+                  outline_width: 0,
+                },
+              },
+            },
+            this.currentConfig
+          )
+        );
+      }
+
+      /**
+       * Returns chart configuration only for specified options.
+       * @param options - Widget options.
+       * @returns {{}} - Chart configuration.
+       */
+      CircularGaugeKpiWidget.prototype.normalizeOptions = function (options) {
+        var result = {};
+        if (options.title) {
+          result.title = {
+            title: {
+              margin_bottom: 15,
+              label: {
+                text: options.title,
+                style: {
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                },
+              },
+            },
+          };
+        }
+        if (options.orientation) {
+          result.annotations = [
+            {
+              label: {
+                text:
+                  '<span style="font-size:28px; font-weight:bold;">%sum' +
+                  options.valueLabel +
+                  '</span>' +
+                  (options.indicator.enabled ? getChange(options.data) : '') +
+                  '<br>' +
+                  '<span style="font-size:14px; color:#9E9E9E;">' +
+                  options.data.name +
+                  '</span>',
+              },
+              position: options.orientation === 'vertical' ? 'top left' : 'right',
+            },
+          ];
+        }
+        if (options.data) {
+          result.series = [
+            {
+              shape: {
+                label: [
+                  {
+                    text:
+                      (options.data.icon
+                        ? '<icon name=%icon size=' + (options.showPercent ? 20 : 40) + ' fill=%fill><br>'
+                        : '') +
+                      (options.showPercent
+                        ? '<span style="color:' +
+                          options.color +
+                          ';font-size:20px;font-weight:bold">{Math.round(%value*100/' +
+                          options.data.maxValue +
+                          ')}%</span>'
+                        : ''),
+                    align: 'center',
+                    verticalAlign: 'middle',
+                  },
+                ],
+              },
+              color: options.color,
+              name: options.data.name,
+              attributes: {
+                icon: options.data.icon,
+                fill: options.color,
+              },
+              points: [['val', options.data.value]],
+            },
+          ];
+          if (options.data.maxValue) {
+            result.yAxis_scale_range = [0, options.data.maxValue];
+          }
+        }
+        if (options.valueFormat) {
+          result.yAxis_formatString = options.valueFormat;
+        }
+        return result;
+
+        function getChange(data) {
+          var margin = 0,
+            pos = options.indicator.position;
+          if (pos === 'top') {
+            margin = 3;
+          } else if (pos === 'middle' || pos === 'bottom') {
+            margin = 2;
+          }
+
+          var val = (data.value / data.prevValue - 1) * 100;
+
+          var valueLabel =
+            val < 0
+              ? '<span style="color:#43a047;font-size:14px;">' + JSC.formatNumber(Math.abs(val), 'n2') + '%</span>'
+              : '<span style="color:#ef5350;font-size:14px;">' + JSC.formatNumber(Math.abs(val), 'n2') + '%</span>';
+
+          return getIcon() + valueLabel;
+
+          function getIcon() {
+            return data.value < data.prevValue
+              ? '<icon name=material/navigation/arrow-drop-up size=12 fill=#43a047 margin=' +
+                  margin +
+                  ' verticalAlign=' +
+                  options.indicator.position +
+                  '>'
+              : '<icon name=material/navigation/arrow-drop-down size=12 fill=#ef5350 margin=' +
+                  margin +
+                  ' verticalAlign=' +
+                  options.indicator.position +
+                  '>';
+          }
+        }
+      };
+
+      /**
+       * Updates the chart based on provided options.
+       * @param options - Widget options
+       * @param updateOptions - Update options such as animation duration.
+       */
+      CircularGaugeKpiWidget.prototype.options = function (options, updateOptions) {
+        var newConfig = this.normalizeOptions(options);
+        /* Maintain chart configuration. */
+        JSC.merge(this.currentConfig, newConfig);
+        /* Update the chart. */
+        this.chart.options(newConfig, updateOptions);
+      };
+
+      /* USING THE WIDGET */
+
+      chart1 = new CircularGaugeKpiWidget('chartDiv1', {
+        orientation: 'horizontal',
+        data: {
+          name: 'Total Earnings',
+          value: 60567,
+          prevValue: 70000,
+          maxValue: 100000,
+          icon: 'linear/ecommerce/money',
+        },
+        valueFormat: 'c0',
+        color: '#EF6C00',
+        showPercent: false,
+        indicator: { enabled: true, position: 'top' },
+      });
+      chart2 = new CircularGaugeKpiWidget('chartDiv2', {
+        orientation: 'vertical',
+        data: { name: 'Sales', value: 584, prevValue: 400, maxValue: 2000 },
+        valueFormat: 'n0',
+        color: '#FBC02D',
+        showPercent: false,
+        indicator: { enabled: true, position: 'middle' },
+      });
+
+      chart3 = new CircularGaugeKpiWidget('chartDiv3', {
+        orientation: 'horizontal',
+        data: { name: 'Users', value: 16654, prevValue: 16000, maxValue: 20000, icon: 'linearicons/user' },
+        valueFormat: 'n0',
+        color: '#00B8D4',
+        showPercent: true,
+        indicator: { enabled: true, position: 'bottom' },
+      });
+    </script>
+  </body>
+</html>

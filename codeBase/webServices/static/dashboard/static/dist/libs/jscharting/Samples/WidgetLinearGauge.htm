@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Linear Gauge Widgets | JSCharting</title>
+    <meta http-equiv="content-type" content="text-html; charset=utf-8" />
+
+    <script type="text/javascript" src="../jsc/jscharting.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+    <style>
+      #widgetsWrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        background: #eeeeee;
+        padding: 20px;
+        box-sizing: border-box;
+        width: 100%;
+      }
+      .chartDiv {
+        width: 100%;
+        box-sizing: content-box;
+        margin: 8px;
+        padding: 15px;
+        border-radius: 10px;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="widgetsWrapper">
+      <div id="chartDiv1" class="chartDiv" style="max-width: 200px; height: 90px;"></div>
+      <div id="chartDiv2" class="chartDiv" style="max-width: 140px; height: 160px;"></div>
+      <div id="chartDiv3" class="chartDiv" style="max-width: 300px; height: 70px;"></div>
+    </div>
+
+    <script type="text/javascript">
+      /*
+Linear gauge widgets with values, descriptive labels and titles.
+Learn how to:
+
+  - Use linear gauges in widgets.
+*/
+      // JS
+      var chart1, chart2, chart3;
+
+      chart1 = generateLinearGaugeWidget('chartDiv1', {
+        title: 'KPI Dashboard',
+        data: [{ name: 'Users', value: 20345 }],
+        color: '#E65100',
+      });
+
+      chart2 = generateLinearGaugeWidget('chartDiv2', {
+        title: 'Gender',
+        data: [
+          { name: 'Male', value: 54, unit: '%', max: 100 },
+          { name: 'Female', value: 43, unit: '%', max: 100 },
+          { name: 'Other', value: 3, unit: '%', max: 100 },
+        ],
+        color: '#673AB7',
+      });
+
+      chart3 = generateLinearGaugeWidget('chartDiv3', {
+        title: '',
+        data: [{ name: 'Average session duration', value: 234, unit: ' s' }],
+        color: '#C2185B',
+      });
+
+      function generateLinearGaugeWidget(chartDiv, options) {
+        return JSC.chart(chartDiv, {
+          title: makeTitle(options.title),
+          legend_visible: false,
+          palette: [options.color],
+          xAxis: {
+            staticColumnWidth: 10,
+            defaultTick_gridLine_color: '#ECEFF1',
+          },
+          yAxis: makeYAxis(options.data),
+          defaultSeries: {
+            type: 'gauge linear horizontal',
+            mouseTracking_enabled: false,
+            shape: {
+              defaultLabel: {
+                verticalAlign: 'top',
+                style_fontSize: 14,
+              },
+              label: makeLabels(options.data),
+            },
+          },
+          defaultPoint_outline_width: 0,
+          series: makeSeries(options.data),
+          toolbar_visible: false,
+        });
+
+        function makeSeries(data) {
+          var series = [];
+          data.forEach(function (item, i) {
+            var name = item.name;
+            series.push({
+              type: 'column roundCaps',
+              yAxis: 'yAxis' + (i + 1),
+              name: name,
+              attributes: {
+                unit: item.unit || '',
+                icon: item.icon
+                  ? '<icon name=' + item.icon.name + ' fill=' + item.icon.color + ' size=36 margin_right=10>'
+                  : ' ',
+              },
+              points: [{ x: name, id: name, y: item.value }],
+            });
+          });
+          return series;
+        }
+
+        function makeYAxis(data) {
+          var axis = [];
+          data.forEach(function (item, i) {
+            axis.push({
+              visible: false,
+              id: 'yAxis' + (i + 1),
+              scale_range: [0, item.max],
+            });
+          });
+          return axis;
+        }
+
+        function makeTitle(title) {
+          if (title === '' || !title) return {};
+          else
+            return {
+              label: {
+                text: title,
+                style: {
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                },
+              },
+            };
+        }
+
+        function makeLabels(data) {
+          var labels;
+          var isIcon = data.find(function (element) {
+            return element.icon;
+          });
+          if (isIcon !== undefined) {
+            labels = [
+              {
+                align: 'left',
+                text: '%icon',
+                offset: '0,-4',
+              },
+              {
+                align: 'left',
+                text:
+                  '<span style="color:' +
+                  options.color +
+                  '">%value%unit</span><br><span style="color:#B0BEC5">%name</span>',
+                offset: '0,-4',
+              },
+            ];
+          } else {
+            labels = [
+              {
+                align: 'right',
+                text: '%name',
+                style_color: '#B0BEC5',
+              },
+              {
+                align: 'left',
+                text: '%value%unit',
+                style_color: options.color,
+              },
+            ];
+          }
+          return labels;
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: rgba(0,101,22,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto 20px auto;
+}
+.profile-img img {
+    width: 115px;
+    height: 115px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.profile-name {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+.profile-email {
+    text-align: center;
+    color: gray;
+    margin-bottom: 20px;
+}
+.edit-profile-btn {
+    display: block;
+    width: 150px;
+    margin: 0 auto 30px;
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none;
+}
+.section-title {
+    margin-left: 20px;
+    margin-bottom: 10px;
+    color: gray;
+}
+.list-group-item1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    border-radius: 16px;
+    margin: 5px -10px;
+    padding: 20px;
+    background-color: var(--tblr-secondary-bg);
+}
+
+.list-group-item1 .setting-item-title {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--tblr-body-color);
+    display: flex;
+    align-items: flex-end;
+}
+
+.list-group-item1 .setting-item-title i {
+    font-size: 24px;
+    margin-right: 10px;
+    color: var(--tblr-body-color);
+}
+.badge {
+    background-color: #00c853;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 7px;
+    margin-right: 10px
+}
+.toggle-switch {
+    display: flex;
+    align-items: center;
+}
+.toggle-switch input {
+    margin-left: 10px;
+}
+
+.logout {
+    margin-top: 50px;
+    margin-left: -10px;
+    margin-right: -10px;
+    height: 50px;
+    border-radius: 16px!important;
+}
+
+.setting-page-select-sync-os-theme {
+    margin-right: -10px!important;
+    width: 70px!important;
+    background-color: var(--bs-body-bg)!important;
+    color: var(--bs-body-color)!important;
+    border:0!important;
+    font-size: 16px!important;
+}
+
+.setting-page-select-sync-os-theme:focus {
+    outline: none!important;
+    box-shadow: none!important;
+    border:0!important;
+}
+
+.setting-page-select-sync-os-theme option {
+    background-color: var(--bs-body-bg)!important;
+    color: var(--bs-body-color)!important;
+    font-size: 16px!important;
+}

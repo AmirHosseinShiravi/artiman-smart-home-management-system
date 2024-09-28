@@ -1,0 +1,123 @@
+.edit-profile-header {
+    padding-left: 0.5rem;
+    display: flex;
+    justify-content: space-between; /* Distribute space between the first and second div */
+    align-items: center; /* Vertically center the items if they have different heights */
+}
+.edit-profile-header .back-link {
+    flex: 0 0 auto; /* Prevent the div from growing */
+    color: var(--tblr-body-color);;
+    text-decoration: none !important;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.edit-profile-header .edit-profile-header-name {
+    font-size: large;
+    font-weight: bold;
+    position: absolute; /* Position the middle div absolutely within the container */
+    left: 50%; /* Move to the horizontal center of the container */
+    transform: translateX(-50%); /* Adjust by half of its width to perfectly center it */
+}
+
+.form-container input {
+    background-color: var(--tblr-tertiary-bg);
+    border: 1px solid var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+.form-container input:focus {
+    background-color: var(--tblr-tertiary-bg);
+    border: 1px solid var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
+.avatar {
+    --tblr-bg-surface-secondary: var(--tblr-gray-100);
+    --tblr-avatar-size: 2.5rem;
+    --tblr-avatar-bg: var(--tblr-bg-surface-secondary);
+    --tblr-avatar-shadow: inset var(--tblr-border-color-translucent) 0 0 0 1px;
+    position: relative;
+    width: var(--tblr-avatar-size);
+    height: var(--tblr-avatar-size);
+    font-size: calc(var(--tblr-avatar-size) / 2.8571428572);
+    font-weight: var(--tblr-font-weight-medium);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tblr-muted);
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: bottom;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    background: var(--tblr-avatar-bg) no-repeat center/cover;
+    border-radius: var(--tblr-border-radius);
+    box-shadow: var(--tblr-avatar-shadow);
+}
+
+.avatar-rounded {
+    border-radius: 100rem;
+}
+
+.avatar-xs {
+--tblr-avatar-size: 1.5rem;
+}
+
+.avatar-xs .badge:empty {
+width: 0.375rem;
+height: 0.375rem;
+}
+
+.avatar-sm {
+--tblr-avatar-size: 2rem;
+}
+
+.avatar-sm .badge:empty {
+width: 0.5rem;
+height: 0.5rem;
+}
+
+.avatar-md {
+--tblr-avatar-size: 4rem;
+}
+
+.avatar-md .badge:empty {
+width: 1rem;
+height: 1rem;
+}
+
+.avatar-lg {
+--tblr-avatar-size: 5.5rem;
+}
+
+.avatar-lg .badge:empty {
+width: 1.375rem;
+height: 1.375rem;
+}
+
+.avatar-xl {
+--tblr-avatar-size: 7rem;
+}
+
+.avatar-xl .badge:empty {
+width: 1.75rem;
+height: 1.75rem;
+}
+
+.avatar-2xl {
+--tblr-avatar-size: 11rem;
+}
+
+.avatar-2xl .badge:empty {
+width: 2.75rem;
+height: 2.75rem;
+}

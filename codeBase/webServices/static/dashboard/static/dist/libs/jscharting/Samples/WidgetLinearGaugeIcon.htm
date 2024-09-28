@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Linear Gauge Icon Widgets | JSCharting</title>
+    <meta http-equiv="content-type" content="text-html; charset=utf-8" />
+
+    <script type="text/javascript" src="../jsc/jscharting.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+    <style>
+      #widgetsWrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        background: #eeeeee;
+        padding: 20px;
+        box-sizing: border-box;
+        width: 100%;
+      }
+      .chartDiv {
+        width: 100%;
+        box-sizing: content-box;
+        margin: 8px;
+        padding: 15px;
+        border-radius: 10px;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="widgetsWrapper">
+      <div id="chartDiv1" class="chartDiv" style="max-width: 200px; height: 94px;"></div>
+      <div id="chartDiv2" class="chartDiv" style="max-width: 180px; height: 240px;"></div>
+      <div id="chartDiv3" class="chartDiv" style="max-width: 300px; height: 70px;"></div>
+      <div id="chartDiv4" class="chartDiv" style="max-width: 300px; height: 94px;"></div>
+    </div>
+
+    <script type="text/javascript">
+      /*
+Linear gauge  widgets with icons, values, descriptive labels and titles.
+Learn how to:
+
+  - Use icons in linear gauge widgets.
+*/
+      // JS
+      var chart1, chart2, chart3;
+
+      /* WIDGET DEFINITION */
+
+      /* Default Widget Options */
+      var linearGaugeWidgetDefaults = {
+        title: 'Dashboard',
+        data: [{ name: 'Value', value: 10, maxValue: undefined, minValue: undefined, icon: 'material/social/people' }],
+        color: 'black',
+        valueFormat: 'n',
+        valueLabel: '',
+      };
+
+      /* Widget Constructor */
+      function LinearGaugeWidget(div, options) {
+        /* Config refers to JSC options, options refers to widget options. */
+        this.currentConfig = this.normalizeOptions(JSC.merge({}, linearGaugeWidgetDefaults, options));
+        this.chart = new JSC.chart(
+          div,
+          JSC.merge(
+            {
+              title_label_style: { fontWeight: 'bold', fontSize: 16 },
+              defaultSeries: {
+                type: 'gauge linear horizontal',
+                mouseTracking_enabled: false,
+                shape_defaultLabel: {
+                  verticalAlign: 'top',
+                  style_fontSize: 14,
+                },
+              },
+              xAxis: {
+                staticColumnWidth: 10,
+                defaultTick_gridLine_color: '#ECEFF1',
+              },
+              legend_visible: false,
+              defaultPoint_outline_width: 0,
+              toolbar_visible: false,
+            },
+            this.currentConfig
+          )
+        );
+      }
+
+      /**
+       * Returns chart configuration only for specified options.
+       * @param options - Widget options.
+       * @returns {{}} - Chart configuration.
+       */
+      LinearGaugeWidget.prototype.normalizeOptions = function (options) {
+        var result = {};
+        if (options.title) {
+          result.title_label_text = options.title;
+        }
+        if (options.color) {
+          result.palette = [options.color];
+        }
+        if (options.data) {
+          result.series = makeSeries(options.data, options.color, options.valueLabel);
+          result.yAxis = makeYAxis(options.data, options.valueFormat);
+        }
+        return result;
+
+        function makeSeries(data, color, label) {
+          var series = [];
+          data.forEach(function (item, i) {
+            var name = item.name;
+            series.push({
+              type: 'column roundCaps',
+              yAxis: 'yAxis' + (i + 1),
+              name: name,
+              color: color,
+              attributes: {
+                icon: item.icon
+                  ? item.icon.path
+                    ? '<icon path=' + item.icon.path + ' fill=' + color + ' size=36 margin_right=10>'
+                    : '<icon name=' + item.icon + ' fill=' + color + ' size=36 margin_right=10>'
+                  : ' ',
+                label: label,
+              },
+              shape_label: makeLabels(item),
+              points: [{ x: name, id: name, y: item.value }],
+            });
+          });
+          return series;
+        }
+
+        function makeYAxis(data, format) {
+          var axis = [];
+          data.forEach(function (item, i) {
+            axis.push({
+              visible: false,
+              id: 'yAxis' + (i + 1),
+              scale_range_max: item.maxValue,
+              scale_range_min: item.minValue,
+              formatString: format,
+            });
+          });
+          return axis;
+        }
+
+        function makeLabels(series) {
+          var labels;
+          if (series.icon) {
+            labels = [
+              {
+                align: 'left',
+                text: '%icon',
+                offset: '0,-4',
+              },
+              {
+                align: 'left',
+                text: '<span style="color:%color">%value %label</span><br><span style="color:#B0BEC5">%name</span>',
+                offset: '0,-4',
+              },
+            ];
+          } else {
+            labels = [
+              {
+                align: 'right',
+                text: '%name',
+                style_color: '#B0BEC5',
+              },
+              {
+                align: 'left',
+                text: '%value %label',
+                style_color: '%color',
+              },
+            ];
+          }
+          return labels;
+        }
+      };
+
+      /**
+       * Updates the chart based on provided options.
+       * @param options - Widget options
+       * @param updateOptions - Update options such as animation duration.
+       */
+      LinearGaugeWidget.prototype.options = function (options, updateOptions) {
+        var newConfig = this.normalizeOptions(options);
+        /* Maintain chart configuration. */
+        JSC.merge(this.currentConfig, newConfig);
+        /* Update the chart. */
+        this.chart.options(newConfig, updateOptions);
+      };
+      chart1 = new LinearGaugeWidget('chartDiv1', {
+        title: 'KPI Dashboard',
+        data: [{ name: 'Users', value: 20345, icon: 'material/social/people' }],
+        color: '#E65100',
+        valueLabel: 'people',
+      });
+
+      chart2 = new LinearGaugeWidget('chartDiv2', {
+        title: 'Gender',
+        data: [
+          { name: 'Male', value: 0.54, maxValue: 1, minValue: 0, icon: 'linear/basic/male' },
+          { name: 'Female', value: 0.43, maxValue: 1, minValue: 0, icon: 'linear/basic/female' },
+          {
+            name: 'Other',
+            value: 0.03,
+            maxValue: 100,
+            minValue: 0,
+            icon: {
+              path:
+                'M57.1 31.9C57.1 18.1 45.9 6.8 32 6.8c-11.2 0-20.8 7.4-24 17.5v.1c0 .1 0 .1-.1.2-.7 2.3-1.1 4.7-1.1 7.3 0 6.4 2.4 12.3 6.4 16.7l2.1 2.1c4.4 3.9 10.3 6.4 16.7 6.4 1.5 0 3-.1 4.4-.4 11.8-2 20.7-12.3 20.7-24.8 0 .1 0 .1 0 0 0 .1 0 .1 0 0zm-25 22.3c-12.2 0-22.2-10-22.2-22.2s10-22.2 22.2-22.2S54.2 19.7 54.3 32c-.1 12.2-10.1 22.2-22.2 22.2z',
+            },
+          },
+        ],
+        color: '#673AB7',
+        valueFormat: 'p',
+      });
+
+      chart3 = new LinearGaugeWidget('chartDiv3', {
+        title: '',
+        data: [{ name: 'Average session duration', value: 234, icon: 'material/device/access-time' }],
+        color: '#C2185B',
+        valueLabel: 's',
+      });
+
+      chart4 = new LinearGaugeWidget('chartDiv4', {});
+    </script>
+  </body>
+</html>
