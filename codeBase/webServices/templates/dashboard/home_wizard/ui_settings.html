@@ -1,4 +1,4 @@
-{% extends 'dashboard/home_wizard.html' %}
+{% extends 'dashboard/pages/home_wizard.html' %}
 {% load static %}
 
 {% block extrahead %}
@@ -21,14 +21,17 @@
           justify-content: start;
           gap: 50px;
           flex-wrap: wrap;
-          max-height: 85vh;
+          max-height: 80vh;
           overflow-y: scroll;
           scrollbar-width: thin;
+          padding-top: 20px;
       }
 
       i {
           font-size: 2em;
           cursor: pointer;
+          text-align: center;
+          width: 1.25em;
       }
 
       .copied-badge {
@@ -48,7 +51,7 @@
   <div class="card-body">
 
     <div class="row">
-      <div class="col-6 pt-2">
+      <div class="col-6 pt-2 pb-3">
         <form method="post" id="home_user_setting_form" action="
 
 
@@ -59,7 +62,7 @@
             {{ form.management_form }}
             {% for field in form %}
               {% if field.name == 'add_to_home' %}
-                <div class="col-12">
+                {% comment %} <div class="col-12">
 
                   <div class="mt-5">
                     <div class="form-label mb-3">{{ field.label }}</div>
@@ -68,10 +71,15 @@
                       <span class="form-check-label">If enabled, this UI element added to home page</span>
                     </label>
                   </div>
-                </div>
+                </div> {% endcomment %}
               {% elif field.name == 'on_color' or field.name == 'off_color' %}
                 <div class="col-lg-6 col-md-6 col-sm-12">
                   <label class="form-label mt-4">{{ field.label }}</label>
+                  {{ field }}
+                </div>
+              {% elif field.name == 'animation_duration' %}
+                <div class="col-12">
+                  <label class="form-label mt-4">{{ field.label }} (in miliseconds)</label>
                   {{ field }}
                 </div>
               {% else %}
@@ -90,163 +98,163 @@
           <h4 class="text-center">Click an Icon to Copy it's Code</h4>
           <div class="icons-box-container">
             <div class="icon-container">
-              <i class="fa-light fa-bell fa-fw"></i>
-              <i class="fa-light fa-grill-hot fa-fw"></i>
-              <i class="fa-light fa-booth-curtain fa-fw"></i>
-              <i class="fa-light fa-bath fa-fw"></i>
-              <i class="fa-light fa-stairs fa-fw"></i>
-              <i class="fa-light fa-air-conditioner fa-fw"></i>
-              <i class="fa-light fa-snowflake fa-fw"></i>
-              <i class="fa-light fa-mug-saucer fa-fw"></i>
-              <i class="fa-light fa-bed-front fa-fw"></i>
-              <i class="fa-light fa-loveseat fa-fw"></i>
-              <i class="fa-light fa-door-open fa-fw"></i>
-              <i class="fa-light fa-shower fa-fw"></i>
-              <i class="fa-light fa-mailbox fa-fw"></i>
-              <i class="fa-light fa-light-switch fa-fw"></i>
-              <i class="fa-light fa-books fa-fw"></i>
-              <i class="fa-light fa-speaker fa-fw"></i>
-              <i class="fa-light fa-speakers fa-fw"></i>
-              <i class="fa-light fa-chair fa-fw"></i>
-              <i class="fa-light fa-plug fa-fw"></i>
-              <i class="fa-light fa-soap fa-fw"></i>
-              <i class="fa-light fa-blanket fa-fw"></i>
-              <i class="fa-light fa-house-night fa-fw"></i>
-              <i class="fa-light fa-lightbulb fa-fw"></i>
-              <i class="fa-light fa-lamp fa-fw"></i>
-              <i class="fa-light fa-microwave fa-fw"></i>
-              <i class="fa-light fa-knife-kitchen fa-fw"></i>
-              <i class="fa-light fa-blinds-raised fa-fw"></i>
-              <i class="fa-light fa-window-frame-open fa-fw"></i>
-              <i class="fa-light fa-window-frame fa-fw"></i>
-              <i class="fa-light fa-washing-machine fa-fw"></i>
-              <i class="fa-light fa-vent-damper fa-fw"></i>
-              <i class="fa-light fa-vacuum-robot fa-fw"></i>
-              <i class="fa-light fa-vacuum fa-fw"></i>
-              <i class="fa-light fa-utensils-slash fa-fw"></i>
-              <i class="fa-light fa-utensils fa-fw"></i>
-              <i class="fa-light fa-tv-retro fa-fw"></i>
-              <i class="fa-light fa-tv fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-xmark fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-under-slash fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-under fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-slash fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-blank-under fa-fw"></i>
-              <i class="fa-light fa-toilet-paper-blank fa-fw"></i>
-              <i class="fa-light fa-toilet-paper fa-fw"></i>
-              <i class="fa-light fa-toilet fa-fw"></i>
-              <i class="fa-light fa-temperature-arrow-up fa-fw"></i>
-              <i class="fa-light fa-temperature-arrow-down fa-fw"></i>
-              <i class="fa-light fa-tank-water fa-fw"></i>
-              <i class="fa-light fa-stairs fa-fw"></i>
-              <i class="fa-light fa-square-ring fa-fw"></i>
-              <i class="fa-light fa-sprinkler-ceiling fa-fw"></i>
-              <i class="fa-light fa-sprinkler fa-fw"></i>
-              <i class="fa-light fa-spoon fa-fw"></i>
-              <i class="fa-light fa-siren-on fa-fw"></i>
-              <i class="fa-light fa-siren fa-fw"></i>
-              <i class="fa-light fa-sink fa-fw"></i>
-              <i class="fa-light fa-signal-stream fa-fw"></i>
-              <i class="fa-light fa-shutters fa-fw"></i>
-              <i class="fa-light fa-shower-down fa-fw"></i>
-              <i class="fa-light fa-sheet-plastic fa-fw"></i>
-              <i class="fa-light fa-sensor-triangle-exclamation fa-fw"></i>
-              <i class="fa-light fa-sensor-on fa-fw"></i>
-              <i class="fa-light fa-sensor-fire fa-fw"></i>
-              <i class="fa-light fa-sensor-cloud fa-fw"></i>
-              <i class="fa-light fa-sensor fa-fw"></i>
-              <i class="fa-light fa-rug fa-fw"></i>
-              <i class="fa-light fa-refrigerator fa-fw"></i>
-              <i class="fa-light fa-pump-soap fa-fw"></i>
-              <i class="fa-light fa-pump fa-fw"></i>
-              <i class="fa-light fa-plate-utensils fa-fw"></i>
-              <i class="fa-light fa-phone-intercom fa-fw"></i>
-              <i class="fa-light fa-person-to-door fa-fw"></i>
-              <i class="fa-light fa-people-roof fa-fw"></i>
-              <i class="fa-light fa-pan-frying fa-fw"></i>
-              <i class="fa-light fa-oven fa-fw"></i>
-              <i class="fa-light fa-outlet fa-fw"></i>
-              <i class="fa-light fa-mouse-field fa-fw"></i>
-              <i class="fa-light fa-mattress-pillow fa-fw"></i>
-              <i class="fa-light fa-lightbulb-on fa-fw"></i>
-              <i class="fa-light fa-lightbulb-cfl-on fa-fw"></i>
-              <i class="fa-light fa-lightbulb-cfl fa-fw"></i>
-              <i class="fa-light fa-light-switch-on fa-fw"></i>
-              <i class="fa-light fa-light-switch-off fa-fw"></i>
-              <i class="fa-light fa-light-ceiling fa-fw"></i>
-              <i class="fa-light fa-lamp-floor fa-fw"></i>
-              <i class="fa-light fa-lamp-desk fa-fw"></i>
-              <i class="fa-light fa-knife fa-fw"></i>
-              <i class="fa-light fa-kitchen-set fa-fw"></i>
-              <i class="fa-light fa-jug-detergent fa-fw"></i>
-              <i class="fa-light fa-jar-wheat fa-fw"></i>
-              <i class="fa-light fa-jar fa-fw"></i>
-              <i class="fa-light fa-house-user fa-fw"></i>
-              <i class="fa-light fa-house-signal fa-fw"></i>
-              <i class="fa-light fa-house-person-return fa-fw"></i>
-              <i class="fa-light fa-house-person-leave fa-fw"></i>
-              <i class="fa-light fa-house-lock fa-fw"></i>
-              <i class="fa-light fa-house-laptop fa-fw"></i>
-              <i class="fa-light fa-house-heart fa-fw"></i>
-              <i class="fa-light fa-house-fire fa-fw"></i>
-              <i class="fa-light fa-house-day fa-fw"></i>
-              <i class="fa-light fa-house-chimney-window fa-fw"></i>
-              <i class="fa-light fa-house-chimney-user fa-fw"></i>
-              <i class="fa-light fa-house-chimney-heart fa-fw"></i>
-              <i class="fa-light fa-hose-reel fa-fw"></i>
-              <i class="fa-light fa-hose fa-fw"></i>
-              <i class="fa-light fa-heat fa-fw"></i>
-              <i class="fa-light fa-grill-fire fa-fw"></i>
-              <i class="fa-light fa-grill fa-fw"></i>
-              <i class="fa-light fa-garage-open fa-fw"></i>
-              <i class="fa-light fa-garage-car fa-fw"></i>
-              <i class="fa-light fa-garage fa-fw"></i>
-              <i class="fa-light fa-fork-knife fa-fw"></i>
-              <i class="fa-light fa-fork fa-fw"></i>
-              <i class="fa-light fa-flashlight fa-fw"></i>
-              <i class="fa-light fa-fireplace fa-fw"></i>
-              <i class="fa-light fa-fire-hydrant fa-fw"></i>
-              <i class="fa-light fa-fire-burner fa-fw"></i>
-              <i class="fa-light fa-faucet-drip fa-fw"></i>
-              <i class="fa-light fa-faucet fa-fw"></i>
-              <i class="fa-light fa-fan-table fa-fw"></i>
-              <i class="fa-light fa-fan fa-fw"></i>
-              <i class="fa-light fa-dungeon fa-fw"></i>
-              <i class="fa-light fa-dryer-heat fa-fw"></i>
-              <i class="fa-light fa-dryer fa-fw"></i>
-              <i class="fa-light fa-door-closed fa-fw"></i>
-              <i class="fa-light fa-couch fa-fw"></i>
-              <i class="fa-light fa-computer fa-fw"></i>
-              <i class="fa-light fa-coffee-pot fa-fw"></i>
-              <i class="fa-light fa-clothes-hanger fa-fw"></i>
-              <i class="fa-light fa-clock-desk fa-fw"></i>
-              <i class="fa-light fa-circle-sort-up fa-fw"></i>
-              <i class="fa-light fa-circle-sort-down fa-fw"></i>
-              <i class="fa-light fa-circle-sort fa-fw"></i>
-              <i class="fa-light fa-chopsticks fa-fw"></i>
-              <i class="fa-light fa-chair-office fa-fw"></i>
-              <i class="fa-light fa-camera-web fa-fw"></i>
-              <i class="fa-light fa-camera-security fa-fw"></i>
-              <i class="fa-light fa-camera-cctv fa-fw"></i>
-              <i class="fa-light fa-box-tissue fa-fw"></i>
-              <i class="fa-light fa-bowl-spoon fa-fw"></i>
-              <i class="fa-light fa-block-brick-fire fa-fw"></i>
-              <i class="fa-light fa-block-brick fa-fw"></i>
-              <i class="fa-light fa-blinds-open fa-fw"></i>
-              <i class="fa-light fa-blinds fa-fw"></i>
-              <i class="fa-light fa-blender fa-fw"></i>
-              <i class="fa-light fa-blanket-fire fa-fw"></i>
-              {#            <i class="fa-light fa-bin-recycle fa-fw"></i>#}
-              {#            <i class="fa-light fa-bin-bottles-recycle fa-fw"></i>#}
-              {#            <i class="fa-light fa-bin-bottles fa-fw"></i>#}
-              {#            <i class="fa-light fa-bell-ring fa-fw"></i>#}
-              <i class="fa-light fa-bell-on fa-fw"></i>
-              <i class="fa-light fa-bed-empty fa-fw"></i>
-              <i class="fa-light fa-bed-bunk fa-fw"></i>
-              <i class="fa-light fa-bed fa-fw"></i>
-              {#            <i class="fa-light fa-bag-seedling fa-fw"></i>#}
-              <i class="fa-light fa-arrow-up-from-water-pump fa-fw"></i>
-              <i class="fa-light fa-air-conditioner fa-fw"></i>
+              <i class="fa-light fa-bell fa-2xl"></i>
+              <i class="fa-light fa-grill-hot fa-2xl"></i>
+              <i class="fa-light fa-booth-curtain fa-2xl"></i>
+              <i class="fa-light fa-bath fa-2xl"></i>
+              <i class="fa-light fa-stairs fa-2xl"></i>
+              <i class="fa-light fa-air-conditioner fa-2xl"></i>
+              <i class="fa-light fa-snowflake fa-2xl"></i>
+              <i class="fa-light fa-mug-saucer fa-2xl"></i>
+              <i class="fa-light fa-bed-front fa-2xl"></i>
+              <i class="fa-light fa-loveseat fa-2xl"></i>
+              <i class="fa-light fa-door-open fa-2xl"></i>
+              <i class="fa-light fa-shower fa-2xl"></i>
+              <i class="fa-light fa-mailbox fa-2xl"></i>
+              <i class="fa-light fa-light-switch fa-2xl"></i>
+              <i class="fa-light fa-books fa-2xl"></i>
+              <i class="fa-light fa-speaker fa-2xl"></i>
+              <i class="fa-light fa-speakers fa-2xl"></i>
+              <i class="fa-light fa-chair fa-2xl"></i>
+              <i class="fa-light fa-plug fa-2xl"></i>
+              <i class="fa-light fa-soap fa-2xl"></i>
+              <i class="fa-light fa-blanket fa-2xl"></i>
+              <i class="fa-light fa-house-night fa-2xl"></i>
+              <i class="fa-light fa-lightbulb fa-2xl"></i>
+              <i class="fa-light fa-lamp fa-2xl"></i>
+              <i class="fa-light fa-microwave fa-2xl"></i>
+              <i class="fa-light fa-knife-kitchen fa-2xl"></i>
+              <i class="fa-light fa-blinds-raised fa-2xl"></i>
+              <i class="fa-light fa-window-frame-open fa-2xl"></i>
+              <i class="fa-light fa-window-frame fa-2xl"></i>
+              <i class="fa-light fa-washing-machine fa-2xl"></i>
+              <i class="fa-light fa-vent-damper fa-2xl"></i>
+              <i class="fa-light fa-vacuum-robot fa-2xl"></i>
+              <i class="fa-light fa-vacuum fa-2xl"></i>
+              <i class="fa-light fa-utensils-slash fa-2xl"></i>
+              <i class="fa-light fa-utensils fa-2xl"></i>
+              <i class="fa-light fa-tv-retro fa-2xl"></i>
+              <i class="fa-light fa-tv fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-xmark fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-under-slash fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-under fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-slash fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-blank-under fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper-blank fa-2xl"></i>
+              <i class="fa-light fa-toilet-paper fa-2xl"></i>
+              <i class="fa-light fa-toilet fa-2xl"></i>
+              <i class="fa-light fa-temperature-arrow-up fa-2xl"></i>
+              <i class="fa-light fa-temperature-arrow-down fa-2xl"></i>
+              <i class="fa-light fa-tank-water fa-2xl"></i>
+              <i class="fa-light fa-stairs fa-2xl"></i>
+              <i class="fa-light fa-square-ring fa-2xl"></i>
+              <i class="fa-light fa-sprinkler-ceiling fa-2xl"></i>
+              <i class="fa-light fa-sprinkler fa-2xl"></i>
+              <i class="fa-light fa-spoon fa-2xl"></i>
+              <i class="fa-light fa-siren-on fa-2xl"></i>
+              <i class="fa-light fa-siren fa-2xl"></i>
+              <i class="fa-light fa-sink fa-2xl"></i>
+              <i class="fa-light fa-signal-stream fa-2xl"></i>
+              <i class="fa-light fa-shutters fa-2xl"></i>
+              <i class="fa-light fa-shower-down fa-2xl"></i>
+              <i class="fa-light fa-sheet-plastic fa-2xl"></i>
+              <i class="fa-light fa-sensor-triangle-exclamation fa-2xl"></i>
+              <i class="fa-light fa-sensor-on fa-2xl"></i>
+              <i class="fa-light fa-sensor-fire fa-2xl"></i>
+              <i class="fa-light fa-sensor-cloud fa-2xl"></i>
+              <i class="fa-light fa-sensor fa-2xl"></i>
+              <i class="fa-light fa-rug fa-2xl"></i>
+              <i class="fa-light fa-refrigerator fa-2xl"></i>
+              <i class="fa-light fa-pump-soap fa-2xl"></i>
+              <i class="fa-light fa-pump fa-2xl"></i>
+              <i class="fa-light fa-plate-utensils fa-2xl"></i>
+              <i class="fa-light fa-phone-intercom fa-2xl"></i>
+              <i class="fa-light fa-person-to-door fa-2xl"></i>
+              <i class="fa-light fa-people-roof fa-2xl"></i>
+              <i class="fa-light fa-pan-frying fa-2xl"></i>
+              <i class="fa-light fa-oven fa-2xl"></i>
+              <i class="fa-light fa-outlet fa-2xl"></i>
+              <i class="fa-light fa-mouse-field fa-2xl"></i>
+              <i class="fa-light fa-mattress-pillow fa-2xl"></i>
+              <i class="fa-light fa-lightbulb-on fa-2xl"></i>
+              <i class="fa-light fa-lightbulb-cfl-on fa-2xl"></i>
+              <i class="fa-light fa-lightbulb-cfl fa-2xl"></i>
+              <i class="fa-light fa-light-switch-on fa-2xl"></i>
+              <i class="fa-light fa-light-switch-off fa-2xl"></i>
+              <i class="fa-light fa-light-ceiling fa-2xl"></i>
+              <i class="fa-light fa-lamp-floor fa-2xl"></i>
+              <i class="fa-light fa-lamp-desk fa-2xl"></i>
+              <i class="fa-light fa-knife fa-2xl"></i>
+              <i class="fa-light fa-kitchen-set fa-2xl"></i>
+              <i class="fa-light fa-jug-detergent fa-2xl"></i>
+              <i class="fa-light fa-jar-wheat fa-2xl"></i>
+              <i class="fa-light fa-jar fa-2xl"></i>
+              <i class="fa-light fa-house-user fa-2xl"></i>
+              <i class="fa-light fa-house-signal fa-2xl"></i>
+              <i class="fa-light fa-house-person-return fa-2xl"></i>
+              <i class="fa-light fa-house-person-leave fa-2xl"></i>
+              <i class="fa-light fa-house-lock fa-2xl"></i>
+              <i class="fa-light fa-house-laptop fa-2xl"></i>
+              <i class="fa-light fa-house-heart fa-2xl"></i>
+              <i class="fa-light fa-house-fire fa-2xl"></i>
+              <i class="fa-light fa-house-day fa-2xl"></i>
+              <i class="fa-light fa-house-chimney-window fa-2xl"></i>
+              <i class="fa-light fa-house-chimney-user fa-2xl"></i>
+              <i class="fa-light fa-house-chimney-heart fa-2xl"></i>
+              <i class="fa-light fa-hose-reel fa-2xl"></i>
+              <i class="fa-light fa-hose fa-2xl"></i>
+              <i class="fa-light fa-heat fa-2xl"></i>
+              <i class="fa-light fa-grill-fire fa-2xl"></i>
+              <i class="fa-light fa-grill fa-2xl"></i>
+              <i class="fa-light fa-garage-open fa-2xl"></i>
+              <i class="fa-light fa-garage-car fa-2xl"></i>
+              <i class="fa-light fa-garage fa-2xl"></i>
+              <i class="fa-light fa-fork-knife fa-2xl"></i>
+              <i class="fa-light fa-fork fa-2xl"></i>
+              <i class="fa-light fa-flashlight fa-2xl"></i>
+              <i class="fa-light fa-fireplace fa-2xl"></i>
+              <i class="fa-light fa-fire-hydrant fa-2xl"></i>
+              <i class="fa-light fa-fire-burner fa-2xl"></i>
+              <i class="fa-light fa-faucet-drip fa-2xl"></i>
+              <i class="fa-light fa-faucet fa-2xl"></i>
+              <i class="fa-light fa-fan-table fa-2xl"></i>
+              <i class="fa-light fa-fan fa-2xl"></i>
+              <i class="fa-light fa-dungeon fa-2xl"></i>
+              <i class="fa-light fa-dryer-heat fa-2xl"></i>
+              <i class="fa-light fa-dryer fa-2xl"></i>
+              <i class="fa-light fa-door-closed fa-2xl"></i>
+              <i class="fa-light fa-couch fa-2xl"></i>
+              <i class="fa-light fa-computer fa-2xl"></i>
+              <i class="fa-light fa-coffee-pot fa-2xl"></i>
+              <i class="fa-light fa-clothes-hanger fa-2xl"></i>
+              <i class="fa-light fa-clock-desk fa-2xl"></i>
+              <i class="fa-light fa-circle-sort-up fa-2xl"></i>
+              <i class="fa-light fa-circle-sort-down fa-2xl"></i>
+              <i class="fa-light fa-circle-sort fa-2xl"></i>
+              <i class="fa-light fa-chopsticks fa-2xl"></i>
+              <i class="fa-light fa-chair-office fa-2xl"></i>
+              <i class="fa-light fa-camera-web fa-2xl"></i>
+              <i class="fa-light fa-camera-security fa-2xl"></i>
+              <i class="fa-light fa-camera-cctv fa-2xl"></i>
+              <i class="fa-light fa-box-tissue fa-2xl"></i>
+              <i class="fa-light fa-bowl-spoon fa-2xl"></i>
+              <i class="fa-light fa-block-brick-fire fa-2xl"></i>
+              <i class="fa-light fa-block-brick fa-2xl"></i>
+              <i class="fa-light fa-blinds-open fa-2xl"></i>
+              <i class="fa-light fa-blinds fa-2xl"></i>
+              <i class="fa-light fa-blender fa-2xl"></i>
+              <i class="fa-light fa-blanket-fire fa-2xl"></i>
+              {#            <i class="fa-light fa-bin-recycle fa-2xl"></i>#}
+              {#            <i class="fa-light fa-bin-bottles-recycle fa-2xl"></i>#}
+              {#            <i class="fa-light fa-bin-bottles fa-2xl"></i>#}
+              {#            <i class="fa-light fa-bell-ring fa-2xl"></i>#}
+              <i class="fa-light fa-bell-on fa-2xl"></i>
+              <i class="fa-light fa-bed-empty fa-2xl"></i>
+              <i class="fa-light fa-bed-bunk fa-2xl"></i>
+              <i class="fa-light fa-bed fa-2xl"></i>
+              {#            <i class="fa-light fa-bag-seedling fa-2xl"></i>#}
+              <i class="fa-light fa-arrow-up-from-water-pump fa-2xl"></i>
+              <i class="fa-light fa-air-conditioner fa-2xl"></i>
               <span class="text-muted" style="font-size: larger">for more icon visit <a
                       href="https://fontawesome.com/icons/" target="_blank">FontAweSome website</a></span>
             </div>
@@ -374,12 +382,15 @@
           closeButton: true,
           clearButton: true,
           swatches: [
-              '#067bc2',
-              '#84bcda',
-              '#80e377',
-              '#ecc30b',
-              '#f37748',
-              '#d56062'
+              '#FFADAD',
+                '#FFD6A5',
+                '#FDFFB6',
+                '#CAFFBF',
+                '#9BF6FF',
+                '#A0C4FF',
+                '#BDB2FF',
+                '#BDB2FF',
+                '#FFC6FF',
           ]
       });
 
@@ -390,12 +401,15 @@
           closeButton: true,
           clearButton: true,
           swatches: [
-              '#067bc2',
-              '#84bcda',
-              '#80e377',
-              '#ecc30b',
-              '#f37748',
-              '#d56062'
+              '#FFADAD',
+                '#FFD6A5',
+                '#FDFFB6',
+                '#CAFFBF',
+                '#9BF6FF',
+                '#A0C4FF',
+                '#BDB2FF',
+                '#BDB2FF',
+                '#FFC6FF',
           ]
       });
 

@@ -29,28 +29,5 @@ scene_page_nav_links.forEach(element => {
 
 })
 
-function showPage(page_query) {
 
-        // Hide all pages
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.remove('active-page');
-        });
-
-        // Show the selected page
-        const page = document.querySelector(page_query);
-        if (page) {
-            page.classList.add('active-page');
-        }
-        return false;
-
-    }
-// page.base("/web_app/v1");
-page('/web_app/v1/home', () => showPage('.home-page'));
-page('/web_app/v1/scene', () => showPage('.scene-page'));
-page('/web_app/v1/setting', () => showPage('.setting-page'));
-
-page({
-      click: true, // intercepts clicks on <a> tags
-      popstate: true, // handles browser back/forward buttons
-    });
 

@@ -2,10 +2,11 @@ import uuid
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django_advance_thumbnail import AdvanceThumbnailField
 
 from .utils import generate_random_password, generate_random_username, generate_random_id
 
@@ -16,6 +17,19 @@ def generate_rand_id_for_controller():
 
 def generate_rand_id_for_client():
     return ''.join(["client_", generate_random_id()])
+
+
+
+class DashboardUser(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, blank=False, null=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='dashboardUser', related_query_name='dashboardUser')
+    avatar = models.ImageField(upload_to="dashboard_users_avatar/original_files/", blank=True, null=True)
+    avatar_thumbnail = AdvanceThumbnailField(source_field='avatar', upload_to='dashboard_users_avatar/thumbnail_files/',
+                                             null=True, blank=True, size=(300, 300))
+
+    telegramID = models.CharField(max_length=100, default='', blank=True, null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='dashboardUser', related_query_name='dashboardUser')
+
 
 
 class CityCoordinates(models.Model):
@@ -92,8 +106,8 @@ class HomeUser(models.Model):
     is_tablet_user = models.BooleanField(blank=False, null=False, default=False)
     is_web_app_user = models.BooleanField(blank=False, null=False, default=False)
     avatar = models.ImageField(upload_to="users_avatar/original_files/", blank=True, null=True)
-    # avatar_thumbnail = AdvanceThumbnailField(source_field='avatar', upload_to='users_avatar/thumbnail_files/',
-    #                                          null=True, blank=True, size=(300, 300))
+    avatar_thumbnail = AdvanceThumbnailField(source_field='avatar', upload_to='users_avatar/thumbnail_files/',
+                                             null=True, blank=True, size=(300, 300))
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='homeUser_created_by')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -391,6 +405,7 @@ class CurtainUI(UIBase):
     button_type = models.CharField(max_length=50, blank=False, null=False, choices=UIBase.ButtonTypes.choices, default=UIBase.ButtonTypes.CURTAIN)
     open_data_point_function = models.ForeignKey(SwitchDataPointFunction, on_delete=models.CASCADE, related_name="open_data_point")
     close_data_point_function = models.ForeignKey(SwitchDataPointFunction, on_delete=models.CASCADE, related_name="close_data_point")
+    animation_duration = models.IntegerField(blank=False, null=False, default=5000)
 
 
 class ThermostatUI(UIBase):

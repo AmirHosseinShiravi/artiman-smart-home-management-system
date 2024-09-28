@@ -27,10 +27,10 @@ class LinkageRuleCreator:
         # TODO[-]: first check config file to validate it's parameters like validity of controller, home, project,
         #  linkage rule and ... . Maybe, attacker set another home or project uuid's in it's sent linkage config
         #  and wanted access to another project or home.
-        self.rule_config["name"] = self.rule_instance.name
-        self.rule_config["rule_uuid"] = self.rule_instance.uuid
-        self.rule_config["project_uuid"] = self.rule_instance.parent_project.uuid
-        self.rule_config["home_uuid"] = self.rule_instance.parent_home.uuid
+        self.rule_config["name"] = str(self.rule_instance.name)
+        self.rule_config["rule_uuid"] = str(self.rule_instance.uuid)
+        self.rule_config["project_uuid"] = str(self.rule_instance.parent_project.uuid)
+        self.rule_config["home_uuid"] = str(self.rule_instance.parent_home.uuid)
         template = Template('''
 import re
 import os
@@ -59,7 +59,7 @@ class ValueTypes(Enum):
 
 class ActionStatus(Enum):
     PENDING = "Pending"
-    IN_PROGRESS = "In Progress"
+    IN_PROGRESS = "In-Progress"
     COMPLETED = "Completed"
     FAILED = "Failed"
     CANCELLED = "Cancelled"
@@ -72,7 +72,7 @@ class LinkageRuleExecutionStatus(Enum):
     ENABLE = "enable"
     DISABLE = "disable"
     # PENDING = "Pending"
-    IN_PROGRESS = "In Progress"
+    IN_PROGRESS = "In-Progress"
     COMPLETED = "Completed"
     FAILED = "Failed"
     # CANCELLED = "Cancelled"
@@ -111,21 +111,26 @@ def value_caster(input_value, output_type):
 
         elif output_type == ValueTypes.DATE.value:
             if isinstance(input_value, str):
-                return datetime.strptime(input_value, '%Y-%m-%d').date()
+                __ = datetime.strptime(input_value, '%m-%d').date()
+                return __.replace(year=datetime.now().year)
             elif isinstance(input_value, datetime):
                 return input_value.date()
             return input_value
 
         elif output_type == ValueTypes.TIME.value:
             if isinstance(input_value, str):
-                return datetime.strptime(input_value, '%H:%M:%S').time()
+                try:
+                    return datetime.strptime(input_value, '%H:%M').time()
+                except ValueError:
+                    return datetime.strptime(input_value, '%H:%M:%S').time()
             elif isinstance(input_value, time):
                 return input_value
             return input_value
 
         elif output_type == ValueTypes.DATETIME.value:
             if isinstance(input_value, str):
-                return datetime.strptime(input_value, '%Y-%m-%d %H:%M:%S')
+                __ =  datetime.strptime(input_value, '%m-%d %H:%M')
+                return __.replace(year=datetime.now().year)
             elif isinstance(input_value, datetime):
                 return input_value
             return input_value
@@ -346,9 +351,10 @@ class LinkageRule(HABApp.Rule):
             #         7               Sunday
             loops = expr["loops"]
             days_of_week = []
-            for index, i in enumerate(str(loops).strip(), start=1):
-                if int(i) == 1:
-                    days_of_week.append(index)
+            if loops is not None and loops!="once":
+                for index, i in enumerate(str(loops).strip(), start=1):
+                    if int(i) == 1:
+                        days_of_week.append(index)
 
             timezone_id = expr["timezone_id"]
 
@@ -596,6 +602,7 @@ class LinkageRule(HABApp.Rule):
     def tap_to_run_execute_actions(self, event: ValueUpdateEvent):
         if str(self.linkage_rule_execution_status.value) not in [str(LinkageRuleExecutionStatus.DISABLE), str(LinkageRuleExecutionStatus.IN_PROGRESS)]:
             print("********* Tap To Run Command ***********")
+            self.linkage_rule_execution_status.post_value(LinkageRuleExecutionStatus.IN_PROGRESS)
             for action in self.actions:
                 action_code = action["code"]
                 self.actions_status[action_code].post_value(ActionStatus.PENDING)
@@ -751,6 +758,8 @@ LinkageRule(config)
                     # rules_field list.
                     rules_field = must_added_rules + rules_field
 
+                    all_client_rules["rules"] = rules_field
+
                     put_client_rule_endpoint = base_url + f"/api/v5/authorization/sources/built_in_database/rules/clients/{home_user.mqtt_client_id}"
                     response = requests.put(put_client_rule_endpoint, data=json.dumps(all_client_rules).encode('utf-8'),
                                             headers=header)
@@ -772,7 +781,8 @@ LinkageRule(config)
         emqx_api_username = os.environ.get('emqx_api_username')
         emqx_api_password = os.environ.get('emqx_api_password')
         base_linkage_rule_topics_address = f"v1/projects/{self.project.uuid}/homes/{self.home.uuid}/linkage-rules/{self.rule_instance.uuid}"
-        regex_pattern = r"v1/projects/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/homes/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/linkage-rules/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/"
+        # regex_pattern = r"v1/projects/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/homes/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/linkage-rules/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/"
+        regex_pattern = r"v1/projects/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/homes/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/linkage-rules/" + str(self.rule_instance.uuid) + "/"
 
         home_users = HomeUser.objects.filter(parent_project=self.project, parent_home=self.home).all()
         for home_user in home_users:
@@ -846,8 +856,14 @@ LinkageRule(config)
                         return True
                     except Exception as e:
                         print(f"Error deleting {file_path}: {e}")
-            return False
+                else:
+                    print(f"file not found.")
+                    # for any reason that file not exist, we return true for not make a problem
+                    return True
+
 
         except Exception as e:
             print(f"file not found:: error: {e}")
-            return False
+            # for any reason that file not exist, we return true for not make a problem, 
+            # because file not exist in rule engine rules folder, so we don't need to worry about it
+            return True

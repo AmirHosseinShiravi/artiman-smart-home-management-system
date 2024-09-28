@@ -15,12 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from . import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("dashboard/v1/", include('dashboard.urls', namespace="dashboard")),
     path("web_app/v1/", include('web_app.urls', namespace="web_app")),
-
-    path('', include('home.urls')),
+    path("system_runtime_tracker/v1/", include('systemUptimeTracker.urls', namespace="systemUptimeTracker")),
+    path("monitor_system_resource/v1/", include('monitor_system_resource.urls', namespace="monitor_system_resource")),
     path("admin/", admin.site.urls),
     path('tabler/', include('admin_tabler.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

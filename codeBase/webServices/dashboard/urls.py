@@ -6,8 +6,21 @@ from . import views
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('accounts/login/', views.LoginView.as_view(), name='login'),
-    path('accounts/logout/', views.logout_view, name='logout'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.logout_view, name='logout'),
+
+    path('home/', views.home_view, name='home'),
+
+    path('get_time/', views.get_time, name='get_time'),
+    path('systemStatus/', views.systemStatus, name='systemStatus'),
+    path('dashboard_statistics/', views.dashboard_statistics, name='dashboard_statistics'),
+    path('get_mqtt_broker_statistics/', views.get_mqtt_broker_statistics, name='get_mqtt_broker_statistics'),
+
+
+    path('users/', views.dashboard_all_user_view, name='dashboard_all_users'),
+    path('users/create_new_user/', views.dashboard_create_or_edit_user_view, name='dashboard_create_new_user'),
+    path('users/edit/<uuid:user_uuid>/', views.dashboard_create_or_edit_user_view, name='dashboard_edit_user'),
+    path('users/delete/<uuid:user_uuid>/', views.dashboard_delete_user_view, name='dashboard_delete_user'),
 
     path('amir/', views.amir, name='amir'),
     path('settings/', views.settings, name='settings'),

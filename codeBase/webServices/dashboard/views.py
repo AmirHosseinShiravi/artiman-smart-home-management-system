@@ -1,17 +1,19 @@
 import json
 import time
 from typing import Any
+from core import settings
+import datetime as dt
 
 from django.contrib.auth.models import Permission
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template import engines
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
 
-from .mqtt_manager import initialize_mqtt, subscribe_to_topic, publish_message
 
 from .utils import (generate_random_username,
                     generate_random_password,
@@ -21,9 +23,14 @@ from .utils import (generate_random_username,
                     set_web_app_client_rule_to_emqx_built_in_database_authorization_backend,
                     set_tablet_client_client_rule_to_emqx_built_in_database_authorization_backend,
                     delete_all_controller_client_authorization_rules,
-                    delete_all_web_app_client_authorization_rules,
-                    delete_all_tablet_client_authorization_rules,
-                    delete_user_from_emqx_password_based_built_in_database_authentication_backend)
+                    delete_web_app_client_authorization_rules,
+                    completely_delete_all_web_app_client_authorization_rules,
+                    delete_tablet_client_authorization_rules,
+                    completely_delete_all_tablet_client_authorization_rules,
+                    delete_user_from_emqx_password_based_built_in_database_authentication_backend,
+                    initialize_mqtt_connection,
+                    get_mqtt_cluster_status,
+                    get_mqtt_cluster_statistics)
 
 from .models import (Project,
                      Home,
@@ -44,7 +51,10 @@ from .models import (Project,
                      SwitchUI,
                      PushButtonUI,
                      ThermostatUI,
-                     CurtainUI)
+                     CurtainUI,
+                     DashboardUser)
+
+from web_app.models import LinkageRule
 
 from .forms import (ProjectForm,
                     HomeForm,
@@ -63,6 +73,8 @@ from .forms import (ProjectForm,
                     PushButtonUIForm,
                     CurtainUIForm,
                     ThermostatUIForm,
+                    DashboardBaseUserForm,
+                    DashboardUserForm,
                     fourPoleSwitch_dataPointFunction_formSet,
                     fivePoleSwitch_dataPointFunction_formSet,
                     thermostat_dataPointFunction_formSet,
@@ -74,13 +86,18 @@ from .forms import (ProjectForm,
                     switches_of_ten_pole_thermostat_data_point_function_formset_initial,
                     thermostat_data_point_formset_initial)
 
+
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse, reverse_lazy
+
 from django.contrib.auth.views import LoginView as dashboardLogin
-from admin_tabler.forms import RegistrationForm, LoginForm, UserPasswordResetForm, UserSetPasswordForm, UserPasswordChangeForm
+from .forms import  LoginForm
 from django.contrib.auth import logout
 
+import psutil
 
 class LoginView(dashboardLogin):
-    template_name = 'pages/sign-in.html'
+    template_name = 'dashboard/pages/sign-in.html'
     form_class = LoginForm
 
 
@@ -89,8 +106,98 @@ def logout_view(request):
     return redirect('dashboard:login')
 
 
+############## Home Section ############### 
+
+@login_required(login_url=reverse_lazy("dashboard:login"))
+def home_view(request):
+    context = {
+        "segment": "home",
+    }
+    return render(request, "dashboard/pages/home.html", context=context)
+
+
+@login_required(login_url=reverse_lazy("dashboard:login"))
+def get_time(request):
+    system_time = int(time.time() * 1000) # js unix timestamp is based on milisecond
+    context = {"system_time": system_time,
+               "validtime"  : 'true' 
+            }
+    # is_valid_time = False
+    # is_valid_time = True
+    context['validtime'] = 'true'
+    # print("*************************************", context)
+    return JsonResponse(context)
+
+
+@login_required(login_url=reverse_lazy("dashboard:login"))
+def systemStatus(request):
+    uptime = dt.datetime.now() - dt.datetime.fromtimestamp(psutil.boot_time())
+
+    context ={'cpu_usage': psutil.cpu_percent(1),
+              'ram_usage': psutil.virtual_memory().percent,
+              'disk_total': '{0:4.2f}'.format(psutil.disk_usage('/').total/ 1024**3),
+              'disk_used': '{0:4.2f}'.format(psutil.disk_usage('/').used / 1024**3),
+              'disk_used_percent': psutil.disk_usage('/').percent,
+              'disk_free': '{0:4.2f}'.format(psutil.disk_usage('/').free / 1024**3),
+              'disk_free_percent': psutil.disk_usage('/'), 
+              'datetime': int((dt.datetime.now().timestamp() + 12600 ) * 1000),
+              'uptime': f'{uptime.days} days, {uptime.seconds // 3600} hours, {(uptime.seconds // 60) % 60} minutes, {uptime.seconds % 60} seconds',
+            #   'firmware_version': f'{FirmwareFile.objects.filter(state = True).get().version}',
+              'system_status':'Up',
+            #   [-]: add config version for home page
+            #   'source_ip_address' : '',
+            #   'destination_ip_address' : '',
+              }
+    
+    return JsonResponse(context)
+
+
+@login_required(login_url=reverse_lazy("dashboard:login"))
+def dashboard_statistics(request):
+    all_projects = Project.objects.count()
+    all_homes= Home.objects.count()
+    all_active_users = HomeUser.objects.filter(user__is_active=True).count()
+    all_installed_controllers = Controller.objects.count()
+    all_active_rules = LinkageRule.objects.filter(status=LinkageRule.RuleStatus.ENABLE).count()
+    all_installed_devices = DeviceBase.objects.count()
+    all_installed_tablet = Tablet.objects.filter(status=True).count()
+
+    context = {
+        "all_projects": all_projects,
+        "all_homes": all_homes,
+        "all_active_users": all_active_users,
+        "all_installed_controllers": all_installed_controllers,
+        "all_active_rules": all_active_rules,
+        "all_installed_devices": all_installed_devices,
+        "all_installed_tablet": all_installed_tablet,
+    }
+    
+    return JsonResponse(context)
+
+
+def get_mqtt_broker_statistics(request):
+    mqtt_broker_statistics = get_mqtt_cluster_statistics()
+    matt_cluster_status = get_mqtt_cluster_status()
+    if mqtt_broker_statistics:
+        context = { 
+            "topics": mqtt_broker_statistics['topics.count'] if 'topics.count' in mqtt_broker_statistics else 0,
+            "subscriptions": mqtt_broker_statistics['subscriptions.count'] if 'subscriptions.count' in mqtt_broker_statistics else 0,
+            "sessions": mqtt_broker_statistics['cluster_sessions.count'] if 'cluster_sessions.count' in mqtt_broker_statistics else 0,
+            "connections": mqtt_broker_statistics['connections.count'] if 'connections.count' in mqtt_broker_statistics else 0,
+            "retained_messages": mqtt_broker_statistics['retained.count'] if 'retained.count' in mqtt_broker_statistics else 0,
+
+            "number_of_nodes": 1,
+            "mqtt_broker_status": matt_cluster_status["app_status"] if "app_status" in matt_cluster_status and matt_cluster_status["app_status"] == "running" else "down" 
+        }
+    else:
+        context = {}
+    return JsonResponse(context)
+
+
+
 ############## Projects Section ###############
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def all_projects_view(request):
     projects = Project.objects.all()
 
@@ -98,9 +205,10 @@ def all_projects_view(request):
         "segment": "projects",
         "projects": projects
     }
-    return render(request, "dashboard/projects.html", context=context)
+    return render(request, "dashboard/pages/projects.html", context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_project(request, project_uuid=None):
     if project_uuid:
         # Edit existing project
@@ -112,11 +220,11 @@ def create_or_edit_project(request, project_uuid=None):
     if request.method == "GET":
         if project:
             form = ProjectForm(instance=project)
-            return render(request, 'dashboard/project_settings.html',
+            return render(request, 'dashboard/pages/project_settings.html',
                           context={'forms': form, 'project_uuid': project_uuid, 'form_type': 'edit_project'})
         else:
             form = ProjectForm()
-            return render(request, 'dashboard/project_settings.html',
+            return render(request, 'dashboard/pages/project_settings.html',
                           context={'forms': form, 'form_type': 'create_new_project'})
 
     if request.method == "POST":
@@ -140,6 +248,7 @@ def create_or_edit_project(request, project_uuid=None):
         return JsonResponse({'response': form.errors})
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_project(request, project_uuid=None):
     if project_uuid:
         # Edit existing project
@@ -157,6 +266,7 @@ def delete_project(request, project_uuid=None):
 
 ############### Project Homes Section ###############
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def project_all_homes_view(request, project_uuid):
     homes = Home.objects.filter(parent_project__uuid=project_uuid).all()
     project = Project.objects.get(uuid=project_uuid)
@@ -164,9 +274,10 @@ def project_all_homes_view(request, project_uuid):
         "homes": homes,
         "project": project
     }
-    return render(request, "dashboard/project_homes.html", context=context)
+    return render(request, "dashboard/pages/project_homes.html", context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home(request, project_uuid=None, home_uuid=None):
     if home_uuid:
         # Edit existing project
@@ -179,12 +290,12 @@ def create_or_edit_home(request, project_uuid=None, home_uuid=None):
     if request.method == "GET":
         if home:
             form = HomeForm(instance=home)
-            return render(request, 'dashboard/home_settings.html',
+            return render(request, 'dashboard/pages/home_settings.html',
                           context={'forms': form, 'project_uuid': project_uuid, 'home_uuid': home_uuid,
                                    'form_type': 'edit_home'})
         else:
             form = HomeForm()
-            return render(request, 'dashboard/home_settings.html',
+            return render(request, 'dashboard/pages/home_settings.html',
                           context={'forms': form, 'form_type': 'create_new_home', 'project_uuid': project_uuid})
 
     if request.method == "POST":
@@ -209,6 +320,7 @@ def create_or_edit_home(request, project_uuid=None, home_uuid=None):
         return JsonResponse({'response': form.errors})
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home(request, project_uuid=None, home_uuid=None):
     if project_uuid and home_uuid:
         # Edit existing project
@@ -226,6 +338,7 @@ def delete_home(request, project_uuid=None, home_uuid=None):
 
 ############### Home Section ##################
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_overview_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
@@ -239,6 +352,7 @@ def home_overview_view(request, project_uuid=None, home_uuid=None):
     return render(request, "dashboard/home_wizard/home_overview.html", context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def view_selected_home_settings_page(request, project_uuid, home_uuid):
     # show page loader when switch between menu links.
     context = {
@@ -252,6 +366,7 @@ def view_selected_home_settings_page(request, project_uuid, home_uuid):
     return redirect('dashboard:home_wizard_home_settings', project_uuid, home_uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_general_settings_section_view(request, project_uuid=None, home_uuid=None):
     message = request.GET.get('message', None)
     if home_uuid and project_uuid:
@@ -301,6 +416,7 @@ def home_general_settings_section_view(request, project_uuid=None, home_uuid=Non
             return JsonResponse({'response': "home not found."})
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_tablet_section_view(request, project_uuid=None, home_uuid=None):
     message = request.GET.get('message', None)
     if home_uuid and project_uuid:
@@ -405,6 +521,7 @@ def home_tablet_section_view(request, project_uuid=None, home_uuid=None):
             return JsonResponse({'response': form.errors})
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_all_zones_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
@@ -420,6 +537,7 @@ def home_all_zones_view(request, project_uuid=None, home_uuid=None):
     return render(request, "dashboard/home_wizard/all_zones.html", context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home_zone_view(request, project_uuid=None, home_uuid=None, zone_uuid=None):
     if zone_uuid and project_uuid and home_uuid:
         # Edit existing project
@@ -456,6 +574,7 @@ def create_or_edit_home_zone_view(request, project_uuid=None, home_uuid=None, zo
         return redirect('dashboard:home_wizard_all_zones', project_uuid=project.uuid, home_uuid=home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home_zone_view(request, project_uuid=None, home_uuid=None, zone_uuid=None):
     if zone_uuid and project_uuid and home_uuid:
         # Edit existing project
@@ -471,6 +590,7 @@ def delete_home_zone_view(request, project_uuid=None, home_uuid=None, zone_uuid=
         return redirect('dashboard:home_wizard_all_zones', project_uuid, home_uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_all_users_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
@@ -484,6 +604,7 @@ def home_all_users_view(request, project_uuid=None, home_uuid=None):
     return render(request, "dashboard/home_wizard/all_home_users.html", context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, user_uuid=None):
     if user_uuid and project_uuid and home_uuid:
         # Edit existing project
@@ -524,6 +645,9 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                 user_instance = user_form.save(commit=True)
                 home_user_instance = home_user_form.save(commit=False)
                 home_user_instance.last_edited_by = request.user
+                avatar = request.FILES.get("avatar")
+                if avatar:
+                    home_user_instance.avatar = avatar
 
                 if home_user_instance.is_tablet_user == False and home_user_instance.is_web_app_user == False:
                     home_user_instance.is_tablet_user = False
@@ -538,10 +662,10 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                 # resend webapp or tablet user to broker(at this time web app and tablet user are identical but have
                 # different entity and different set authorization rules function for future purpose.)
                 if home_user_instance.is_tablet_user:
-                    # delete_all_tablet_client_authorization_rules(tablet_user_uuid=home_user.uuid)
+                    delete_tablet_client_authorization_rules(tablet_user_uuid=home_user.uuid)
                     set_tablet_client_client_rule_to_emqx_built_in_database_authorization_backend(tablet_user_uuid=home_user_instance.uuid)
                 elif home_user_instance.is_web_app_user:
-                    # delete_all_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
+                    delete_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
                     set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(home_user_uuid=home_user_instance.uuid)
 
                 add_user_to_emqx_password_based_built_in_database_authentication_backend(
@@ -561,6 +685,9 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                     home_user.parent_project = project
                     home_user.created_by = request.user
                     home_user.last_edited_by = request.user
+                    avatar = request.FILES.get("avatar")
+                    if avatar:
+                        home_user.avatar = avatar
 
                     if home_user_instance.is_tablet_user == False and home_user_instance.is_web_app_user == False:
                         home_user_instance.is_tablet_user = False
@@ -581,13 +708,25 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
                     if home_user_instance.is_tablet_user is False and home_user_instance.is_web_app_user is False:
                         home_user_instance.is_tablet_user = False
                         home_user_instance.is_web_app_user = True
-                    home_user_instance = HomeUser.objects.create(user=user_instance,
-                                                                 parent_project=project,
-                                                                 parent_home=home,
-                                                                 is_tablet_user=home_user_instance.is_tablet_user,
-                                                                 is_web_app_user=home_user_instance.is_web_app_user,
-                                                                 created_by=request.user,
-                                                                 last_edited_by=request.user)
+
+                    avatar = request.FILES.get("avatar")
+                    if avatar:
+                        home_user_instance = HomeUser.objects.create(user=user_instance,
+                                                                     parent_project=project,
+                                                                     parent_home=home,
+                                                                     is_tablet_user=home_user_instance.is_tablet_user,
+                                                                     is_web_app_user=home_user_instance.is_web_app_user,
+                                                                     created_by=request.user,
+                                                                     last_edited_by=request.user,
+                                                                     avatar=avatar)
+                    else:
+                        home_user_instance = HomeUser.objects.create(user=user_instance,
+                                                                     parent_project=project,
+                                                                     parent_home=home,
+                                                                     is_tablet_user=home_user_instance.is_tablet_user,
+                                                                     is_web_app_user=home_user_instance.is_web_app_user,
+                                                                     created_by=request.user,
+                                                                     last_edited_by=request.user)
 
                     if home_user_instance.is_tablet_user:
                         set_tablet_client_client_rule_to_emqx_built_in_database_authorization_backend(tablet_user_uuid=home_user_instance.uuid)
@@ -602,6 +741,7 @@ def create_or_edit_home_user_view(request, project_uuid=None, home_uuid=None, us
         return redirect("dashboard:home_wizard_all_users", project_uuid=project.uuid, home_uuid=home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home_user_view(request, project_uuid, home_uuid, user_uuid):
     if user_uuid and project_uuid and home_uuid:
         # Edit existing project
@@ -614,13 +754,13 @@ def delete_home_user_view(request, project_uuid, home_uuid, user_uuid):
         delete_user_from_emqx_password_based_built_in_database_authentication_backend(mqtt_username=home_user.mqtt_username)
 
         if home_user.is_tablet_user:
-            delete_all_tablet_client_authorization_rules(tablet_user_uuid=home_user.uuid)
+            completely_delete_all_tablet_client_authorization_rules(tablet_user_uuid=home_user.uuid)
 
         elif home_user.is_web_app_user:
-            delete_all_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
+            completely_delete_all_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
 
         else:
-            delete_all_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
+            completely_delete_all_web_app_client_authorization_rules(home_user_uuid=home_user.uuid)
 
         User.objects.get(id=home_user.user.id).delete()
 
@@ -630,8 +770,9 @@ def delete_home_user_view(request, project_uuid, home_uuid, user_uuid):
         return redirect('dashboard:home_wizard_all_users', project_uuid, home_uuid)
 
 
-#############################################################################################################
-
+##########################################################
+# ###################################################
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_all_controller_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
@@ -646,6 +787,7 @@ def home_all_controller_view(request, project_uuid=None, home_uuid=None):
     return render(request, 'dashboard/home_wizard/all_controllers.html', context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home_controller_view(request, project_uuid=None, home_uuid=None, controller_uuid=None):
     if controller_uuid:
         home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
@@ -757,6 +899,7 @@ def create_or_edit_home_controller_view(request, project_uuid=None, home_uuid=No
         return redirect('dashboard:home_wizard_all_controllers', project.uuid, home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home_controller_view(request, project_uuid=None, home_uuid=None, controller_uuid=None):
     home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
     project = get_object_or_404(Project, uuid=project_uuid)
@@ -783,10 +926,14 @@ def delete_home_controller_view(request, project_uuid=None, home_uuid=None, cont
     return redirect('dashboard:home_wizard_all_controllers', project.uuid, home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def download_home_controller_config_view(request, project_uuid=None, home_uuid=None, controller_uuid=None):
+    # based on controller modal and all related device and datapoint functions, generate a json config file for controller that cover all settings that controller need to work
+    # this file will be used to download on controller to setup all settings
     pass
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_all_devices_view(request, project_uuid=None, home_uuid=None):
     home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
     project = get_object_or_404(Project, uuid=project_uuid)
@@ -805,6 +952,7 @@ def home_all_devices_view(request, project_uuid=None, home_uuid=None):
     return render(request, 'dashboard/home_wizard/all_devices.html', context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, device_uuid=None):
     if device_uuid:
         home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
@@ -1256,6 +1404,7 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                 return redirect('dashboard:home_wizard_all_devices', project_uuid=project.uuid, home_uuid=home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home_device_view(request, project_uuid=None, home_uuid=None, device_uuid=None):
     home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
     project = get_object_or_404(Project, uuid=project_uuid)
@@ -1288,6 +1437,7 @@ def delete_home_device_view(request, project_uuid=None, home_uuid=None, device_u
     return redirect('dashboard:home_wizard_all_devices', project.uuid, home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def home_all_ui_elements_view(request, project_uuid=None, home_uuid=None):
     home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
     project = get_object_or_404(Project, uuid=project_uuid)
@@ -1306,6 +1456,7 @@ def home_all_ui_elements_view(request, project_uuid=None, home_uuid=None):
     return render(request, 'dashboard/home_wizard/all_ui.html', context=context)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def create_or_edit_home_ui_element_view(request, project_uuid=None, home_uuid=None, ui_element_uuid=None):
     if ui_element_uuid:
         home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
@@ -1533,6 +1684,7 @@ def create_or_edit_home_ui_element_view(request, project_uuid=None, home_uuid=No
                 return redirect('dashboard:home_wizard_all_ui_elements', project_uuid=project.uuid, home_uuid=home.uuid)
 
 
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def delete_home_ui_element_view(request, project_uuid=None, home_uuid=None, ui_element_uuid=None):
     home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
     project = get_object_or_404(Project, uuid=project_uuid)
@@ -1545,60 +1697,140 @@ def delete_home_ui_element_view(request, project_uuid=None, home_uuid=None, ui_e
     return redirect('dashboard:home_wizard_all_ui_elements', project.uuid, home.uuid)
 
 
-############### MQTT manager ###################
-
-# Example usage in a Django view
-# def my_view(request):
-    # Publish a message
-def handle_message(topic: str, payload: Any):
-    print(f"Received message on {topic}: {payload}")
-    # Process the message as needed
-
-
-initialize_mqtt()
-
-# publish_message("test/topic", {"message": "Hello from Django!"})
-
-# Subscribe to a topic
-# subscribe_to_topic("test/topic", handle_message)
-
-# Your view logic here
-# return HttpResponse("MQTT message published and subscribed!")
-
-
-
-
-
-# from .mqtt_manager_v2 import mqtt_manager
-#
-#
-# def handle_message(topic: str, payload: Any):
-#     print(f"Received message on {topic}: {payload}")
-#     # Process the message as needed
-#
-#
-# mqtt_manager.publish("test/topic", {"message": "Hello from Django!"})
-# mqtt_manager.subscribe("test/topic", handle_message)
+# ############### MQTT manager ###################
+if not settings.in_task_mode:
+    initialize_mqtt_connection()
 
 ############### Users Section ##################
 
-
+@login_required(login_url=reverse_lazy("dashboard:login"))
 def dashboard_all_user_view(request):
-    pass
+    if request.user.has_perm('dashboard.view_dashboarduser'):
+        all_users_query = DashboardUser.objects.all()
+    else:
+        all_users_query = DashboardUser.objects.filter(user=request.user)
+    context = {'users': all_users_query,
+               'segment': 'all_users'
+               }
+    return render(request, 'dashboard/pages/dashboard_users.html', context=context)
 
 
-def dashboard_create_new_user_view(request):
-    pass
+@login_required(login_url=reverse_lazy("dashboard:login"))
+def dashboard_create_or_edit_user_view(request, user_uuid=None):
 
+    if not request.user.has_perm('dashboard.add_dashboarduser') or not request.user.has_perm('dashboard.change_dashboarduser'):
+        return redirect('dashboard:dashboard_all_users')
+    else:
+        if user_uuid:
+            user = get_object_or_404(DashboardUser, uuid=user_uuid)
+        else:
+            user = None
 
-def dashboard_selected_user_view(request):
     if request.method == "GET":
-        pass
+        if user:
+            dashboard_base_user_form = DashboardBaseUserForm(instance=user.user)
+            dashboard_user_form = DashboardUserForm(instance=user)
+        else:
+            dashboard_base_user_form = DashboardBaseUserForm()
+            dashboard_user_form = DashboardUserForm()
+        context = {
+            'segment': 'add_user',
+            'dashboard_base_user_form': dashboard_base_user_form,
+            'dashboard_user_form': dashboard_user_form,
+            'user_uuid': user_uuid,
+        }
+        return render(request, 'dashboard/pages/create_new_dashboard_user.html', context=context)
     if request.method == "POST":
-        pass
-    if request.method == "DELETE":
-        pass
+        if user:    
+            dashboard_base_user_form = DashboardBaseUserForm(request.POST, request.FILES, instance=user.user)
+            dashboard_user_form = DashboardUserForm(request.POST, request.FILES, instance=user)
 
+            if dashboard_base_user_form.is_valid() and dashboard_user_form.is_valid():
+                dashboard_base_user_instance = dashboard_base_user_form.save(commit=True)
+                dashboard_user_form_instance = dashboard_user_form.save(commit=False)
+                avatar = request.FILES.get("avatar")
+                if avatar:
+                    dashboard_user_form_instance.avatar = avatar
+
+                
+                dashboard_user_form_instance.save()
+                
+                group_name = dashboard_user_form_instance.group
+                if group_name:
+                    try:
+                        group = Group.objects.get(name=group_name)
+                        dashboard_base_user_instance.groups.clear()
+                        dashboard_base_user_instance.groups.add(group)
+                    except Group.DoesNotExist:
+                        print("Group does not exist")
+                return redirect('dashboard:dashboard_all_users')
+            else:
+                context = {
+                    'segment': 'add_user',
+                    'dashboard_base_user_form': dashboard_base_user_form,
+                    'dashboard_user_form': dashboard_user_form,
+                    'user_uuid': user_uuid,
+                }
+                return render(request, 'dashboard/pages/create_new_dashboard_user.html', context=context)   
+        else:
+            dashboard_base_user_form = DashboardBaseUserForm(request.POST, request.FILES)
+            dashboard_user_form = DashboardUserForm(request.POST, request.FILES)
+            if dashboard_base_user_form.is_valid() and dashboard_user_form.is_valid():
+                dashboard_base_user_instance = dashboard_base_user_form.save(commit=True)
+                dashboard_user_instance = dashboard_user_form.save(commit=False)
+                if hasattr(dashboard_base_user_instance, 'dashboardUser'):
+                    dashboard_user = dashboard_base_user_instance.dashboardUser
+                        
+                    avatar = request.FILES.get("avatar")
+                    if avatar:
+                        dashboard_user.avatar = avatar
+
+                    dashboard_base_user_instance.dashboardUser.save()
+                else:
+
+                    avatar = request.FILES.get("avatar")
+                    if avatar:
+                        dashboard_user_instance = DashboardUser.objects.create(user=dashboard_base_user_instance,
+                                                                                group=dashboard_user_instance.group,
+                                                                                telegramID=dashboard_user_instance.telegramID,
+                                                                                avatar=avatar)
+                    else:
+                        dashboard_user_instance = DashboardUser.objects.create(user=dashboard_base_user_instance,
+                                                                                group=dashboard_user_instance.group,
+                                                                                telegramID=dashboard_user_instance.telegramID)
+
+                group_name = dashboard_user_form_instance.group
+                if group_name:
+                    try:
+                        group = Group.objects.get(name=group_name)
+                        dashboard_base_user_instance.groups.clear()
+                        dashboard_base_user_instance.groups.add(group)
+                    except Group.DoesNotExist:
+                        print("Group does not exist")
+
+                return redirect('dashboard:dashboard_all_users')
+            else:
+                print(dashboard_base_user_form.errors)
+                print(dashboard_user_form.errors)
+                context = {
+                    'segment': 'add_user',
+                    'dashboard_base_user_form': dashboard_base_user_form,
+                    'dashboard_user_form': dashboard_user_form,
+                    'user_uuid': user_uuid,
+                }
+                return render(request, 'dashboard/pages/create_new_dashboard_user.html', context=context)   
+
+def dashboard_delete_user_view(request, user_uuid=None):
+    if request.user.has_perm('dashboard.delete_dashboarduser'):
+        dashboard_user = get_object_or_404(DashboardUser, uuid=user_uuid)
+        if dashboard_user:
+            user = dashboard_user.user
+            user.delete()
+            return redirect('dashboard:dashboard_all_users')
+        else:
+            return redirect('dashboard:dashboard_all_users')
+    else:
+        return redirect('dashboard:dashboard_all_users')
 
 ############### login/logout section ##################
 
@@ -1626,7 +1858,7 @@ def settings(request):
         'parent': 'extra',
         'segment': 'settings',
     }
-    return render(request, 'dashboard/home_settings.html', context)
+    return render(request, 'dashboard/pages/home_settings.html', context)
 
 
 def settings_button(request):

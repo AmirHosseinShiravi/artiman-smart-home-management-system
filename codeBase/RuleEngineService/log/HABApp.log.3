@@ -1,0 +1,221 @@
+[2024-09-25 01:38:14,046] [                   HABApp]     INFO | HABApp Version 24.08.1
+[2024-09-25 01:38:14,370] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py:213: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:38:14,371] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py:232: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:38:14,376] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py:547: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:38:14,377] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py:555: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | Error "First run can not be in the past! Now: 2024-09-25 01:38:14.393590+03:30, run: 2024-09-24T20:36:00+03:30" in load:
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | Could not load D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py!
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | File "<frozen runpy>", line 291 in run_path
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,511] [             HABApp.Rules]    ERROR | File "<frozen runpy>", line 98 in _run_module_code
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | File "<frozen runpy>", line 88 in _run_code
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 666 in rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      658 |                 print(f"action_code:: {action_code} :: action status:: {action_status.value}")
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      660 |     # def perform_action(self, action):
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      664 | config = {'name': 'Test1', 'index': 0, 'rule_uuid': '5326c2b0-2f8a-4d50-806b-4a53f503ac50', 'project_uuid': 'fa1d1043-54bf-424b-9aab-fbae54d873c9', 'home_uuid': '5dbbeedc-9041-4191-a1fc-f2a4471b7968', 'type': 'automation', 'status': 'enable', 'add_to_home_status': 'false', 'style': {'color': '#FFB5A7'}, 'decision_expr': 'or', 'effective_time': {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}, 'conditions': [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}], 'actions': [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]}
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR | -->  666 | LinkageRule(config)
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      (ValueError, TypeError, json.JSONDecodeError) = (<class 'ValueError'>, <class 'TypeError'>, <class 'json.decoder.JSONDecodeError'>)
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      ActionStatus.COMPLETED = <ActionStatus.COMPLETED: 'Completed'>
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      ActionStatus.IN_PROGRESS = <ActionStatus.IN_PROGRESS: 'In-Progress'>
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      ActionStatus.PENDING = <ActionStatus.PENDING: 'Pending'>
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      int, MqttItem.listen_event = (<class 'int'>, <function BaseItem.listen_event at 0x000002D3EEFDEFC0>)
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.COMPLETED = <LinkageRuleExecutionStatus.COMPLETED: 'Completed'>
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.DISABLE = <LinkageRuleExecutionStatus.DISABLE: 'disable'>
+[2024-09-25 01:38:14,512] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.ENABLE = <LinkageRuleExecutionStatus.ENABLE: 'enable'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.IN_PROGRESS = <LinkageRuleExecutionStatus.IN_PROGRESS: 'In-Progress'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      pytz.utc = <UTC>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.BOOLEAN = <ValueTypes.BOOLEAN: 'BOOLEAN'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.DATE = <ValueTypes.DATE: 'DATE'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.DATETIME = <ValueTypes.DATETIME: 'DATETIME'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.DECIMAL = <ValueTypes.DECIMAL: 'DECIMAL'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.FLOAT = <ValueTypes.FLOAT: 'FLOAT'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.INTEGER = <ValueTypes.INTEGER: 'INTEGER'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.JSON = <ValueTypes.JSON: 'JSON'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.STRING = <ValueTypes.STRING: 'STRING'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      ValueTypes.TIME = <ValueTypes.TIME: 'TIME'>
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      config = {'name': 'Test1', 'index': 0, 'rule_uuid': '5326c2b0-2f8a-4d50-806b-4a53f503ac50', 'project_uuid': 'fa1d1043-54bf-424b-9aab-fbae54d873c9', 'home_uuid': '5dbbeedc-9041-4191-a1fc-f2a4471b7968', 'type': 'automation', 'status': 'enable', 'add_to_home_status': 'false', 'style': {'color': '#FFB5A7'}, 'decision_expr': 'or', 'effective_time': {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}, 'conditions': [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}], 'actions': [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]}
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      dict() = {}
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR | File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 170 in __init__
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |      146 | def __init__(self, linkage_rule_config):
+[2024-09-25 01:38:14,513] [             HABApp.Rules]    ERROR |        (...)
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      167 |     self.linkage_rule_execution_status = None
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      168 |     self.tap_to_run_command_status: bool = False
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      169 |     self.listeners = None
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR | -->  170 |     self.create_rule()
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      171 |     self.create_action()
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      int, MqttItem.listen_event = (<class 'int'>, <function BaseItem.listen_event at 0x000002D3EEFDEFC0>)
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self = <LinkageRule Test1>
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self.actions = [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self.actions_status = {}
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self.condition_event_listeners = {}
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self.conditions = [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}]
+[2024-09-25 01:38:14,514] [             HABApp.Rules]    ERROR |      self.conditions_status = {1: False}
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.config = {'name': 'Test1', 'index': 0, 'rule_uuid': '5326c2b0-2f8a-4d50-806b-4a53f503ac50', 'project_uuid': 'fa1d1043-54bf-424b-9aab-fbae54d873c9', 'home_uuid': '5dbbeedc-9041-4191-a1fc-f2a4471b7968', 'type': 'automation', 'status': 'enable', 'add_to_home_status': 'false', 'style': {'color': '#FFB5A7'}, 'decision_expr': 'or', 'effective_time': {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}, 'conditions': [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}], 'actions': [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]}
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.decision_expr = 'or'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.effective_time = {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.home_uuid = '5dbbeedc-9041-4191-a1fc-f2a4471b7968'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.linkage_rule_base_topic = 'v1/projects/fa1d1043-54bf-424b-9aab-fbae54d873c9/homes/5dbbeedc-9041-4191-a1fc-f2a4471b7968/linkage-rules/5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.linkage_rule_execution_status = None
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.linkage_rule_type = 'automation'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.listeners = None
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.param_file_name = 'rule_params_5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.project_uuid = 'fa1d1043-54bf-424b-9aab-fbae54d873c9'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.rule_uuid = '5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      self.tap_to_run_command_status = False
+[2024-09-25 01:38:14,515] [             HABApp.Rules]    ERROR |      dict() = {}
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      linkage_rule_config = {'name': 'Test1', 'index': 0, 'rule_uuid': '5326c2b0-2f8a-4d50-806b-4a53f503ac50', 'project_uuid': 'fa1d1043-54bf-424b-9aab-fbae54d873c9', 'home_uuid': '5dbbeedc-9041-4191-a1fc-f2a4471b7968', 'type': 'automation', 'status': 'enable', 'add_to_home_status': 'false', 'style': {'color': '#FFB5A7'}, 'decision_expr': 'or', 'effective_time': {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}, 'conditions': [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}], 'actions': [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]}
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR | File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 202 in create_rule
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      173 | def create_rule(self):
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      174 |     # Extract details from config
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |        (...)
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      198 |             condition_code = int(condition["code"])
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      199 |             self.conditions_status[condition_code] = False
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      201 |         for condition in self.conditions:
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR | -->  202 |             self.create_condition(condition)
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |      203 |     else:
+[2024-09-25 01:38:14,516] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.DISABLE = <LinkageRuleExecutionStatus.DISABLE: 'disable'>
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      LinkageRuleExecutionStatus.ENABLE = <LinkageRuleExecutionStatus.ENABLE: 'enable'>
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self = <LinkageRule Test1>
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.actions = [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.conditions = [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}]
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.conditions_status = {1: False}
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.conditions_status[condition_code] = False
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.config = {'name': 'Test1', 'index': 0, 'rule_uuid': '5326c2b0-2f8a-4d50-806b-4a53f503ac50', 'project_uuid': 'fa1d1043-54bf-424b-9aab-fbae54d873c9', 'home_uuid': '5dbbeedc-9041-4191-a1fc-f2a4471b7968', 'type': 'automation', 'status': 'enable', 'add_to_home_status': 'false', 'style': {'color': '#FFB5A7'}, 'decision_expr': 'or', 'effective_time': {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}, 'conditions': [{'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}], 'actions': [{'code': 1, 'action_executor': 'delay', 'executor_property': {'delay_seconds': '5'}}]}
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.decision_expr = 'or'
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.effective_time = {'start': '00:00:00', 'end': '23:59:59', 'loops': '1111111', 'timezone_id': 'Asia/Tehran'}
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.home_uuid = '5dbbeedc-9041-4191-a1fc-f2a4471b7968'
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.linkage_rule_base_topic = 'v1/projects/fa1d1043-54bf-424b-9aab-fbae54d873c9/homes/5dbbeedc-9041-4191-a1fc-f2a4471b7968/linkage-rules/5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,517] [             HABApp.Rules]    ERROR |      self.linkage_rule_base_topic + "/actions/trigger/" = 'v1/projects/fa1d1043-54bf-424b-9aab-fbae54d873c9/homes/5dbbeedc-9041-4191-a1fc-f2a4471b7968/linkage-rules/5326c2b0-2f8a-4d50-806b-4a53f503ac50/actions/trigger/'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_base_topic + "/status/get" = 'v1/projects/fa1d1043-54bf-424b-9aab-fbae54d873c9/homes/5dbbeedc-9041-4191-a1fc-f2a4471b7968/linkage-rules/5326c2b0-2f8a-4d50-806b-4a53f503ac50/status/get'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_base_topic + "/status/set" = 'v1/projects/fa1d1043-54bf-424b-9aab-fbae54d873c9/homes/5dbbeedc-9041-4191-a1fc-f2a4471b7968/linkage-rules/5326c2b0-2f8a-4d50-806b-4a53f503ac50/status/set'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_execution_status = None
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_type = 'automation'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.param_file_name = 'rule_params_5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.project_uuid = 'fa1d1043-54bf-424b-9aab-fbae54d873c9'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.rule_name = 'Test1'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.rule_uuid = '5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      condition = {'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      condition["code"] = 1
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      condition_code = 1
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      int(condition["code"]) = 1
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_type == "automation" = True
+[2024-09-25 01:38:14,518] [             HABApp.Rules]    ERROR |      self.linkage_rule_type == "scene" = False
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR | File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 338 in create_condition
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      235 | def create_condition(self, condition):
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |        (...)
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      335 |             # Convert the localized datetime to UTC
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      336 |             utc_datetime = local_datetime_with_tz.astimezone(pytz.utc)
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      337 |             print(f"date:: utc_datetime:: {utc_datetime}")
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR | -->  338 |             self.run.at(utc_datetime, self.evaluate_timer_conditions, condition_code=condition_code)
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      340 |         # if loops and time will be set, means user wants to check this condition regularly
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      pytz.utc = <UTC>
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      self = <LinkageRule Test1>
+[2024-09-25 01:38:14,519] [             HABApp.Rules]    ERROR |      self.param_file_name = 'rule_params_5326c2b0-2f8a-4d50-806b-4a53f503ac50'
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      self.run = <HABApp.rule.scheduler.habappschedulerview.HABAppSchedulerView object at 0x000002D3F6959790>
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      ValueTypes.DATE = <ValueTypes.DATE: 'DATE'>
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      ValueTypes.TIME = <ValueTypes.TIME: 'TIME'>
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      combined_datetime = datetime.datetime(2024, 9, 24, 20, 36)
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      condition = {'code': 1, 'entity_type': 'timer', 'expr': {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}}
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      condition["code"] = 1
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      condition['entity_type'] = 'timer'
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      condition['expr'] = {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      condition_code = 1
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      days_of_week = []
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      desire_date = datetime.date(2024, 9, 24)
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      desire_time = datetime.time(20, 36)
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      entity_type = 'timer'
+[2024-09-25 01:38:14,520] [             HABApp.Rules]    ERROR |      expr = {'date': '09-24', 'time': '20:36', 'loops': 'once', 'timezone_id': 'Asia/Tehran'}
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      expr["date"] = '09-24'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      expr["loops"] = 'once'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      expr["time"] = '20:36'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      expr["timezone_id"] = 'Asia/Tehran'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      int(condition["code"]) = 1
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      len(days_of_week) = 0
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      len(days_of_week) > 0 and isinstance(desire_time, time) = False
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      local_datetime_with_tz = datetime.datetime(2024, 9, 24, 20, 36, tzinfo=<DstTzInfo 'Asia/Tehran' +0330+3:30:00 STD>)
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      local_timezone = <DstTzInfo 'Asia/Tehran' LMT+3:26:00 STD>
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      loops = 'once'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      loops is not None and loops!="once" = False
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      str(loops) = 'once'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      timezone_id = 'Asia/Tehran'
+[2024-09-25 01:38:14,521] [             HABApp.Rules]    ERROR |      utc_datetime = datetime.datetime(2024, 9, 24, 17, 6, tzinfo=<UTC>)
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      desire_date is not None = True
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      desire_time is not None = True
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      entity_type == "device_report" = False
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      entity_type == "timer" = True
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      entity_type == "weather" = False
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      len(days_of_week) > 0 = False
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      loops is not None = True
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      loops!="once" = False
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR | File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\HABApp\rule\scheduler\habappschedulerview.py", line 37 in at
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      34 | def at(self, time: Union[None, dt_datetime, dt_timedelta, dt_time, int],
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      35 |        callback: HINT_CB, *args: HINT_CB_P.args, **kwargs: HINT_CB_P.kwargs) -> OneTimeJob:
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      36 |     callback = wrap_func(callback, context=self._habapp_rule_ctx)
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR | -->  37 |     return super().at(time, callback, *args, **kwargs)
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      self = <HABApp.rule.scheduler.habappschedulerview.HABAppSchedulerView object at 0x000002D3F6959790>
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      self._habapp_rule_ctx = <HABApp.rule_ctx.rule_ctx.HABAppRuleContext object at 0x000002D3F6E6DED0>
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      callback = <HABApp.core.internals.wrapped_function.wrapped_thread.WrappedThreadFunction object at 0x000002D3F6DAA9D0>
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      kwargs = {'condition_code': 1}
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      None, dt_datetime, dt_timedelta, dt_time, int = (None, <class 'datetime.datetime'>, <class 'datetime.timedelta'>, <class 'datetime.time'>, <class 'int'>)
+[2024-09-25 01:38:14,522] [             HABApp.Rules]    ERROR |      time = datetime.datetime(2024, 9, 24, 17, 6, tzinfo=<UTC>)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |    ------------------------------------------------------------
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR | 
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR | --------------------------------------------------------------------------------
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR | Traceback (most recent call last):
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\HABApp\rule_manager\rule_file.py", line 79, in load
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     self.create_rules(created_rules)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\HABApp\rule_manager\rule_file.py", line 69, in create_rules
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     runpy.run_path(str(self.path), run_name=str(self.path), init_globals=rule_hook.in_dict())
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "<frozen runpy>", line 291, in run_path
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "<frozen runpy>", line 98, in _run_module_code
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "<frozen runpy>", line 88, in _run_code
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 666, in rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     LinkageRule(config)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 170, in __init__
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     self.create_rule()
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 202, in create_rule
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     self.create_condition(condition)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py", line 338, in create_condition
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     self.run.at(utc_datetime, self.evaluate_timer_conditions, condition_code=condition_code)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\HABApp\rule\scheduler\habappschedulerview.py", line 37, in at
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     return super().at(time, callback, *args, **kwargs)
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\eascheduler\scheduler_view.py", line 29, in at
+[2024-09-25 01:38:14,523] [             HABApp.Rules]    ERROR |     job._schedule_first_run(time)
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\eascheduler\jobs\job_one_time.py", line 13, in _schedule_first_run
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR |     self._set_next_run(get_first_timestamp(first_run))
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR |   File "D:\artimanproject\artiman_smart_home_management_system\codeBase\webServices\venv\Lib\site-packages\eascheduler\jobs\job_base.py", line 125, in get_first_timestamp
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR |     raise FirstRunInThePastError(f'First run can not be in the past! Now: {now}, run: {new_base}')
+[2024-09-25 01:38:14,524] [             HABApp.Rules]    ERROR | eascheduler.errors.errors.FirstRunInThePastError: First run can not be in the past! Now: 2024-09-25 01:38:14.393590+03:30, run: 2024-09-24T20:36:00+03:30
+[2024-09-25 01:38:14,526] [             HABApp.Rules]  WARNING | Failed to load D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_5326c2b0-2f8a-4d50-806b-4a53f503ac50.py!
+[2024-09-25 01:48:14,319] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_378cf86d-24bb-4db3-9b08-99707e51b1b1.py:210: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:48:14,319] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_378cf86d-24bb-4db3-9b08-99707e51b1b1.py:229: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:48:14,321] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_378cf86d-24bb-4db3-9b08-99707e51b1b1.py:543: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:48:14,321] [              HABApp.Rule]  WARNING | D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\rules\rule_378cf86d-24bb-4db3-9b08-99707e51b1b1.py:551: DeprecationWarning:invalid escape sequence '\/'
+[2024-09-25 01:48:14,328] [             HABApp.Rules]     INFO | Added rule "rita" from rules/rule_378cf86d-24bb-4db3-9b08-99707e51b1b1.py
+[2024-09-25 02:38:14,188] [            HABApp.Config]     INFO | Parameters disabled! Folder D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\param does not exist!
+[2024-09-25 02:38:14,188] [            HABApp.Config]     INFO | Manual thing configuration disabled! Folder D:\artimanproject\artiman_smart_home_management_system\codeBase\RuleEngineService\config does not exist!

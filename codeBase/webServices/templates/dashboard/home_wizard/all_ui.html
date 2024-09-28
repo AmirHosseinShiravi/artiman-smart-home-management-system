@@ -1,5 +1,5 @@
-{% extends 'dashboard/home_wizard.html' %}
-{% load admin_tabler %}
+{% extends 'dashboard/pages/home_wizard.html' %}
+{% load dashboard %}
 {% load static %}
 
 {% block extrahead %}
@@ -105,7 +105,11 @@
                   <td>{{ ui_element.ui_base.created_at }}</td>
                   <td>{{ ui_element.ui_base.last_edited_by }}</td>
                   <td>{{ ui_element.ui_base.last_modified }}</td>
-                <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% if perms.dashboard.delete_uibase %}
+                    <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% else %}
+                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                  {% endif %}
 
                 </tr>
               {% endfor %}

@@ -1,4 +1,4 @@
-{% extends 'dashboard/home_wizard.html' %}
+{% extends 'dashboard/pages/home_wizard.html' %}
 {% load static %}
 
 {% block extrahead %}
@@ -92,7 +92,7 @@
                   <td>{{ zone.zone_name }}</td>
                   <td>{{ zone.description|default_if_none:'' }}</td>
                   <td>{{ zone.zone_devices.count }}</td>
-                  {% if perms.dashboard.change_homeUser %}
+                  {% if perms.dashboard.change_zone %}
                     <td>
                       <a href="#" data-zone-uuid="{{ zone.uuid }}"
                          data-edit-form-href="{% url 'dashboard:home_wizard_edit_zone' project.uuid home.uuid zone.uuid %}"
@@ -115,8 +115,11 @@
 {#                                        {% elif project.status == 'in_construction' %} bg-yellow#}
 {#                                        {% elif project.status == 'enable' %} bg-green#}
 {#                                        {% endif %} badge-blink me-1"></span>{{ project.status }}</td>#}
-
-                <td><a href="{% url 'dashboard:home_wizard_delete_zone' home.parent_project.uuid home.uuid zone.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% if perms.dashboard.delete_zone %}
+                    <td><a href="{% url 'dashboard:home_wizard_delete_zone' home.parent_project.uuid home.uuid zone.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% else %}
+                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                  {% endif %}
 
                 </tr>
               {% endfor %}

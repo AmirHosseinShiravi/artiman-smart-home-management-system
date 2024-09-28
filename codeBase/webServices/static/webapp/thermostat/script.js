@@ -45,6 +45,7 @@ class TemperatureDial {
 
   handleMouseUp = (event) => {
     this.rotating = false;
+    console.log("this.tempDisplay.innerHTML",this.tempDisplay.innerHTML);
   }
 
   rotate(x, y) {
@@ -55,7 +56,7 @@ class TemperatureDial {
 
   updateDial(angle) {
     const percentageOfFullRange = ((360 + (angle - 90)) % 360) / 360;
-    const newTemp = (this.minTemp + this.tempRange * percentageOfFullRange).toFixed(1);
+    const newTemp = (this.minTemp + this.tempRange * percentageOfFullRange).toFixed(0);
     const hue = percentageOfFullRange < 0.5 ? 200 : 5;
     const alpha = 40 + 2 * 45 * Math.abs(percentageOfFullRange - 0.5);
 
@@ -77,11 +78,11 @@ class TemperatureDial {
 
     });
 
-    document.addEventListener("mousemove", this.handleMouseMove);
-    document.addEventListener("touchmove", this.handleTouchMove, { passive: false });
+    this.tempHandle.addEventListener("mousemove", this.handleMouseMove);
+    this.tempHandle.addEventListener("touchmove", this.handleTouchMove, { passive: false });
 
-    document.addEventListener("mouseup", this.handleMouseUp);
-    document.addEventListener("touchend", this.handleMouseUp);
+    this.tempHandle.addEventListener("mouseup", this.handleMouseUp);
+    this.tempHandle.addEventListener("touchend", this.handleMouseUp);
 
     window.addEventListener("resize", () => {
       this.origin = this.calculateRotationOrigin();

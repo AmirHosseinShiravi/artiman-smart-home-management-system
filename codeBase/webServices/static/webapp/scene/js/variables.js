@@ -22,7 +22,3 @@ const thermostat_operation_mode_enum = {
     HEAT: "Heat",
     COOL: "Cool"
 };
-
-
-let scene_wizard_all_device_class_list;
-

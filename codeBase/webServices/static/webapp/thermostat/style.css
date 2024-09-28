@@ -326,7 +326,7 @@
 }
 
 
-.thermostat-control-buttons-container .bbb:active {
+.thermostat-control-buttons-container .bbb.active {
 
   background-color: var(--color-pink);
 }

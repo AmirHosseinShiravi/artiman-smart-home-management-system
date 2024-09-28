@@ -1,7 +1,11 @@
+const instanceMap = new WeakMap();
 
-
-class SceneWizardPageClass{
+class SceneWizardPageClass {
     constructor() {
+        if (instanceMap.has(SceneWizardPageClass)) {
+            return instanceMap.get(SceneWizardPageClass);
+        }
+
         this.if_conditions_list = [];
         this.then_actions_list = [];
         this.decision_expr = "or";
@@ -20,23 +24,12 @@ class SceneWizardPageClass{
         this.dpf_modal = document.querySelector('#dpf-modal');
         this.dpf_bootstrap_modal_instance = bootstrap.Modal.getOrCreateInstance(this.dpf_modal);
         // Close modal
-        this.dpf_modal.addEventListener('hidden.bs.modal', (event) => {
-            try {
-                this.dpfModalSave();
-            }catch (error){
+        this.dpf_modal.addEventListener('hidden.bs.modal', this.handleDpfModalHidden);
 
-            }
-            finally {
-                this.dpf_bootstrap_modal_instance.hide();
-            }
-
-        });
 
         this.save_dpfs_button = document.getElementById('save-dpf-btn');
-        this.save_dpfs_button.addEventListener('click', ()=>{
-            this.addConditionsOrActionsDevice();
-            this.showPage('#scene-wizard-page');
-        })
+        this.save_dpfs_button.addEventListener('click', this.handleSaveDpfsButtonClick);
+
 
         this.page_dom = null;
 
@@ -45,6 +38,12 @@ class SceneWizardPageClass{
         this.handle_if_then_lists_items_delete_button_click = this.handle_if_then_lists_items_delete_button_click.bind(this);
         this.hanlde_if_then_lists_items_edit_button_click = this.hanlde_if_then_lists_items_edit_button_click.bind(this);
 
+        this.handleDpfModalHidden = this.handleDpfModalHidden.bind(this);
+        this.handleSaveDpfsButtonClick = this.handleSaveDpfsButtonClick.bind(this);
+        this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this);
+        this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
+        this.handleSchedulerModalHidden = this.handleSchedulerModalHidden.bind(this);
+ 
 
         this.scheduler_modal = document.getElementById('automate_modal_scheduler');
         this.scheduler_bootstrap_modal_instance = new bootstrap.Modal(this.scheduler_modal);
@@ -74,19 +73,43 @@ class SceneWizardPageClass{
 
 
         this.scene_wizard_save_button = null;
+        this.scene_wizard_delete_button = null;
 
         this.in_editing_linkage_rule = false;
         this.in_editing_linkage_rule_index = null;
         this.in_editing_linkage_rule_type = "";
 
+        this.in_sending_request_progress = false;
 
-        // this.init_sortables_lists();
-        // this.init_color_picker();
+        this.rule_config_type = "";
+        // render empty scene wizard page
+        this.page_dom = this.create_page_element();
+        this.render(document.querySelector('.container-fluid'));
+        this.addEventListeners(this.page_dom);
+        this.init_sortables_lists();
+        this.init_color_picker();
+        // this.init_scheduler_modal();
+        this.show_if_condition_empty_item();
+        this.show_then_actions_empty_item();
+        this.init_if_condition_options_modal();
+        this.init_then_action_options_modal();
+        this.enable_if_condition_tap_to_run_option();
+        this.init_scheduler_modal();
+        this.init_delay_modal();
 
-    };
+        instanceMap.set(SceneWizardPageClass, this);
+    }
 
+    static getInstance() {
+        if (!instanceMap.has(SceneWizardPageClass)) {
+            new SceneWizardPageClass();
+        }
+        return instanceMap.get(SceneWizardPageClass);
+    }
 
     destroy() {
+        // Perform any cleanup here
+        console.log("Destroying SceneWizardPageClass instance");
 
         if (this.scheduler_modal_datePicker) {
             this.scheduler_modal_datePicker.destroy(); // Assuming Picker has a destroy method
@@ -98,22 +121,52 @@ class SceneWizardPageClass{
         }
         this.scheduler_modal.removeEventListener('hidden.bs.modal', this.save_scheduler_item);
         this.delay_modal.removeEventListener('hidden.bs.modal', this.save_delay_item);
+        this.dpf_modal.removeEventListener('hidden.bs.modal', this.handleDpfModalHidden);
+        this.save_dpfs_button.removeEventListener('click', this.handleSaveDpfsButtonClick);
+        if(this.scene_wizard_delete_button){    
+            this.scene_wizard_delete_button.removeEventListener('click', this.handleDeleteButtonClick);
+        }
+        this.scene_wizard_save_button.removeEventListener('click', this.handleSaveButtonClick);
+        this.scheduler_modal.removeEventListener('hidden.bs.modal', this.handleSchedulerModalHidden);
+
+        instanceMap.delete(SceneWizardPageClass);
     }
 
 
+    handleDpfModalHidden = (event) => {
+        try {
+            this.dpfModalSave();
+        } catch (error) {
+            console.error('Error in dpfModalSave:', error);
+        } finally {
+            this.dpf_bootstrap_modal_instance.hide();
+        }
+    };
+
+    handleSaveDpfsButtonClick = (event) => {
+        event.preventDefault();
+        console.log('Click handler called');
+        this.addConditionsOrActionsDevice();
+        this.showPage('#scene-wizard-page');
+        // prevent default behavior of save button
+        return true;
+    };
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    create_page_element({scene_header_name="Create Scene", mode="create"}={}){
+    create_page_element(){
 
-        const buttons = mode === "edit"? `<div class="mt-5 mb-4 d-flex flex-row">
-                                            <div class="btn btn-danger btn w-100 me-3 ms-2" id="scene-wizard-delete-button">Delete</div> 
-                                            <div class="btn btn-success btn w-100 ms-3 me-2" id="scene-wizard-save-button">Save</div> 
-                                          </div>` :
-                                                    `<div class="mt-5 mb-4">
-                                                        <div class="btn btn-success btn-lg w-100 " id="scene-wizard-save-button">Save</div>
-                                                    </div>`;
+        // const buttons = mode === "edit"? `
+        //                                     <div class="d-flex flex-row">
+        //                                     <div class="btn btn-danger btn w-100 me-3 ms-2" id="scene-wizard-delete-button">Delete</div> 
+        //                                     <div class="btn btn-success btn w-100 ms-3 me-2" id="scene-wizard-save-button">Save</div> 
+        //                                     </div>
+        //                                   ` :
+        //                                             `
+        //                                                 <div class="btn btn-success btn-lg w-100 " id="scene-wizard-save-button">Save</div>
+        //                                             `;
 
         const scene_wizard_dom = document.createElement('div');
         scene_wizard_dom.className = 'page scene-sub-page scene-wizard-page';
@@ -121,10 +174,10 @@ class SceneWizardPageClass{
         scene_wizard_dom.innerHTML = `
         <div class="scene-page-header mt-4">
           <a href="/web_app/v1/scene" class="back-link">Cancel</a>
-          <div class="scene-wizard-header-name">${scene_header_name}</div>
+          <div class="scene-wizard-header-name">New Scene</div>
         </div>
 
-        <div class="scene-wizard-if-conditions-section mb-2 mt-4">
+        <div class="scene-wizard-if-conditions-section mb-3 mt-4">
           <div class="row">
 
             <div class="col-9 pt-4 ps-4">
@@ -161,7 +214,7 @@ class SceneWizardPageClass{
 
         </div>
 
-        <div class="mt-2 mb-2 scene-wizard-then-conditions-section">
+        <div class="scene-wizard-then-conditions-section mt-2 mb-3 ">
           <div class="row">
 
             <div class="col-9 pt-4 ps-4">
@@ -188,28 +241,33 @@ class SceneWizardPageClass{
 
         </div>
 
-        <div class="scene-wizard-linkage-rule-name mb-2 p-3" style="border-radius: 8px;background-color: var(--bg-snow);">
+        <div class="scene-wizard-linkage-rule-name mb-3 p-3" ">
           <div class="">
             <label for="scene_name_input" class="form-label">Rule Name</label>
             <input type="text" class="form-control"  id="scene_name_input" placeholder="Set Rule Name" required>
           </div>
         </div>
 
-        <div class="scene-wizard-linkage-rule-style mb-2  p-3" style="border-radius: 8px;background-color: var(--bg-snow);">
+        <div class="scene-wizard-linkage-rule-style mb-3 p-3">
             <div class="example full">
-              <p class="color-black">Select Rule Color</p>
+              <label for="scene_color_picker_input" class="form-label">Select Rule Color</label>
               <input type="text" class="coloris instance1" id="scene_color_picker_input" value="#FFB5A7" readonly>
             </div>
 
         </div>
         
-        <div class="d-flex justify-content-between align-items-center mb-2 p-3" id="add-to-home-section" style="border-radius: 8px;background-color: var(--bg-snow);">
+        <div class="d-flex justify-content-between align-items-center mb-3 p-3" id="add-to-home-section">
           <span class="mr-3 ">Show on Home Page</span>
           <div class="form-check form-switch">
             <input class="form-check-input" style="height: 30px;width: 50px;" type="checkbox" id="scene-wizard-add-to-home-switch">
           </div>
         </div>
-        ${buttons}
+        <div class="mt-5 mb-4" id="scene-wizard-action-buttons-container">
+            <div class="d-flex flex-row">
+                <div class="btn btn-danger btn w-100 me-2 ms-2" id="scene-wizard-delete-button" style="display:none;">Delete<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span></div> 
+                <div class="btn btn-success btn w-100 ms-2 me-2" id="scene-wizard-save-button">Save<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span></div> 
+            </div>
+        </div>
         `;
 
 
@@ -239,23 +297,45 @@ class SceneWizardPageClass{
         });
 
         this.scene_wizard_save_button = scene_wizard_dom.querySelector('#scene-wizard-save-button');
-        this.scene_wizard_save_button.addEventListener('click', () => {
-            this.save_linkage_rule().then(() => {
-                this.showPage('.scene-page');
-            }).catch((error) => {});
-        });
+        this.scene_wizard_save_button.addEventListener('click', this.handleSaveButtonClick);
 
-        if(mode === "edit"){
-            const delete_button_el = scene_wizard_dom.querySelector('#scene-wizard-delete-button');
-            delete_button_el.addEventListener("click", ()=> {
-                this.delete_selected_rule().then(()=>{
-                    this.showPage('.scene-page');
-                })
-            })
-        }
+        
+        this.scene_wizard_delete_button = scene_wizard_dom.querySelector('#scene-wizard-delete-button');
+        this.scene_wizard_delete_button.addEventListener("click", this.handleDeleteButtonClick);
+        
 
         return scene_wizard_dom
     }
+
+    handleDeleteButtonClick = (event) => {
+        if (this.in_sending_request_progress){
+            return;
+        }
+        this.in_sending_request_progress = true;    
+        this.delete_selected_rule()
+            .then(() => {
+                this.showPage('.scene-page');
+            })
+            .catch((error) => {
+                console.error('Error deleting linkage rule:', error);
+            });
+        this.in_sending_request_progress = false;
+    };
+
+    handleSaveButtonClick = () => {
+        if (this.in_sending_request_progress){
+            return;
+        }
+        this.in_sending_request_progress = true;
+        this.save_linkage_rule()
+            .then(() => {
+                this.showPage('.scene-page');
+            })
+            .catch((error) => {
+                console.error('Error saving linkage rule:', error);
+            });
+        this.in_sending_request_progress = false;
+    };
 
     create_tap_to_run_item(){
         let item_dom = document.createElement('div');
@@ -524,6 +604,7 @@ class SceneWizardPageClass{
             formatToggle: true,
             closeButton: true,
             clearButton: true,
+            // swatchesOnly: true,
             swatches: [
                 '#FFADAD',
                 '#FFD6A5',
@@ -534,7 +615,6 @@ class SceneWizardPageClass{
                 '#BDB2FF',
                 '#BDB2FF',
                 '#FFC6FF',
-
             ]
         });
 
@@ -555,7 +635,7 @@ class SceneWizardPageClass{
         const if_add_icon = this.page_dom.querySelector('.if-add-item-icon');
         const if_empty_item = this.page_dom.querySelector('.empty-if-condition-item');
         if_add_icon.removeEventListener('click', this.handle_if_add_icon_click);
-        if_empty_item.addEventListener('click', this.handle_if_add_icon_click);
+        if_empty_item.removeEventListener('click', this.handle_if_add_icon_click);
     }
 
     handle_if_add_icon_click(e){
@@ -585,7 +665,7 @@ class SceneWizardPageClass{
         const then_add_icon = this.page_dom.querySelector('.then-add-item-icon');
         const then_empty_item = this.page_dom.querySelector('.empty-then-action-item');
         then_add_icon.removeEventListener('click', this.handle_then_add_icon_click);
-        then_empty_item.addEventListener('click', this.handle_then_add_icon_click);
+        then_empty_item.removeEventListener('click', this.handle_then_add_icon_click);
     }
 
     handle_then_add_icon_click(e){
@@ -691,13 +771,13 @@ class SceneWizardPageClass{
 
     addEventListeners(page_dom){
         // add event listener for delete buttons
-        const delete_buttons = page_dom.querySelectorAll('.delete-icon');
+        const delete_buttons = document.querySelectorAll('.scene-wizard-page .delete-icon');
         delete_buttons.forEach(delete_button =>{
             delete_button.addEventListener('click', this.handle_if_then_lists_items_delete_button_click);
         });
 
         // add event listener for edit buttons
-        const edit_buttons = page_dom.querySelectorAll('.edit-icon');
+        const edit_buttons = document.querySelectorAll('.scene-wizard-page .edit-icon');
         edit_buttons.forEach(edit_button =>{
             edit_button.addEventListener('click', this.hanlde_if_then_lists_items_edit_button_click);
         });
@@ -722,7 +802,7 @@ class SceneWizardPageClass{
         // browser garbage collector remove unused event listener. also browser has no issue with multiple identical
         // eventlistener for one element, so we let browser to handle it :) .
 
-        const delete_buttons = page_dom.querySelectorAll('.delete-icon');
+        const delete_buttons = document.querySelectorAll('.scene-wizard-page .delete-icon');
         delete_buttons.forEach(delete_button =>{
             delete_button.removeEventListener('click', this.handle_if_then_lists_items_delete_button_click);
         });
@@ -1043,10 +1123,12 @@ class SceneWizardPageClass{
         });
         this.scheduler_modal_reset_modal_values();
         // Add event listener for modal close
-        this.scheduler_modal.addEventListener('hidden.bs.modal', (event) => {
-            this.save_scheduler_item();
-        });
+        this.scheduler_modal.addEventListener('hidden.bs.modal', this.handleSchedulerModalHidden);
 
+    }
+
+    handleSchedulerModalHidden = () => {
+        this.save_scheduler_item();
     }
 
     getWeekdayString(isoWeekdayString) {
@@ -1074,7 +1156,7 @@ class SceneWizardPageClass{
         return selectedDays.join(',');
     }
 
-    save_scheduler_item(){
+    save_scheduler_item = () => {
         if(!this.in_editing_mode) {
             const data = this.scheduler_modal_get_modal_values();
 
@@ -1337,7 +1419,7 @@ class SceneWizardPageClass{
         return [pad(hours), pad(minutes), pad(secondsRemaining)];
     }
 
-    save_delay_item(){
+    save_delay_item = () => {
         if(this.in_editing_mode === false) {
             const data = this.delay_modal_get_modal_values();
 
@@ -1565,8 +1647,7 @@ class SceneWizardPageClass{
     showDPFSelectionPage() {
         const dpfSelectionList = document.getElementById("dpf-selection-list");
         dpfSelectionList.innerHTML = this.selectedDevice.dataPointFunctions.map(dpf => `
-            <div class="dpf-card d-flex justify-content-between align-items-center p-3 border-0 rounded-10 mb-2" data-dpf-name="${dpf.function_name}" 
-            style="background-color: #f0f0f0;height:4rem;">
+            <div class="dpf-card d-flex justify-content-between align-items-center p-3 border-0 rounded-10 mb-2" data-dpf-name="${dpf.function_name}" >
               <span class="font-weight-bold">${dpf.display_name}</span>
               <span class="d-flex align-items-center">
                 <span class="me-3 selected-value" data-dpf-value="" data-dpf-comparision-operator="=="></span>
@@ -1609,10 +1690,14 @@ class SceneWizardPageClass{
                           padding: 10px;
                           cursor: pointer;
                           margin-bottom: 10px;
+                          color: var(--tblr-body-color);
                         }
                         .custom-radio-row input[type="radio"] {
                           margin-left: 10px;
                           scale: 1.3;
+                        }
+                        .custom-radio-row span {
+                          color: var(--tblr-body-color);                        
                         }
                       </style>
                       ${dpf.typeEnum.map(value => `
@@ -1653,6 +1738,9 @@ class SceneWizardPageClass{
                           margin-left: 10px;
                           scale: 1.3;
                         }
+                        .custom-radio-row2 span {
+                          color: var(--tblr-body-color);                        
+                        }
                       </style>
                       ${dpf.typeEnum.map(value => `
                         <label class="custom-radio-row2">
@@ -1680,7 +1768,7 @@ class SceneWizardPageClass{
               const maxValue = Math.max(...dpf.typeEnum);
               if(this.currentMode === 'if'){
                   return `
-                <div class="comparison-buttons m-2 p-4 d-flex flex-column justify-content-center border rounded-10 bg-snow">
+                <div class="comparison-buttons m-2 p-4 d-flex flex-column justify-content-center rounded-10">
                     <div class="text-center mb-3 fs-6 fw-bold">select comparasion</div>
                     <div class="btn-group w-100" role="group" aria-label="Comparison buttons">
                       <button type="button" onclick="dpf_comarasion_buttons_action('<')" class="btn btn-outline-primary" data-selected-status="false" data-operator="<">&lt;</button>
@@ -1688,7 +1776,7 @@ class SceneWizardPageClass{
                       <button type="button" onclick="dpf_comarasion_buttons_action('>')" class="btn btn-outline-primary" data-selected-status="false" data-operator=">">&gt;</button>
                     </div>
                 </div>
-                <div class="range-selector m-2 p-4 border rounded-10 bg-snow">
+                <div class="range-selector m-2 p-4 rounded-10">
                   <div class="text-center mb-2">
                   <label for="customRange" class="form-label fs-6 fw-bold">Select dataPoint value</label>
                   
@@ -1704,7 +1792,7 @@ class SceneWizardPageClass{
               }
               else{
                   return `
-                <div class="range-selector m-2 p-4 border rounded-10 bg-snow">
+                <div class="range-selector m-2 p-4 rounded-10">
                   <div class="text-center mb-2">
                   <label for="customRange" class="form-label fs-6 fw-bold">Select dataPoint value</label>
                   
@@ -1811,6 +1899,7 @@ class SceneWizardPageClass{
 
     // Add conditions or actions to the rule wizard page
     addConditionsOrActionsDevice() {
+        console.log('============== addConditionsOrActionsDevice called ==================');
         const listElement = this.currentMode === "if" ?
             document.querySelector(".if-conditions-sortable-list") :
             document.querySelector(".then-actions-sortable-list");
@@ -1882,7 +1971,7 @@ class SceneWizardPageClass{
                     this.rule_config_type = "automation";
                 }
             }
-            else{
+            else if(this.currentMode === "then"){
 
                 let matched_then_action = this.then_actions_list.find(item => item["action_executor"] === "device_issue" && item.hasOwnProperty("device_uuid") && item["device_uuid"] === this.selectedDevice.device_uuid && item["executor_property"]["function_code"] === dpf.name);
                 if(matched_then_action){
@@ -2005,6 +2094,12 @@ class SceneWizardPageClass{
 
 
             try {
+                
+                // this.in_sending_request_progress = true;
+                this.scene_wizard_save_button.querySelector('span').style.display = "inline-block";
+                this.scene_wizard_save_button.disabled = true;
+                // this.scene_wizard_save_button.textContent = "Saving...";
+
                 const response = await fetch(`${linkage_rule_base_url}`, {
                     method: 'POST',
                     headers: {
@@ -2020,7 +2115,7 @@ class SceneWizardPageClass{
                         rule_config["rule_uuid"] = result.rule_uuid;
                         linkage_rules.push(rule_config);
 
-                        mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True');
+                        mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True', {qos:2});
 
                         generateRuleCards();
 
@@ -2061,6 +2156,12 @@ class SceneWizardPageClass{
 
 
                 try {
+                    
+                    // this.in_sending_request_progress = true;
+                    this.scene_wizard_save_button.querySelector('span').style.display = "inline-block";
+                    this.scene_wizard_save_button.disabled = true;
+                    // this.scene_wizard_save_button.textContent = "Saving...";
+
                     const response = await fetch(`${linkage_rule_base_url}${matched_rule["rule_uuid"]}/`, {
                         method: 'POST',
                         headers: {
@@ -2088,7 +2189,7 @@ class SceneWizardPageClass{
                             matched_rule["conditions"] = this.if_conditions_list;
                             matched_rule["actions"] = this.then_actions_list;
 
-                            mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True');
+                            mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True', {qos:2});
 
                             generateRuleCards();
                         }
@@ -2117,6 +2218,12 @@ class SceneWizardPageClass{
 
             if(matched_rule) {
                 try {
+                    
+                    // this.in_sending_request_progress = true;
+                    this.scene_wizard_delete_button.querySelector('span').style.display = "inline-block";
+                    this.scene_wizard_delete_button.disabled = true;
+                    // this.scene_wizard_delete_button.textContent = "Deleting...";
+
                     const response = await fetch(`${linkage_rule_base_url}delete/${matched_rule["rule_uuid"]}/`, {
                         method: 'GET',
                         headers: {
@@ -2170,6 +2277,7 @@ class SceneWizardPageClass{
     }
 
 
+
     // render scene wizard page.
     render(container) {
         const scene_wizard_el = document.querySelector('.scene-wizard-page');
@@ -2181,21 +2289,88 @@ class SceneWizardPageClass{
 
     render_scene_wizard_page(rule_id=null, container_query_selector='.container-fluid'){
         if(rule_id === null){
-            this.rule_config_type = "";
-            // render empty scene wizard page
-            this.page_dom = this.create_page_element();
-            this.render(document.querySelector(container_query_selector));
-            this.addEventListeners(this.page_dom);
-            this.init_sortables_lists();
-            this.init_color_picker();
+            // this.rule_config_type = "";
+            // // render empty scene wizard page
+            // this.page_dom = this.create_page_element();
+            // this.render(document.querySelector(container_query_selector));
+            // this.addEventListeners(this.page_dom);
+            // this.init_sortables_lists();
+            // this.init_color_picker();
+            // // this.init_scheduler_modal();
+            // this.show_if_condition_empty_item();
+            // this.show_then_actions_empty_item();
+            // this.init_if_condition_options_modal();
+            // this.init_then_action_options_modal();
+            // this.enable_if_condition_tap_to_run_option();
             // this.init_scheduler_modal();
+            // this.init_delay_modal();
+
+            this.if_conditions_list = [];
+            this.then_actions_list = [];
+            this.decision_expr = "or";
+            this.rule_name = "";
+            this.rule_style_color = '#FFB5A7';
+            this.add_to_home_status = false;
+            this.rule_config_type = "";
+            this.currentMode = "if"; // "if" or "then"
+            this.selectedDevice = null;
+            this.selectedDPF = null;
+            this.pageHistory = [];
+            this.currentPageIndex = -1;
+            this.selectedDPFs = [];
+            this.editing_item = {
+                    item_category: '',
+                    item_type: '',
+                    item_index: ''
+                }
+            this.in_editing_mode = false;
+            this.in_editing_linkage_rule = false;
+            this.in_editing_linkage_rule_index = null;
+            this.in_editing_linkage_rule_type = "";
+            this.rule_config_type = "";
+
+            // clear if-conditions-sortable-list
+            const ifConditionsList = this.page_dom.querySelector('.if-conditions-sortable-list');
+            while (ifConditionsList.firstChild) {
+                ifConditionsList.removeChild(ifConditionsList.firstChild);
+            }
+
+            // clear then-actions-sortable-list
+            const thenActionsList = this.page_dom.querySelector('.then-actions-sortable-list');
+            while (thenActionsList.firstChild) {
+                thenActionsList.removeChild(thenActionsList.firstChild);
+            }
+
+            // reset decision expression select input
+            const decisionExprSelect = this.page_dom.querySelector('#decision_expr_select_input');
+            decisionExprSelect.value = 'or';
+
+            // reset rule name input
+            const ruleNameInput = this.page_dom.querySelector('#scene_name_input');
+            ruleNameInput.value = '';
+
+            // reset color picker
+            const colorPicker = this.page_dom.querySelector('#scene_color_picker_input');
+            colorPicker.value = "#FFB5A7";
+
+            // reset page header name
+            const pageHeader = this.page_dom.querySelector('.scene-wizard-header-name');
+            pageHeader.textContent = 'New Scene';
+            
+            this.scene_wizard_delete_button.style.display = "none";
+            
+            this.in_sending_request_progress = false;
+            this.scene_wizard_delete_button.querySelector('span').style.display = "none";
+            this.scene_wizard_save_button.querySelector('span').style.display = "none";
+            this.scene_wizard_save_button.disabled = false;
+            // this.scene_wizard_save_button.textContent = "Save";
+
+
             this.show_if_condition_empty_item();
             this.show_then_actions_empty_item();
-            this.init_if_condition_options_modal();
-            this.init_then_action_options_modal();
             this.enable_if_condition_tap_to_run_option();
-            this.init_scheduler_modal();
-            this.init_delay_modal();
+            // set page header name to "New Scene"
+            // 
 
         }
         else {
@@ -2204,8 +2379,38 @@ class SceneWizardPageClass{
                 this.in_editing_linkage_rule = true;
                 this.in_editing_linkage_rule_index = rule_config["index"];
                 this.in_editing_linkage_rule_type = rule_config.type;
-                this.page_dom = this.create_page_element({scene_header_name:"Edit Scene", mode:"edit"});
-                this.render(document.querySelector(container_query_selector));
+                // this.page_dom = this.create_page_element({scene_header_name:"Edit Scene", mode:"edit"});
+                // this.render(document.querySelector(container_query_selector));
+
+                this.currentMode = "if"; // "if" or "then"
+                this.selectedDevice = null;
+                this.selectedDPF = null;
+                this.pageHistory = [];
+                this.currentPageIndex = -1;
+                this.selectedDPFs = [];
+                this.editing_item = {
+                        item_category: '',
+                        item_type: '',
+                        item_index: ''
+                    }
+                this.in_editing_mode = false;
+                
+                const ifConditionsList = this.page_dom.querySelector('.if-conditions-sortable-list');
+                while (ifConditionsList.firstChild) {
+                    ifConditionsList.removeChild(ifConditionsList.firstChild);
+                }
+
+                // clear then-actions-sortable-list
+                const thenActionsList = this.page_dom.querySelector('.then-actions-sortable-list');
+                while (thenActionsList.firstChild) {
+                    thenActionsList.removeChild(thenActionsList.firstChild);
+                }
+
+                const pageHeader = this.page_dom.querySelector('.scene-wizard-header-name');
+                pageHeader.textContent = 'Edit Scene';
+
+                
+                this.scene_wizard_delete_button.style.display = "block";
 
                 this.decision_expr = rule_config['decision_expr'];
                 const decision_expr_select_input_element = this.page_dom.querySelector('#decision_expr_select_input');
@@ -2219,6 +2424,17 @@ class SceneWizardPageClass{
                 const rule_color_input_el = this.page_dom.querySelector('.scene-wizard-linkage-rule-style #scene_color_picker_input');
                 rule_color_input_el.value = this.rule_style_color;
 
+                this.in_sending_request_progress = false;
+                
+                this.scene_wizard_save_button.querySelector('span').style.display = "none";
+                this.scene_wizard_save_button.disabled = false;
+                // this.scene_wizard_save_button.textContent = "Save";
+                
+                this.scene_wizard_delete_button.querySelector('span').style.display = "none";
+                this.scene_wizard_delete_button.disabled = false;
+                // this.scene_wizard_delete_button.textContent = "Delete";
+                
+                
                 this.add_to_home_status = rule_config.add_to_home_status;
                 const linkage_rule_add_to_home_switch_element = this.page_dom.querySelector('#scene-wizard-add-to-home-switch');
                 if(this.add_to_home_status === "true"){
@@ -2244,13 +2460,13 @@ class SceneWizardPageClass{
                     this.show_then_actions_empty_item();
                 }
 
-                this.init_sortables_lists();
-                this.init_color_picker();
-                this.init_if_condition_options_modal();
-                this.init_then_action_options_modal();
+                // this.init_sortables_lists();
+                // this.init_color_picker();
+                // this.init_if_condition_options_modal();
+                // this.init_then_action_options_modal();
                 this.enable_if_condition_tap_to_run_option();
-                this.init_scheduler_modal();
-                this.init_delay_modal();
+                // this.init_scheduler_modal();
+                // this.init_delay_modal();
 
                 // create conditions and actions cards
 
@@ -2379,7 +2595,7 @@ class SceneWizardPageClass{
 
 
 
-                this.addEventListeners(this.page_dom);
+                this.update_event_listeners();
 
             }
         }

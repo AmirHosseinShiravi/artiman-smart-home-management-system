@@ -262,11 +262,11 @@ function handleEditClick(event) {
     const ruleIndex = event.currentTarget.dataset.ruleIndex;
     const ruleType = event.currentTarget.dataset.ruleType;
     const ruleUuid = event.currentTarget.dataset.ruleUuid;
-    if (scene_wizard_instance !== null) {
-        scene_wizard_instance.destroy();
-    }
-    scene_wizard_instance = null;
-    scene_wizard_instance = new SceneWizardPageClass();
+
+    // if(scene_wizard_instance){
+    //     scene_wizard_instance.destroy();
+    // }
+    // scene_wizard_instance = SceneWizardPageClass.getInstance();
     scene_wizard_instance.render_scene_wizard_page(rule_id=ruleUuid);
     scene_wizard_instance.showPage('#scene-wizard-page');
 
@@ -458,36 +458,67 @@ function showActionsModal(rule) {
 function updateRuleStatus(ruleUuid, status) {
     const rule = linkage_rules.find(rule => rule.rule_uuid === ruleUuid);
     if (rule) {
-        if(status === "enable") {
-            set_switch_color(rule, true);
-        }
-        else{
-            set_switch_color(rule, false);
-        }
+        if (rule.type === "scene"){
 
-        const card = document.querySelector(`.scene-rule-card[data-scene-automation-rule-id="${rule.index}"]`);
-        if (card) {
-            // const statusElement = card.querySelector('.little-text #status');
-            // if (statusElement) {
-            //     statusElement.textContent = status;
-            // }
+            if(status === "enable") {
+                
+            }
+            else if (status === "disable"){
+                
+            }
+            else if (status === "In-Progress"){
+                const scene_card = document.querySelector(`.scene-rule-card[data-scene-scene-rule-id="${rule.index}"]`);
+                if (scene_card) {
+                    scene_card.querySelector(".icon-section i").classList.add("fa-fade");
+                }
+            }
+            else if (status === "Completed"){
+                const scene_card = document.querySelector(`.scene-rule-card[data-scene-scene-rule-id="${rule.index}"]`);
+                if (scene_card) {
+                    scene_card.querySelector(".icon-section i").classList.remove("fa-fade");
+                }
+            }
+        }  
+        else if (rule.type === "automation"){
 
-            const checkbox = card.querySelector('.checkbox');
-            if (checkbox) {
-                checkbox.checked = status === 'enable' || status === true;
+            if(status === "enable") {
+                set_switch_color(rule, true);
+                const card = document.querySelector(`.scene-rule-card[data-scene-automation-rule-id="${rule.index}"]`);
+                if (card) {
+
+                    const checkbox = card.querySelector('.checkbox');
+                    if (checkbox) {
+                        checkbox.checked = status === 'enable' || status === true;
+                    }
+                }
+            }
+            else if (status === "disable"){
+                set_switch_color(rule, false);
+                const card = document.querySelector(`.scene-rule-card[data-scene-automation-rule-id="${rule.index}"]`);
+                if (card) {
+
+                    const checkbox = card.querySelector('.checkbox');
+                    if (checkbox) {
+                        checkbox.checked = status === 'enable' || status === true;
+                    }
+                }
+            }
+            else if (status === "In-Progress"){
+                const scene_card = document.querySelector(`.scene-rule-card[data-scene-automation-rule-id="${rule.index}"]`);
+                if (scene_card) {
+                    scene_card.querySelector(".icon-section i").classList.add("fa-fade");
+                }
+            }
+            else if (status === "Completed"){
+                const scene_card = document.querySelector(`.scene-rule-card[data-scene-automation-rule-id="${rule.index}"]`);
+                if (scene_card) {
+                    scene_card.querySelector(".icon-section i").classList.remove("fa-fade");
+                }
             }
 
-            // Update the switch label for visual feedback
-            // const switchLabel = card.querySelector('.switch');
-            // if (switchLabel) {
-            //     if (status === 'on' || status === true) {
-            //         switchLabel.classList.add('active');
-            //     } else {
-            //         switchLabel.classList.remove('active');
-            //     }
-            // }
-        }
+        } 
 
+        
     }
 }
 
@@ -515,7 +546,7 @@ function updateModalActionStatuses(ruleUuid) {
                 if(status === "Pending"){
                     statusIcon.innerHTML = '<i class="fa-solid fa-loader fa-lg" style="color: #FFD43B;"></i>';
                 }
-                else if(status === "In Progress"){
+                else if(status === "In-Progress"){
                     statusIcon.innerHTML = '<i class="fa-solid fa-loader fa-spin fa-lg" style="color: #FFD43B;"></i>';
                 }
                 else if(status === "Completed"){
@@ -541,7 +572,7 @@ function subscribeMqttTopic(topic, callback) {
 function setupRuleActionsSubscriptions(projectUuid, homeUuid) {
     const category = 'ruleActions';
     const topics = linkage_rules.flatMap(rule => [
-        `v1/projects/${projectUuid}/homes/${homeUuid}/linkage-rules/${rule.rule_uuid}/status/set`,
+        `v1/projects/${projectUuid}/homes/${homeUuid}/linkage-rules/${rule.rule_uuid}/status/get`,
         // `v1/projects/${projectUuid}/homes/${homeUuid}/linkage-rules/+/actions/create-new-rule-event`,
         ...rule.actions.map(action =>
             `v1/projects/${projectUuid}/homes/${homeUuid}/linkage-rules/${rule.rule_uuid}/actions/actions-status/${action.code}`

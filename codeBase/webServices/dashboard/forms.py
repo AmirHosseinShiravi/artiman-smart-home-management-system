@@ -1,13 +1,95 @@
+import os
 from copy import deepcopy
 
 from django import forms
 from django.forms import BaseInlineFormSet, inlineformset_factory, modelformset_factory, formset_factory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
+from core import settings
 from .models import Project, Home, HomeUser, Tablet, Controller, Zone, \
     DeviceBase, DataPointFunction, SwitchDataPointFunction, ThermostatDataPointFunction, Switch, \
     FourPoleSwitch, FivePoleSwitch, Thermostat, FourPoleThermostat, TenPoleThermostat, \
-    DeviceSwitchActions, UIBase, UIProxy, SwitchUI, PushButtonUI, CurtainUI, ThermostatUI
+    DeviceSwitchActions, UIBase, UIProxy, SwitchUI, PushButtonUI, CurtainUI, ThermostatUI, DashboardUser
+
 from .utils import generate_random_username, generate_random_password
+
+
+# custom image widget
+from django.forms import ClearableFileInput
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+
+
+
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UsernameField, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+
+
+class LoginForm(AuthenticationForm):
+    username = UsernameField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "username"}))
+    password = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "password"}),
+    )
+  
+
+
+
+class DashboardBaseUserForm(forms.ModelForm):
+    # new_password = forms.CharField(required=False, label='New Password', initial=generate_random_password)
+    new_password = forms.CharField(required=False, label='New Password')
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super(DashboardBaseUserForm, self).__init__(*args, **kwargs)
+        self.fields['username'].initial = generate_random_username(length=12)
+        for field in self.fields.values():
+            # if field.label == 'active':
+            #     field.widget.attrs.update({"class": "form-check-input", "type": "checkbox"})
+            # else:
+            if field.label == 'Username':
+                field.widget.attrs.update({'class': 'form-control'})
+            elif field.label == 'First name':
+                field.widget.attrs.update({'class': 'form-control'})
+            elif field.label == 'Last name':
+                field.widget.attrs.update({'class': 'form-control'})
+            elif field.label == 'Email address':
+                field.widget.attrs.update({'class': 'form-control'})
+            elif field.label == 'New Password':
+                field.widget.attrs.update({'class': 'form-control'})
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if self.cleaned_data['new_password']:
+            user.set_password(self.cleaned_data['new_password'])
+        if commit:
+            user.save()
+        return user
+
+
+
+class DashboardUserForm(forms.ModelForm):
+    # group = forms.ModelChoiceField(label='Group', queryset=Group.objects.all())
+    avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file d-none'}), required=False)
+    class Meta:
+        model = DashboardUser
+        fields = ['telegramID', 'group']
+    
+    def __init__(self, *args, **kwargs):
+        super(DashboardUserForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+
+            if field.label == 'TelegramID':
+                field.widget.attrs.update({'class': 'form-control'})
+            elif field.label == 'Group':
+                field.widget.attrs.update({'class': 'form-select'})
+                field.queryset = Group.objects.all()
 
 
 class ProjectForm(forms.ModelForm):
@@ -79,10 +161,27 @@ class UserForm(forms.ModelForm):
         return user
 
 
+class CustomImageWidget(ClearableFileInput):
+    template_name = os.path.join(settings.BASE_DIR, 'templates', 'widgets', 'custom_image_widget.html')
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget'].update({
+            'is_initial': self.is_initial(value),
+            'input_text': _('Change'),
+            'initial_text': _('Image'),
+            'clear_checkbox_label': _('Clear'),
+        })
+        return context
+
+
 class HomeUserForm(forms.ModelForm):
     class Meta:
         model = HomeUser
         fields = ['desc', 'avatar', 'is_tablet_user', 'is_web_app_user']
+        # widgets = {
+        #     'avatar': CustomImageWidget(),
+        # }
 
     def __init__(self, *args, **kwargs):
         super(HomeUserForm, self).__init__(*args, **kwargs)
@@ -266,6 +365,8 @@ class SwitchUIForm(UIBaseForm):
         model = SwitchUI
         child_fields = deepcopy(UIBaseForm.Meta.fields)
         child_fields.insert(4, 'data_point_function')
+        child_fields.remove('on_color')
+        child_fields.remove('off_color')
         fields = child_fields
 
     def __init__(self, *args, **kwargs):
@@ -297,6 +398,8 @@ class PushButtonUIForm(UIBaseForm):
         model = PushButtonUI
         child_fields = deepcopy(UIBaseForm.Meta.fields)
         child_fields.insert(4, 'data_point_function')
+        child_fields.remove('on_color')
+        child_fields.remove('off_color')
         fields = child_fields
 
     def __init__(self, *args, **kwargs):
@@ -333,6 +436,10 @@ class CurtainUIForm(UIBaseForm):
         child_fields = deepcopy(UIBaseForm.Meta.fields)
         child_fields.insert(4, 'open_data_point_function')
         child_fields.insert(5, 'close_data_point_function')
+        child_fields.insert(6, 'animation_duration')
+        # remove on_color and off_color from child_fields
+        child_fields.remove('on_color')
+        child_fields.remove('off_color')
         fields = child_fields
 
     def __init__(self, *args, **kwargs):
@@ -358,10 +465,12 @@ class CurtainUIForm(UIBaseForm):
             elif field_name == 'on_color':
                 field.widget.attrs.update(
                     {'id': 'colorpicker-on-color', 'class': 'form-control coloris instance2', 'value': '#45aaf2'})
-            elif field_name == 'on_icon':
+            # elif field_name == 'on_icon':
+            #     field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
+            # elif field_name == 'off_icon':
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
-            elif field_name == 'off_icon':
-                field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
+            elif field_name == 'animation_duration':
+                field.widget.attrs.update({'class': 'form-control', 'placeholder': 'in miliseconds'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -376,6 +485,8 @@ class ThermostatUIForm(UIBaseForm):
         child_fields.insert(7, 'speed_function')
         child_fields.insert(8, 'control_mode_function')
         child_fields.insert(9, 'operation_mode_function')
+        child_fields.remove('on_color')
+        child_fields.remove('off_color')
         fields = child_fields
 
     def __init__(self, *args, **kwargs):

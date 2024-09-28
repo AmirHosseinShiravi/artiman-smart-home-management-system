@@ -32,6 +32,10 @@ if not SECRET_KEY:
 DEBUG = str2bool(os.environ.get('DEBUG'))
 #print(' DEBUG -> ' + str(DEBUG) ) 
 
+
+in_task_mode = False
+
+
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = ['http://192.168.65.150:8000', 'http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:100', 'http://127.0.0.1:5085']
@@ -50,10 +54,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    "home",
+    
+    "systemUptimeTracker",
     "dashboard.apps.DashboardConfig",
     "web_app",
+    'django_user_agents',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +70,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -142,12 +148,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = 'en-us'
 
-# TIME_ZONE = "UTC"
-TIME_ZONE = "Asia/Tehran"
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
@@ -176,6 +183,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Path to media file storage
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = '/dashboard/v1/projects/all/'
+LOGIN_REDIRECT_URL = '/dashboard/v1/home/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 

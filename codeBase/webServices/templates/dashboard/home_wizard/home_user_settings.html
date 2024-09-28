@@ -1,10 +1,10 @@
-{% extends 'dashboard/home_wizard.html' %}
+{% extends 'dashboard/pages/home_wizard.html' %}
 {% load static %}
 
 
 {% block right_side_card_content %}
   <div class="card-body">
-    <form method="post" id="home_user_setting_form" action="{% if form_type == 'create_new_home_user' %}
+    <form method="post"  enctype="multipart/form-data" id="home_user_setting_form" action="{% if form_type == 'create_new_home_user' %}
                                                                       {% url 'dashboard:home_wizard_create_new_user' project.uuid home.uuid %}
                                                                     {% else %}
                                                                       {% url 'dashboard:home_wizard_edit_user' project.uuid home.uuid home_user.uuid %}
@@ -44,8 +44,13 @@
               </label>
             </div>
           {% elif field.name == 'desc' %}
-            <div class="col-6 mt-4 mb-4">
+            <div class="col-12 mt-4">
               <label class="form-label">Description</label>
+              {{ field }}
+            </div>
+          {% elif field.name == 'avatar' %}
+            <div class="col-12 mt-4 mb-4">
+              <label class="form-label">Avatar</label>
               {{ field }}
             </div>
           {% else %}
