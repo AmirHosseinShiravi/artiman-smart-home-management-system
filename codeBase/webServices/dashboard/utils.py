@@ -62,7 +62,7 @@ def get_mqtt_cluster_statistics():
             print("get error while getting mqtt broker statistics. error:: " + response.content.decode())
             return False
     except Exception as e:
-        print("get error while getting mqtt broker statistics. error:: " + response.content.decode())
+        print("get error while getting mqtt broker statistics.")
         print(e)
         return {}
 
@@ -88,7 +88,7 @@ def get_mqtt_cluster_status():
             print("get error while getting mqtt broker status. error:: " + response.content.decode())
             return False
     except Exception as e:
-        print("get error while getting mqtt broker status. error:: " + response.content.decode())
+        print("get error while getting mqtt broker status.")
         print(e)
         return {}
 
