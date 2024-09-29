@@ -1799,7 +1799,7 @@ def dashboard_create_or_edit_user_view(request, user_uuid=None):
                                                                                 group=dashboard_user_instance.group,
                                                                                 telegramID=dashboard_user_instance.telegramID)
 
-                group_name = dashboard_user_form_instance.group
+                group_name = dashboard_user_instance.group
                 if group_name:
                     try:
                         group = Group.objects.get(name=group_name)

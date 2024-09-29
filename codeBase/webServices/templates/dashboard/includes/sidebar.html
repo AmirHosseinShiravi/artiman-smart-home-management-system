@@ -33,6 +33,7 @@
                 </span>
               </a>
             </li>
+            {% if perms.dashboard.add_dashboarduser %}
             <li class="nav-item {% if 'add_user' in segment %}active{% endif %}">
               <a class="nav-link" href="{% url 'dashboard:dashboard_create_new_user' %}" >
                 <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -43,6 +44,7 @@
                 </span>
               </a>
             </li>
+            {% endif %}
 
 
 

@@ -34,6 +34,8 @@
               Home Controllers
             </h2>
           </div>
+
+          {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
 
@@ -59,6 +61,7 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -68,63 +71,70 @@
         <!-- Content here -->
 
 
-            <table class="display hover row-border stripe" id="illnesses_table" style="width: 100%;">
-              <thead>
-              <tr>
-                <th>controller name</th>
-                <th>description</th>
-                <th>status</th>
-                <th>Local IP address</th>
-                <th>Port</th>
-                <th>mqtt client ID</th>
-                <th>settings</th>
-                <th>Download</th>
-                <th>creator</th>
-                <th>created at</th>
-                <th>editor</th>
-                <th>edited at</th>
-                <th>delete</th>
-              </tr>
-              </thead>
+        <table class="display hover row-border stripe" id="illnesses_table" style="width: 100%;">
+          <thead>
+          <tr>
+            <th>controller name</th>
+            <th>description</th>
+            <th>status</th>
+            <th>Local IP address</th>
+            <th>Port</th>
+            <th>mqtt client ID</th>
+            <th>settings</th>
+            <th>Download</th>
+            <th>creator</th>
+            <th>created at</th>
+            <th>editor</th>
+            <th>edited at</th>
+            <th>delete</th>
+          </tr>
+          </thead>
 
-              <tbody>
+          <tbody>
 
-              {% for controller in controllers%}
-                <tr>
-                  <td>{{ controller.name }}</td>
-                  <td class="text-truncate" style="max-width: 100px;">{{ controller.descriptions }}</td>
-                  <td>
-                    <span class="badge {% if controller.status == 'disable' %} bg-red
-                                       {% elif controller.status == 'error' %} bg-yellow
-                                       {% elif controller.status == 'enable' %} bg-green
-                                       {% endif %} badge-blink me-1"></span>{{ controller.status }}</td>
+          {% for controller in controllers%}
+            <tr>
+              <td>{{ controller.name }}</td>
+              <td class="text-truncate" style="max-width: 100px;">{{ controller.descriptions }}</td>
+              <td>
+                <span class="badge {% if controller.status == 'disable' %} bg-red
+                                   {% elif controller.status == 'error' %} bg-yellow
+                                   {% elif controller.status == 'enable' %} bg-green
+                                   {% endif %} badge-blink me-1"></span>{{ controller.status }}</td>
 
-                  <td>{{ controller.ip_address }}</td>
-                  <td>{{ controller.port_number }}</td>
-                  <td>{{ controller.mqtt_client_id }}</td>
-                  {% if perms.dashboard.change_controller %}
-                    <td><a href="{% url 'dashboard:home_wizard_edit_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
-                    {% else %}
-                    <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+              <td>{{ controller.ip_address }}</td>
+              <td>{{ controller.port_number }}</td>
+              <td>{{ controller.mqtt_client_id }}</td>
+              {% if perms.dashboard.change_controller %}
+                {% if not controller.parent_project.project_lock %}
+                  <td><a href="{% url 'dashboard:home_wizard_edit_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                {% else %}
+                  <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+                {% endif %}
+              {% else %}
+                <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+              {% endif %}
 
-                  {% endif %}
+              <td><a href="{% url 'dashboard:home_wizard_download_controller_config' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-square-down" style="font-size: 23px"></i></a></td>
 
-                  <td><a href="{% url 'dashboard:home_wizard_download_controller_config' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-square-down" style="font-size: 23px"></i></a></td>
+              <td>{{ controller.created_by }}</td>
+              <td>{{ controller.created_at }}</td>
+              <td>{{ controller.last_edited_by }}</td>
+              <td>{{ controller.last_modified }}</td>
+              {% if perms.dashboard.delete_controller %}
+                {% if not controller.parent_project.project_lock %}
+                  <td><a href="{% url 'dashboard:home_wizard_delete_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                {% else %}
+                  <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                {% endif %}
+              {% else %}
+                <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+              {% endif %}
 
-                  <td>{{ controller.created_by }}</td>
-                  <td>{{ controller.created_at }}</td>
-                  <td>{{ controller.last_edited_by }}</td>
-                  <td>{{ controller.last_modified }}</td>
-                  {% if perms.dashboard.delete_controller %}
-                    <td><a href="{% url 'dashboard:home_wizard_delete_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
-                  {% else %}
-                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
-                  {% endif %}
-
-                </tr>
-              {% endfor %}
-              </tbody>
-            </table>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
 
 
 

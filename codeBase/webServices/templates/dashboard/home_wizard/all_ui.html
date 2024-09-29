@@ -35,6 +35,8 @@
               Home UI Elements
             </h2>
           </div>
+
+          {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
 
@@ -61,6 +63,7 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -96,17 +99,25 @@
                   <td>{{ ui_element.ui_base.parent_zone.zone_name }}</td>
 
                   {% if perms.dashboard.change_uibase %}
-                      <td><a href="{% url 'dashboard:home_wizard_edit_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
-                      {% else %}
+                    {% if not ui_element.ui_base.parent_project.project_lock %}
+                        <td><a href="{% url 'dashboard:home_wizard_edit_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                    {% else %}
                       <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
-
                     {% endif %}
+                  {% else %}
+                    <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+                  {% endif %}
+
                   <td>{{ ui_element.ui_base.created_by }}</td>
                   <td>{{ ui_element.ui_base.created_at }}</td>
                   <td>{{ ui_element.ui_base.last_edited_by }}</td>
                   <td>{{ ui_element.ui_base.last_modified }}</td>
                   {% if perms.dashboard.delete_uibase %}
-                    <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% if not ui_element.ui_base.parent_project.project_lock %}
+                      <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% else %}
+                      <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                    {% endif %}
                   {% else %}
                     <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
                   {% endif %}

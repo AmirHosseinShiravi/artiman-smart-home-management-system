@@ -34,6 +34,7 @@
               Home Devices
             </h2>
           </div>
+          {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
 
@@ -60,6 +61,7 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -96,11 +98,14 @@
                   <td>{{ device.device_base.parent_controller.name }}</td>
                   <td>{{ device.device_base.modbus_id }}</td>
                   {% if perms.dashboard.change_device %}
+                    {% if not device.device_base.parent_project.project_lock %}
                       <td><a href="{% url 'dashboard:home_wizard_edit_device' project.uuid home.uuid device.device_base.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
-                      {% else %}
+                    {% else %}
                       <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
-
                     {% endif %}
+                  {% else %}
+                    <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+                  {% endif %}
 {#                  <td class="text-truncate" style="max-width: 100px;">{{ device.descriptions }}</td>#}
 {#                  <td>#}
 {#                    <span class="badge {% if device.status == 'disable' %} bg-red#}
@@ -114,7 +119,11 @@
                   <td>{{ device.device_base.last_edited_by }}</td>
                   <td>{{ device.device_base.last_modified }}</td>
                   {% if perms.dashboard.delete_device %}
-                    <td><a href="{% url 'dashboard:home_wizard_delete_device' project.uuid home.uuid device.device_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% if not device.device_base.parent_project.project_lock %}
+                      <td><a href="{% url 'dashboard:home_wizard_delete_device' project.uuid home.uuid device.device_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% else %}
+                      <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                    {% endif %}
                   {% else %}
                     <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
                   {% endif %}

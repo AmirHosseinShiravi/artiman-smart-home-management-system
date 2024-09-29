@@ -59,9 +59,9 @@
             {% for user in users %}
             
           <div class="col-md-6 col-lg-3 ps-6 pe-6">
-            <div class="card">
+            <div class="card" style="background-color:var(--bs-text-gray-200)">
               <div class="card-body p-4 text-center">
-                <span class="avatar avatar-xl mb-3 rounded" style="background-image: url({% if user.avatar_thumbnail %}{{ user.avatar_thumbnail.url }}{% endif %})"></span>
+                <span class="avatar avatar-xl mb-3 rounded" style="background-image: url({% if user.avatar_thumbnail %}{{ user.avatar_thumbnail.url }}{% else %}{% static 'empty-avatar.png' %}{% endif %})"></span>
                 <h3 class="m-0 mb-1"><a href="#" class="name">{{ user.user.first_name }}&nbsp;{{ user.user.last_name }}</a></h3>
                 <div class="text-muted">{{ user.user.username }}</div>
                 <div class="text-muted">{{ user.group }}</div>
@@ -81,7 +81,7 @@
                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                    <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5"></path>
                    <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z"></path>
-                  </svg> &nbsp;View Profile</a>
+                  </svg> &nbsp;Profile</a>
                    <a href="{% url 'dashboard:dashboard_delete_user' user.uuid %}" target="_blank" class="card-btn">
                     <i class="fa-regular fa-trash fa-lg"></i>
                        &nbsp;Delete User

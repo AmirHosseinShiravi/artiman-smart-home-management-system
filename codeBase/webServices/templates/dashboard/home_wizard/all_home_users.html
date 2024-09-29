@@ -34,6 +34,8 @@
               Home Users
             </h2>
           </div>
+
+          {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
 
@@ -59,6 +61,8 @@
               </a>
             </div>
           </div>
+          {% endif %}
+
         </div>
       </div>
     </div>
@@ -94,11 +98,15 @@
                   <td>{{ user.is_tablet_user }}</td>
                   <td>{{ user.is_web_app_user }}</td>
                   {% if perms.dashboard.change_homeUser %}
-                    <td><a href="{% url 'dashboard:home_wizard_edit_user' project.uuid home.uuid user.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                    {% if not user.parent_project.project_lock %}
+                      <td><a href="{% url 'dashboard:home_wizard_edit_user' project.uuid home.uuid user.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                     {% else %}
-                    <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
-
+                      <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+                    {% endif %}
+                  {% else %}
+                      <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
                   {% endif %}
+
                   <td>{{ user.user.last_login|default_if_none:'not login yet' }}</td>
                   <td>{{ user.created_by }}</td>
                   <td>{{ user.created_at }}</td>
@@ -111,7 +119,11 @@
 {#                                        {% elif project.status == 'enable' %} bg-green#}
 {#                                        {% endif %} badge-blink me-1"></span>{{ project.status }}</td>#}
                   {% if perms.dashboard.delete_homeUser %}
-                    <td><a href="{% url 'dashboard:home_wizard_delete_user' home.parent_project.uuid home.uuid user.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% if not user.parent_project.project_lock %}
+                      <td><a href="{% url 'dashboard:home_wizard_delete_user' home.parent_project.uuid home.uuid user.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                    {% else %}
+                      <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                    {% endif %}
                   {% else %}
                     <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
                   {% endif %}

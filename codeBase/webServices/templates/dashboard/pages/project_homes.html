@@ -36,6 +36,8 @@
               Project Homes
             </h2>
           </div>
+
+          {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
 
@@ -61,6 +63,7 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -112,10 +115,13 @@
                   <td><a href="{% url 'dashboard:home_wizards' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-sliders" style="font-size: 20px"></i></a></td>
 
                   {% if perms.dashboard.change_project %}
-                    <td><a href="{% url 'dashboard:edit_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
+                    {% if not home.parent_project.project_lock %}
+                      <td><a href="{% url 'dashboard:edit_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                     {% else %}
+                      <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
+                    {% endif %}
+                  {% else %}
                     <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
-
                   {% endif %}
 
 {#                  {% if project.project_lock == False %}#}
@@ -129,7 +135,11 @@
                 <td>{{ home.last_edited_by }}</td>
                 <td>{{ home.last_modified }}</td>
                 {% if perms.dashboard.delete_home %}
-                  <td><a href="{% url 'dashboard:delete_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% if not home.parent_project.project_lock %}
+                    <td><a href="{% url 'dashboard:delete_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% else %}
+                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                  {% endif %}
                 {% else %}
                   <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
                 {% endif %}
