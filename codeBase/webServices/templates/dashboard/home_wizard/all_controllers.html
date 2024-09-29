@@ -106,7 +106,7 @@
               <td>{{ controller.port_number }}</td>
               <td>{{ controller.mqtt_client_id }}</td>
               {% if perms.dashboard.change_controller %}
-                {% if not controller.parent_project.project_lock %}
+                {% if not project.project_lock %}
                   <td><a href="{% url 'dashboard:home_wizard_edit_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                 {% else %}
                   <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
@@ -122,7 +122,7 @@
               <td>{{ controller.last_edited_by }}</td>
               <td>{{ controller.last_modified }}</td>
               {% if perms.dashboard.delete_controller %}
-                {% if not controller.parent_project.project_lock %}
+                {% if not project.project_lock %}
                   <td><a href="{% url 'dashboard:home_wizard_delete_controller' project.uuid home.uuid controller.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
                 {% else %}
                   <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>

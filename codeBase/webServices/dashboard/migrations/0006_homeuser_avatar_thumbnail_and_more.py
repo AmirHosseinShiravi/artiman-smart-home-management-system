@@ -11,6 +11,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='homeuser',
+            name='avatar_thumbnail',
+            field=django_advance_thumbnail.fields.AdvanceThumbnailField(blank=True, null=True,
+                                                                        upload_to='users_avatar/thumbnail_files/'),
+        ),
         migrations.AlterField(
             model_name='dashboarduser',
             name='telegramID',

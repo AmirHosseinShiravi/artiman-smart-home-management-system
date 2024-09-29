@@ -54,10 +54,12 @@
     </form>
   </div>
   <div class="card-footer bg-transparent mt-auto">
-    <div class="btn-list justify-content-end">
-      <a href="{% url 'dashboard:home_wizard_tablet_settings' project.uuid home.uuid %}" class="btn">Cancel</a>
-      <button type="submit" form="home_setting_form" class="btn btn-primary">Submit</button>
-    </div>
+    {% if perms.dashboard.add_tablet or perms.dashboard.change_tablet %}
+      <div class="btn-list justify-content-end">
+        <a href="{% url 'dashboard:home_wizard_tablet_settings' project.uuid home.uuid %}" class="btn">Cancel</a>
+        <button type="submit" form="home_setting_form" class="btn btn-primary">Submit</button>
+      </div>
+    {% endif %}
   </div>
 
 {% endblock right_side_card_content %}

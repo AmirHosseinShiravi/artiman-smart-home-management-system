@@ -99,7 +99,7 @@
                   <td>{{ ui_element.ui_base.parent_zone.zone_name }}</td>
 
                   {% if perms.dashboard.change_uibase %}
-                    {% if not ui_element.ui_base.parent_project.project_lock %}
+                    {% if not project.project_lock %}
                         <td><a href="{% url 'dashboard:home_wizard_edit_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                     {% else %}
                       <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
@@ -113,7 +113,7 @@
                   <td>{{ ui_element.ui_base.last_edited_by }}</td>
                   <td>{{ ui_element.ui_base.last_modified }}</td>
                   {% if perms.dashboard.delete_uibase %}
-                    {% if not ui_element.ui_base.parent_project.project_lock %}
+                    {% if not project.project_lock %}
                       <td><a href="{% url 'dashboard:home_wizard_delete_ui_element' project.uuid home.uuid ui_element.ui_base.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
                     {% else %}
                       <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>

@@ -114,8 +114,8 @@
 
                   <td><a href="{% url 'dashboard:home_wizards' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-sliders" style="font-size: 20px"></i></a></td>
 
-                  {% if perms.dashboard.change_project %}
-                    {% if not home.parent_project.project_lock %}
+                  {% if perms.dashboard.change_home %}
+                    {% if not project.project_lock %}
                       <td><a href="{% url 'dashboard:edit_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                     {% else %}
                       <td><i class="fa-light fa-pen-to-square" style="font-size: 25px"></i></td>
@@ -135,7 +135,7 @@
                 <td>{{ home.last_edited_by }}</td>
                 <td>{{ home.last_modified }}</td>
                 {% if perms.dashboard.delete_home %}
-                  {% if not home.parent_project.project_lock %}
+                  {% if not project.project_lock %}
                     <td><a href="{% url 'dashboard:delete_home' home.parent_project.uuid home.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
                   {% else %}
                     <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
