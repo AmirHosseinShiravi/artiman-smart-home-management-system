@@ -129,10 +129,15 @@
                 <td>{{ project.last_edited_by }}</td>
                 <td>{{ project.last_modified }}</td>
                 {% if perms.dashboard.delete_project %}
-                  <td><a href="{% url 'dashboard:delete_project' project.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% if not project.project_lock %}
+                    <td><a href="{% url 'dashboard:delete_project' project.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
+                  {% else %}
+                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                  {% endif %}
                 {% else %}
-                  <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
+                    <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
                 {% endif %}
+
                 </tr>
               {% endfor %}
               </tbody>
