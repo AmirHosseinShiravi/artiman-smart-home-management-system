@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+    }
+    
+    .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+        text-align: center;
+    }
+    
+    .status-bar {
+        width: 300px;
+        height: 30px;
+        background-color: #e0e0e0;
+        margin: 10px 0;
+        position: relative;
+    }
+    
+    .status-bar-fill {
+        height: 100%;
+        transition: width 0.5s ease-in-out;
+    }
+    
+    .status-bar-label {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: black;
+        font-weight: bold;
+    }
+    
+    .status-bar-percentage {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: black;
+    }
+    
+    .cpu-fill { background-color: #ff6b6b; }
+    .ram-fill { background-color: #4ecdc4; }
+    .storage-fill { background-color: #45b7d1; }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>System Status Indicator</h1>
+        <div id="statusChart"></div>
+    </div>
+
+
+    <script>
+        class SystemStatus {
+            constructor() {
+                this.cpu = 0;
+                this.ram = 0;
+                this.storage = 0;
+            }
+        
+            updateStatus() {
+                this.cpu = Math.floor(Math.random() * 101);
+                this.ram = Math.floor(Math.random() * 101);
+                this.storage = Math.floor(Math.random() * 101);
+            }
+        }
+        
+        // View
+        class SystemStatusView {
+            constructor(model, element) {
+                this.model = model;
+                this.element = element;
+            }
+        
+            render() {
+                this.element.innerHTML = `
+                    <div class="status-bar">
+                        <div class="status-bar-fill cpu-fill" style="width: ${this.model.cpu}%"></div>
+                        <span class="status-bar-label">CPU</span>
+                        <span class="status-bar-percentage">${this.model.cpu}%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill ram-fill" style="width: ${this.model.ram}%"></div>
+                        <span class="status-bar-label">RAM</span>
+                        <span class="status-bar-percentage">${this.model.ram}%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill storage-fill" style="width: ${this.model.storage}%"></div>
+                        <span class="status-bar-label">Storage</span>
+                        <span class="status-bar-percentage">${this.model.storage}%</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Controller
+        const systemStatus = new SystemStatus();
+        const statusChart = document.getElementById('statusChart');
+        const systemStatusView = new SystemStatusView(systemStatus, statusChart);
+        
+        function updateChart() {
+            systemStatus.updateStatus();
+            systemStatusView.render();
+        }
+        
+        // Update the chart every 2 seconds
+        setInterval(updateChart, 2000);
+        
+        // Initial render
+        updateChart();
+    </script>
+</body>
+
+</html>

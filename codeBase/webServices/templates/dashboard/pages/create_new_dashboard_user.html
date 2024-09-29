@@ -1,0 +1,197 @@
+{% extends 'dashboard/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Artiman smart - Create New Dashboard User {% endblock title %}
+{% block body %}layout-fluid{% endblock body %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+    <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/animate.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/dashboard/home_style.css' %}"/>
+
+    <style>
+      .custom-container {
+        width: 50%;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      }
+      @media (min-width: 768px) {
+        .custom-container {
+          width: 50%;
+
+        }
+      }
+      @media (max-width: 768px) {
+        .custom-container {
+          width: 100%;
+        }
+      }
+    </style>
+
+{% endblock extrastyle %}
+
+{% block content %}
+  <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="custom-container">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+                {% if user_uuid %}Edit Dashboard User{% else %}Create New Dashboard User{% endif %}
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="custom-container">
+        <div class="card">
+          <div class="row g-0">
+            <div class="col d-flex flex-column">
+              <form action="{% if user_uuid %}{% url 'dashboard:dashboard_edit_user' user_uuid=user_uuid %}{% else %}{% url 'dashboard:dashboard_create_new_user' %}{% endif %}" method="POST" enctype="multipart/form-data" autocomplete="on">
+                {% csrf_token %}
+                <div class="card-body">
+                  {% comment %} <h2 class="mb-4">{% if user_uuid %}Edit{% else %}Insert New{% endif %} Dashboard User Profile</h2> {% endcomment %}
+                  
+                  <h3 class="card-title mb-4">Profile Details</h3>
+                  <div class="row align-items-center mb-3">
+                    <div class="col-auto">
+                      <span class="avatar avatar-xl" id="avatar_preview" style="background-image: url({% if dashboard_user_form.instance.avatar %}{{ dashboard_user_form.instance.avatar.url }}{% endif %})"></span>
+                    </div>
+                    <div class="col-auto">
+                      <label for="id_avatar" class="btn btn-primary">
+                        Change Avatar
+                      </label>
+                      {{ dashboard_user_form.avatar }}  
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <div class="form-label">Username</div>
+                      {{ dashboard_base_user_form.username }}
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-label">First Name</div>
+                      {{ dashboard_base_user_form.first_name }}
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-label">Last Name</div>
+                      {{ dashboard_base_user_form.last_name }}
+                    </div>
+                  </div>
+
+                    <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mt-4">Email</h5>
+                        <div class="row">
+                            <div class="col-10">
+                            {{ dashboard_base_user_form.email }}
+                            </div>
+                            <div class="col-2">
+                            <button id="email-button" class="btn" onclick="openEmail()" type="button">
+                                Open
+                            </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mt-4">Telegram ID</h5>
+                        <div class="row">
+                            <div class="col-10">
+                            {{ dashboard_user_form.telegramID }}
+                            </div>
+                            <div class="col-2">
+                            <button id="telegram-button" class="btn" onclick="openTelegram()" type="button">
+                                Open
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                  
+
+                  <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mt-4">Password</h5>
+                        <div class="row">
+                            <div class="col-8">
+                            {{ dashboard_base_user_form.new_password }}
+                            </div>
+                            <div class="col-2">
+                            <button onclick="generatePass()" class="btn" type="button">
+                                Generate password
+                            </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+
+                  
+                  <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="card-title mt-4">User Permissions</h5>
+                        {{ dashboard_user_form.group }}
+                      
+                    </div>
+                  </div>
+                  
+
+
+                </div>
+                <div class="card-footer bg-transparent mt-auto">
+                  <div class="btn-list justify-content-end">
+                    <button type="submit"  class="btn btn-primary">
+                      {% if user_uuid %}Update{% else %}Create{% endif %}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include 'includes/footer.html' %}
+  </div>
+{% endblock content %}
+
+{% block extrajs %}
+<script>
+  function generatePass() {
+    let pass = '';
+    let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'abcdefghijklmnopqrstuvwxyz0123456789@#$';
+
+    for (let i = 1; i <= 15; i++) {
+        let char = Math.floor(Math.random() * str.length + 1);
+        pass += str.charAt(char)
+    }
+    let password_field = document.getElementById("id_new_password");
+    password_field.value = pass;
+  }
+
+  function openEmail() {
+    let email_input_val = document.getElementById("id_email").value;
+    window.open("mailto:" + email_input_val, '_blank').focus();
+  }
+
+  function openTelegram() {
+    let telegram_input_val = document.getElementById("id_telegramID").value;
+    window.open("https://telegram.me/" + telegram_input_val, '_blank').focus();
+  }
+
+  document.getElementById("id_avatar").addEventListener("change", function(event) {
+    var image = document.getElementById('avatar_preview');
+    image.style.backgroundImage = "url(" + URL.createObjectURL(event.target.files[0]) + ")";
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermostat Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .temperature-knob-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .dial-container {
+            position: relative;
+            padding-bottom: 100%;
+        }
+        .dial {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .dial__tick {
+            stroke: #000;
+            stroke-width: 2;
+        }
+        .dial__center {
+            fill: #fff;
+            stroke: #000;
+            stroke-width: 2;
+        }
+        .dial__temp {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .dial__temp-units {
+            font-size: 24px;
+        }
+        .dial__track {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 40;
+        }
+        .dial__dot {
+            fill: #45aaf2;
+            cursor: pointer;
+        }
+        .thermostat-card {
+            cursor: pointer;
+        }
+        .tabs12 {
+            display: flex;
+            position: relative;
+            background-color: #fff;
+            box-shadow: 0 0 1px 0 rgba(24, 94, 224, 0.15), 0 6px 12px 0 rgba(24, 94, 224, 0.15);
+            padding: 0.75rem;
+            border-radius: 99px;
+        }
+        .tabs12 * {
+            z-index: 2;
+        }
+        .container12 input[type="radio"] {
+            display: none;
+        }
+        .tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+            width: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: color 0.15s ease-in;
+        }
+        .glider {
+            position: absolute;
+            display: flex;
+            height: 30px;
+            width: 100px;
+            background-color: #45aaf2;
+            z-index: 1;
+            border-radius: 99px;
+            transition: 0.25s ease-out;
+        }
+        input[type="radio"]:checked + label {
+            color: #fff;
+        }
+        input[id="radio-low"]:checked ~ .glider {
+            transform: translateX(0);
+        }
+        input[id="radio-medium"]:checked ~ .glider {
+            transform: translateX(100%);
+        }
+        input[id="radio-high"]:checked ~ .glider {
+            transform: translateX(200%);
+        }
+        input[id="radio-auto"]:checked ~ .glider {
+            transform: translateX(300%);
+        }
+        input[id="radio-heat"]:checked ~ .glider {
+            transform: translateX(0);
+        }
+        input[id="radio-cool"]:checked ~ .glider {
+            transform: translateX(100%);
+        }
+        .thermostat-power-switch button {
+            background-color: #45aaf2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div id="thermostat-cards" class="row"></div>
+    </div>
+
+    <div class="modal fade" id="thermostatModal" tabindex="-1" aria-labelledby="thermostatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thermostatModalLabel">Thermostat Control</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="temperature-knob-container">
+                        <div class="dial-container">
+                            <svg class="dial" viewBox="0 0 400 400">
+                                <defs>
+                                    <linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#e5e5e5"/>
+                                        <stop offset="100%" stop-color="#e5e5e5" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <line class="dial__tick" x1="50%" x2="50%" y1="17%" y2="83%" />
+                                <line class="dial__tick" x1="17%" x2="83%" y1="50%" y2="50%" />
+                                <circle class="dial__center" id="dial-center" cx="50%" cy="50%" r="120"/>
+                                <text class="dial__temp" x="50%" y="50%" text-anchor="middle">
+                                    <tspan id="temp-display">31</tspan>
+                                    <tspan class="dial__temp-units">&deg;C</tspan>
+                                </text>
+                                <g class="dial__control">
+                                    <circle class="dial__track" cx="50%" cy="50%" r="152" stroke="url(#linear)"/>
+                                    <circle id="temp-handle" class="dial__dot" cx="48" cy="50%" r="8" stroke="transparent" stroke-width="20" />
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-center text-muted fw-bold">Current Temp</p>
+                    <p class="text-center text-muted fw-bold pb-3" style="margin-top: -10px">
+                        <span id="current-temp">25</span>&deg;C
+                    </p>
+                    <div class="thermostat-control-buttons-container mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="thermostat-power-switch">
+                                <button id="power-button"><span>Turn On</span>&nbsp;&nbsp;<i class="fa-solid fa-power-off"></i></button>
+                            </div>
+                            <div class="container12">
+                                <div class="tabs12">
+                                    <input type="radio" id="radio-heat" name="heat_cool" checked/>
+                                    <label class="tab" for="radio-heat"><i class="fa-solid fa-sun"></i>&nbsp;Heat</label>
+                                    <input type="radio" id="radio-cool" name="heat_cool"/>
+                                    <label class="tab" for="radio-cool"><i class="fa-solid fa-snowflake"></i>&nbsp;Cool</label>
+                                    <span class="glider"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container12">
+                            <div class="tabs12">
+                                <input type="radio" id="radio-low" name="fan_speed" />
+                                <label class="tab" for="radio-low">Low</label>
+                                <input type="radio" id="radio-medium" name="fan_speed" />
+                                <label class="tab" for="radio-medium">Medium</label>
+                                <input type="radio" id="radio-high" name="fan_speed" />
+                                <label class="tab" for="radio-high">High</label>
+                                <input type="radio" id="radio-auto" name="fan_speed" checked/>
+                                <label class="tab" for="radio-auto">Auto</label>
+                                <span class="glider"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script>
+        class TemperatureDial {
+            constructor(tempDisplaySelector, tempHandleSelector, dialCenterSelector) {
+                this.tempDisplay = document.querySelector(tempDisplaySelector);
+                this.tempHandle = document.querySelector(tempHandleSelector);
+                this.dialCenter = document.querySelector(dialCenterSelector);
+
+                this.minTemp = 16.0;
+                this.maxTemp = 32.0;
+                this.tempRange = this.maxTemp - this.minTemp;
+                
+                this.onTemperatureChange = null;
+
+                this.origin = this.calculateRotationOrigin();
+                this.rotating = false;
+                this.initEventListeners();
+            }
+
+            calculateRotationOrigin() {
+                const { width, height, x, y } = this.dialCenter.getBoundingClientRect();
+                return {
+                    x: x + width / 2,
+                    y: y + height / 2,
+                };
+            }
+
+            handleMouseDown = (event) => {
+                this.rotating = true;
+            }
+
+            handleMouseMove = (event) => {
+                if (this.rotating) {
+                    const { clientX, clientY } = event;
+                    this.rotate(clientX, clientY);
+                }
+            }
+
+            handleTouchMove = (event) => {
+                if (this.rotating) {
+                    event.preventDefault();
+                    const { clientX, clientY } = event.touches[0];
+                    this.rotate(clientX, clientY);
+                }
+            }
+
+            handleMouseUp = (event) => {
+                this.rotating = false;
+                if (this.onTemperatureChange) {
+                    this.onTemperatureChange(parseFloat(this.tempDisplay.textContent));
+                }
+            }
+
+            rotate(x, y) {
+                const angle = Math.atan2(y - this.origin.y, x - this.origin.x);
+                const angleDegrees = 180 + angle * 180 / Math.PI;
+                this.updateDial(angleDegrees);
+            }
+
+            updateDial(angle) {
+                const percentageOfFullRange = ((360 + (angle - 90)) % 360) / 360;
+                const newTemp = (this.minTemp + this.tempRange * percentageOfFullRange).toFixed(1);
+                const hue = percentageOfFullRange < 0.5 ? 200 : 5;
+                const alpha = 40 + 2 * 45 * Math.abs(percentageOfFullRange - 0.5);
+
+                this.tempDisplay.textContent = newTemp;
+                document.documentElement.style.setProperty("--temp-rotation", `${angle}deg`);
+                document.documentElement.style.setProperty("--temp-hue", hue);
+                document.documentElement.style.setProperty("--temp-alpha", `${alpha}%`);
+            }
+
+            initEventListeners() {
+                this.tempHandle.addEventListener("mousedown", this.handleMouseDown);
+                this.tempHandle.addEventListener("touchstart", this.handleMouseDown);
+
+                this.tempHandle.addEventListener("mousemove", this.handleMouseMove);
+                this.tempHandle.addEventListener("touchmove", this.handleTouchMove, { passive: false });
+
+                this.tempHandle.addEventListener("mouseup", this.handleMouseUp);
+                this.tempHandle.addEventListener("touchend", this.handleMouseUp);
+
+                window.addEventListener("resize", () => {
+                    this.origin = this.calculateRotationOrigin();
+                });
+
+            }
+
+            setTemperature(temp) {
+                const percentageOfFullRange = (temp - this.minTemp) / this.tempRange;
+                const angle = percentageOfFullRange * 360 + 90;
+                this.updateDial(angle);
+            }
+        }
+
+        class ThermostatController {
+            constructor(eventBus, mqttClient) {
+                this.eventBus = eventBus;
+                this.mqttClient = mqttClient;
+                this.thermostats = [];
+                this.currentThermostat = null;
+                this.temperatureDial = new TemperatureDial("#temp-display", "#temp-handle", "#dial-center");
+                this.temperatureDial.onTemperatureChange = this.handleTemperatureChange.bind(this);
+                this.initEventListeners();
+            }
+
+            initEventListeners() {
+                document.querySelector('.thermostat-power-switch .bbb').addEventListener('click', this.togglePower.bind(this));
+                document.querySelectorAll('input[name="heat_cool"]').forEach(radio => {
+                    radio.addEventListener('change', this.handleOperationModeChange.bind(this));
+                });
+                document.querySelectorAll('input[name="fan_speed"]').forEach(radio => {
+                    radio.addEventListener('change', this.handleFanSpeedChange.bind(this));
+                });
+            }
+
+            addThermostat(thermostat) {
+                this.thermostats.push(thermostat);
+                this.createThermostatCard(thermostat);
+            }
+
+            createThermostatCard(thermostat) {
+                const correspond_zone_content_element = document.querySelector(`.content[data-menu-content-zone="${thermostat.zone_uuid}"]`);
+                const card_section = document.createElement('div');
+                card_section.className = 'col-6';
+                const card = document.createElement('div');
+                card.className = 'custom-card';
+                card.setAttribute('data-ui-element-uuid', thermostat.uuid);
+                card.setAttribute('data-ui-element-type', thermostat.button_type);
+                card.innerHTML = `
+                    <div class="icon-section  d-flex align-items-end">
+                        ${thermostat.off_icon}
+                    </div>
+                    <div class="text-section d-flex flex-column align-items-start">
+                        <div class="big-text animation-text-container" id="overflow-text"><span id="card-name">${thermostat.button_name}</span></div>
+                        <div class="little-text"><span id="card-status">${thermostat.off_text}</span></div>
+                    </div>
+                `;
+                card.addEventListener('click', () => this.openThermostatModal(thermostat));
+                card_section.appendChild(card);
+                correspond_zone_content_element.appendChild(card_section);
+            }
+
+            openThermostatModal(thermostat) {
+                this.currentThermostat = thermostat;
+                document.getElementById('current-temp').textContent = thermostat.currentTemp;
+                this.temperatureDial.setTemperature(thermostat.targetTemp);
+                document.getElementById('thermostat-power-button-text').textContent = thermostat.status === "ON" ? 'Turn Off' : 'Turn On';
+                document.querySelector('.thermostat-power-switch .bbb').classList.toggle("active", thermostat.status === "ON");
+                document.getElementById(`radio-${thermostat.operationMode.toLowerCase()}`).checked = true;
+                if (thermostat.fanControlMode === 'Auto') {
+                    document.getElementById('radio-auto').checked = true;
+                } else {
+                    document.getElementById(`radio-${thermostat.fanSpeed.toLowerCase()}`).checked = true;
+                }
+                
+                new bootstrap.Modal.getOrCreateInstance(document.getElementById('modaler')).show();
+            }
+
+            handleTemperatureChange(newTemp) {
+                if (this.currentThermostat) {
+                    this.currentThermostat.targetTemp = newTemp;
+                    this.updateThermostat('spt', newTemp);
+                }
+            }
+
+            togglePower() {
+                if (this.currentThermostat) {
+                    this.currentThermostat.status = this.check_values_validity(this.currentThermostat.status, "status") == "ON" ? "OFF" : "ON";
+                    const powerButton = document.querySelector('.thermostat-power-switch .bbb');
+                    powerButton.querySelector('span').textContent = this.currentThermostat.status === "ON" ? 'Turn Off' : 'Turn On';
+                    if (this.currentThermostat.status === "ON") {
+                        powerButton.classList.add("active");
+                    } else {
+                        powerButton.classList.remove("active");
+                    }
+                    this.updateThermostatCard(this.currentThermostat);
+                    this.updateThermostat('status', this.currentThermostat.status);
+                }
+            }
+
+            handleOperationModeChange(event) {
+                if (this.currentThermostat) {
+                    this.currentThermostat.operationMode = event.target.id === 'radio-heat' ? 'Heat' : 'Cool';
+                    this.updateThermostat('hc', this.currentThermostat.operationMode);
+                }
+            }
+
+            handleFanSpeedChange(event) {
+                if (this.currentThermostat) {
+                    const targetId = event.target.id.replace('radio-', '');
+                    this.currentThermostat.fanSpeed = targetId.replace(/^(low|medium|high)/i, match => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase());
+                    
+                    if (targetId === 'auto') {
+                        this.currentThermostat.fanControlMode = 'Auto';
+                    } else {
+                        this.currentThermostat.fanControlMode = 'Manual';
+                    }
+                    
+                    this.updateThermostat('fms', this.currentThermostat.fanSpeed);
+                    this.updateThermostat('fct', this.currentThermostat.fanControlMode);
+                }
+            }
+
+            updateThermostat(functionName, value) {
+                const datapoint = this.currentThermostat.datapoint_functions.find(dp => dp.function_name === functionName);
+                if (datapoint) {
+                    const topic = `v1/controllers/${all_home_devices.find(device => device.uuid === datapoint.device_uuid)?.controller_uuid}/devices/${datapoint.device_uuid}/functions/${datapoint.function_name}/set`;
+                    this.mqttClient.publish(topic, value);
+                    this.updateThermostatCard(this.currentThermostat);
+                    this.updateThermostatModal(this.currentThermostat);
+                }
+            }
+
+            updateThermostatCard(thermostat) {
+                const card = document.querySelector(`.custom-card[data-ui-element-uuid="${thermostat.uuid}"]`);
+                if (card) {
+                    card.querySelector('#card-status').textContent = thermostat.status == "ON" ? thermostat.on_text : thermostat.off_text;
+                    // Update card color based on status and color variables
+                    if (thermostat.status == "ON") {
+                        card.style.backgroundColor = thermostat.on_color || '#45aaf2';
+                        card.querySelector('.icon-section').innerHTML = thermostat.on_icon;
+                    } else {
+                        card.style.backgroundColor = thermostat.off_color || '#45aaf2';
+                        card.querySelector('.icon-section').innerHTML = thermostat.off_icon;
+                    }
+                    
+                }
+            }
+
+            updateThermostatModal(thermostat) {
+                if (this.currentThermostat.uuid == thermostat.uuid) {
+                    document.getElementById('current-temp').textContent = thermostat.currentTemp;
+                    this.temperatureDial.setTemperature(thermostat.targetTemp);
+                    document.getElementById('thermostat-power-button-text').textContent = thermostat.status == "ON" ? thermostat.on_text : thermostat.off_text;
+                    document.querySelector('.thermostat-power-switch .bbb').classList.toggle("active", thermostat.status == "ON");
+                    document.getElementById(`radio-${thermostat.operationMode.toLowerCase()}`).checked = true;
+                    if (thermostat.fanControlMode == "Auto") {
+                        document.getElementById('radio-auto').checked = true;
+                    } else {
+                        document.getElementById(`radio-${thermostat.fanSpeed.toLowerCase()}`).checked = true;
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            setupThermostatSidebarsection() {
+                // add a inline element to the sidebar top with the name of the thermostat
+                // when clicked, below thermostat show corresponding thermostat
+                // thermostat controls:
+                // power button to turn on or off the thermostat
+                // temperature dial to control the temperature
+                // operation mode button to control the operation mode
+                // fan speed button to control the fan speed
+                // fan control mode button to control the fan control mode  
+                // send each change over mqtt
+                // show thermostat controls change based on received mqtt messages
+                const sidebarSection = document.createElement('div');
+                sidebarSection.className = 'thermostat-sidebar-section';
+
+                this.thermostats.forEach(thermostat => {
+                    const thermostatElement = document.createElement('div');
+                    thermostatElement.className = 'thermostat-sidebar-item';
+                    thermostatElement.textContent = thermostat.button_name;
+                    thermostatElement.addEventListener('click', () => this.showThermostatControls(thermostat));
+                    sidebarSection.appendChild(thermostatElement);
+                });
+
+                const controlsSection = document.createElement('div');
+                controlsSection.className = 'thermostat-controls-section';
+                controlsSection.style.display = 'none';
+
+                // Assuming the thermostat controls are already designed and present in the HTML
+                // We'll just move them to the sidebar and show/hide as needed
+                const thermostatControls = document.querySelector('.thermostat-controls');
+                if (thermostatControls) {
+                    controlsSection.appendChild(thermostatControls);
+                }
+
+                sidebarSection.appendChild(controlsSection);
+                document.querySelector('.sidebar').appendChild(sidebarSection);
+
+                // Helper methods
+                showThermostatControls(thermostat) {
+                    this.currentThermostat = thermostat;
+                    controlsSection.style.display = 'block';
+                    this.updateThermostatControls();
+                }
+
+                updateThermostatControls() {
+                    // Update UI elements based on current thermostat state
+                    const powerButton = document.getElementById('thermostat-power-button');
+                    if (powerButton) {
+                        powerButton.textContent = this.currentThermostat.status === "ON" ? "Turn Off" : "Turn On";
+                    }
+
+                    const heatCoolRadios = document.querySelectorAll('input[name="heat-cool"]');
+                    heatCoolRadios.forEach(radio => {
+                        radio.checked = radio.value === this.currentThermostat.operationMode;
+                    });
+
+                    const fanSpeedRadios = document.querySelectorAll('input[name="fan-speed"]');
+                    fanSpeedRadios.forEach(radio => {
+                        radio.checked = radio.value === this.currentThermostat.fanSpeed;
+                    });
+
+                    const tempDial = document.querySelector('.temperature-dial');
+                    if (tempDial) {
+                        // Assuming there's a method to set the temperature on the dial
+                        tempDial.setTemperature(this.currentThermostat.targetTemp);
+                    }
+                }
+
+                // Event listeners for the controls
+                document.getElementById('thermostat-power-button').addEventListener('click', () => {
+                    const newStatus = this.currentThermostat.status === "ON" ? "OFF" : "ON";
+                    this.updateThermostat("status", newStatus);
+                });
+
+                document.querySelectorAll('input[name="heat-cool"]').forEach(radio => {
+                    radio.addEventListener('change', (event) => {
+                        this.updateThermostat("hc", event.target.value);
+                    });
+                });
+
+                document.querySelectorAll('input[name="fan-speed"]').forEach(radio => {
+                    radio.addEventListener('change', (event) => {
+                        this.updateThermostat("fms", event.target.value);
+                    });
+                });
+
+                // Assuming there's an event or method to detect temperature dial changes
+                document.querySelector('.temperature-dial').addEventListener('change', (event) => {
+                    this.updateThermostat("spt", event.target.value);
+                });
+
+                updateThermostat(property, value) {
+                    const datapoint = this.currentThermostat.datapoint_functions.find(dp => dp.function_name === property);
+                    if (datapoint) {
+                        const topic = `v1/controllers/${all_home_devices.find(device => device.uuid === datapoint.device_uuid)?.controller_uuid}/devices/${datapoint.device_uuid}/functions/${datapoint.function_name}/set`;
+                        this.mqttClient.publish(topic, value);
+                        this.updateThermostatCard(this.currentThermostat);
+                        this.updateThermostatControls();
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            check_values_validity(value, function_name) {
+                
+                if (function_name == "status") {
+                    if (value != "ON" || value != "OFF") {
+                        value = "OFF";
+                    }
+                    
+                }
+
+                if (function_name == "tmp") {
+                    
+                    if (typeof value == "string") {
+                        value = parseFloat(value);
+                    }
+                    if (value < 16.0) {
+                        value = 16.0;
+                    } else if (value > 32.0) {
+                        value = 32.0;
+                    }
+
+                }
+
+
+                if (function_name == "spt") {
+                    
+                    if (typeof value == "string") {
+                        value = parseFloat(value);
+                    }
+                    if (value < 16.0) {
+                        value = 16.0;
+                    } else if (value > 32.0) {
+                        value = 32.0;
+                    }
+                    
+                }
+
+                if (function_name == "fms") {
+                    if(value != "Low" || value != "Medium" || value != "High") {
+                        value = "Low";
+                    }
+                }
+
+                if (function_name == "hc") {
+                    if (value != "Heat" || value != "Cool") {
+                        value = "Heat";
+                    }
+                }
+
+                if (function_name == "fct") {
+                    if (value != "Auto" || value != "Manual") {
+                        value = "Auto";
+                    }
+                }
+                return value;
+            }
+
+            setupSubscriptions(thermostat) {
+                const topics = thermostat.datapoint_functions.flatMap(datapoint => 
+                    `v1/controllers/${all_home_devices.find(device => device.uuid === datapoint.device_uuid)?.controller_uuid}/devices/${datapoint.device_uuid}/functions/${datapoint.function_name}/get`,
+                );
+                this.eventBus.updateCategory("thermostat-ui-elements", topics, (topic) => {
+                    return (message) => {
+                        const datapoint = this.thermostats.datapoint_functions.find(dpf => dpf.function_name === topic.split('/')[6] && dpf.device_uuid === topic.split('/')[4]);
+
+                        if (datapoint) {
+                            const validValue = this.check_values_validity(message, datapoint.function_name);
+                            switch (datapoint.function_name) {
+                                case 'status':
+                                    thermostat.status = validValue;
+                                    break;
+                                case 'tmp':
+                                    thermostat.currentTemp = validValue;
+                                    break;
+                                case 'spt':
+                                    thermostat.targetTemp = validValue;
+                                    break;
+                                case 'fms':
+                                    thermostat.fanSpeed = validValue;
+                                    break;
+                                case 'fct':
+                                    thermostat.fanControlMode = validValue;
+                                    break;
+                                case 'hc':
+                                    thermostat.operationMode = validValue;
+                                    break;
+                            }
+                            this.updateThermostatCard(thermostat);
+                            this.updateThermostatModal(thermostat);
+                        }
+                    }
+                });
+            }
+
+
+        }
+
+
+        // Initialize ThermostatController
+        const thermostatController = new ThermostatController(eventBus, mqttClient);
+
+        // Example usage: Add thermostats from UI elements
+        const uiElements = [
+            {
+                "uuid": "5d57ec13-cceb-4114-b2c1-6cb09c302d91",
+                "name": "Kitchen Thermostat",
+                "button_name": "kitchen thermostat",
+                "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8",
+                "datapoint_functions": [
+                    {"function_name": "status", "value_type": "BOOLEAN"},
+                    {"function_name": "tmp", "value_type": "DECIMAL"},
+                    {"function_name": "spt", "value_type": "DECIMAL"},
+                    {"function_name": "fms", "value_type": "STRING"},
+                    {"function_name": "fct", "value_type": "STRING"},
+                    {"function_name": "hc", "value_type": "STRING"}
+                ]
+            },
+            {
+                "uuid": "5d57ec13-cceb-4114-b2c1-6cb09c302d91",
+                "name": "thermostat 1",
+                "descriptions": null,
+                "button_name": "kitchen thermostat",
+                "on_text": "ON",
+                "off_text": "OFF",
+                "on_color": "#45aaf2",
+                "off_color": "#45aaf2",
+                "on_icon": "<i class=\"fa-light fa-light-switch fa-fw\"></i>",
+                "off_icon": "<i class=\"fa-light fa-light-switch fa-fw\"></i>",
+                "add_to_home": false,
+                "button_type": "thermostat",
+                "zone_uuid": "4ee3f099-0efc-4161-8722-ecc4710bf860",
+                "ui_type": "thermostatui",
+                "datapoint_functions": [
+                    {
+                        "display_name": "power status",
+                        "function_name": "status",
+                        "value_type": "BOOLEAN",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    },
+                    {
+                        "display_name": "current temperature",
+                        "function_name": "tmp",
+                        "value_type": "DECIMAL",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    },
+                    {
+                        "display_name": "target temperature",
+                        "function_name": "spt",
+                        "value_type": "DECIMAL",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    },
+                    {
+                        "display_name": "speed",
+                        "function_name": "fms",
+                        "value_type": "STRING",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    },
+                    {
+                        "display_name": "control mode",
+                        "function_name": "fct",
+                        "value_type": "STRING",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    },
+                    {
+                        "display_name": "operation mode",
+                        "function_name": "hc",
+                        "value_type": "STRING",
+                        "device_uuid": "9d7a5cea-0997-4b4c-9e2b-7be15f52aee8"
+                    }
+                ]
+            }
+            // Add more thermostats here
+        ];
+
+        uiElements.forEach(element => {
+            
+                const thermostat = {
+                    currentTemp: 25,
+                    targetTemp: 22,
+                    status: "OFF",
+                    operationMode: 'Heat',
+                    fanSpeed: 'Auto',
+                    fanControlMode: 'Auto',
+                    ...element
+                };
+                thermostatController.addThermostat(thermostat);
+        });
+
+        thermostatController.thermostats[1].currentTemp = 2;
+        thermostatController.thermostats[1].targetTemp = 19;
+        thermostatController.thermostats[1].status = true;
+        thermostatController.thermostats[1].operationMode = 'Cool';
+        thermostatController.thermostats[1].fanSpeed = 'High';
+
+
+        setTimeout(()=>{
+            thermostatController.openThermostatModal(thermostatController.thermostats[0]);
+        }, 2000);
+
+        setTimeout(()=>{
+            thermostatController.thermostats[0].currentTemp = 23;
+            thermostatController.thermostats[0].targetTemp = 28;
+        }, 4000);
+    </script>
+</body>
+</html>

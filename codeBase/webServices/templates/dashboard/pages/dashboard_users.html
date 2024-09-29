@@ -1,0 +1,135 @@
+{% extends 'dashboard/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Artiman smart - All Users {% endblock title %}
+{% block body %}layout-fluid{% endblock body %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+
+    <script src="{% static 'DataTables/jQuery-3.7.0/jquery-3.7.0.min.js' %}" xmlns="http://www.w3.org/1999/html"></script>
+
+    
+    <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/animate.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/dashboard/home_style.css' %}"/>
+    <script src="{% static 'dashboard/static/dist/libs/list.js/dist/list.min.js' %}"></script>
+        
+    <style>
+        ul.pagination li{
+            padding-right: 20px;
+        }
+    </style>
+{% endblock extrahead %}
+
+
+
+{% block content %}
+
+  <div class="page-wrapper" id="users">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+              Users
+            </h2>
+            <div class="text-muted mt-1">All Users: {{ users|length }}</div>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ms-auto d-print-none">
+            <div class="d-flex">
+              <input type="search" class="form-control d-inline-block w-9 me-3 search" placeholder="Search user…"/>
+              <a href="{% url 'dashboard:dashboard_create_new_user' %}" class="btn btn-primary">
+                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                New user
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl ">
+        <div class="row row-cards list">
+            
+            {% for user in users %}
+            
+          <div class="col-md-6 col-lg-3 ps-6 pe-6">
+            <div class="card">
+              <div class="card-body p-4 text-center">
+                <span class="avatar avatar-xl mb-3 rounded" style="background-image: url({% if user.avatar_thumbnail %}{{ user.avatar_thumbnail.url }}{% endif %})"></span>
+                <h3 class="m-0 mb-1"><a href="#" class="name">{{ user.user.first_name }}&nbsp;{{ user.user.last_name }}</a></h3>
+                <div class="text-muted">{{ user.user.username }}</div>
+                <div class="text-muted">{{ user.group }}</div>
+                {% comment %} <div class="mt-3">
+                  <span class="badge bg-purple-lt">{{ user.profile.location }}</span>
+                </div> {% endcomment %}
+              </div>
+              <div class="d-flex flex-wrap">
+                {% comment %} <a href="https://telegram.me/{{ user.profile.telegramID }}" target="_blank" class="card-btn"><!-- Download SVG icon from http://tabler-icons.io/i/mail -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-telegram" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                   <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+                  </svg> &nbsp;Telegram</a> {% endcomment %}
+                <a href="{% url 'dashboard:dashboard_edit_user' user.uuid %}" class="card-btn"><!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                   <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                   <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5"></path>
+                   <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z"></path>
+                  </svg> &nbsp;View Profile</a>
+                   <a href="{% url 'dashboard:dashboard_delete_user' user.uuid %}" target="_blank" class="card-btn">
+                    <i class="fa-regular fa-trash fa-lg"></i>
+                       &nbsp;Delete User
+                   </a> 
+              </div>
+            </div>
+          </div>
+            {% endfor %}
+
+
+
+
+        </div>
+        <div class="d-flex mt-4">
+          <ul class="pagination ms-auto"></ul>
+        </div>
+      </div>
+    </div>
+
+    {% include 'dashboard/includes/footer.html' %}
+
+  </div>
+
+{% endblock content %}
+
+
+{% block extrajs %}
+
+
+    <script>
+    $("ul.pagination li a").click(function (){
+        console.log("hi");
+    })
+
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+          valueNames: [ 'name' ],
+          page: 12,
+            innerWindow: 2,
+            outerWindow:2,
+          pagination: true
+        };
+        var userList = new List('users', options);
+        $("ul.pagination > li").addClass("page-item");
+        $("ul.pagination > li > a").addClass("page-link");
+    });
+    </script>
+{% endblock extrajs %}

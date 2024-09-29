@@ -1,0 +1,287 @@
+{% extends 'dashboard/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Home Wizard - {% endblock title %}
+{% block body %}layout-fluid{% endblock body %}
+
+
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+
+{% endblock extrahead %}
+
+
+
+{% block content %}
+
+  <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <h2 class="page-title">
+              Home Wizard
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+
+        <div class="row g-0" style="min-height: 30vw">
+          <div class="col card d-none d-md-block border-end" style="max-width: 12%;margin-right: 2px">
+            <div class="card-body">
+              <h4 class="subheader">Home settings Menu</h4>
+              <div class="list-group list-group-transparent">
+{#                <a href="{% url 'dashboard:home_overview' project.uuid home.uuid %}" id="settings444"#}
+{#                   class="list-group-item list-group-item-action d-flex align-items-center  border-bottom border-top">Overview</a>#}
+                <a href="{% url 'dashboard:home_wizard_home_settings' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center {% if segment == 'settings' %}active{% endif %} border-bottom">General
+                  settings</a>
+                <a href="{% url 'dashboard:home_wizard_tablet_settings' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'tablet' %}active{% endif %}">Home
+                  Tablet</a>
+                <a href="{% url 'dashboard:home_wizard_all_controllers' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'controllers' %}active{% endif %}">Home
+                  Controllers</a>
+                <a href="{% url 'dashboard:home_wizard_all_zones' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'zones' %}active{% endif %}">Home
+                  Zones</a>
+                <a href="{% url 'dashboard:home_wizard_all_devices' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'devices' %}active{% endif %}">Home
+                  Devices</a>
+                <a href="{% url 'dashboard:home_wizard_all_ui_elements' project.uuid home.uuid %}" id="amir"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'ui' %}active{% endif %}">Home UI</a>
+                <a href="{% url 'dashboard:home_wizard_all_users' project.uuid home.uuid %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center border-bottom {% if segment == 'home_users' %}active{% endif %}">Home Users</a>
+                <!--                  <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">Billing & Invoices</a>-->
+              </div>
+              <!--                <h4 class="subheader mt-4">Experience</h4>-->
+              <!--                <div class="list-group list-group-transparent">-->
+              <!--                  <a href="#" class="list-group-item list-group-item-action">Give Feedback</a>-->
+              <!--                </div>-->
+            </div>
+          </div>
+          <div class="col card">
+
+            {% block right_side_card_content %}{% endblock right_side_card_content %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include 'includes/footer.html' %}
+  </div>
+
+
+
+  <div class="d-none" id="page-loader-section">
+    <div class="page page-center">
+      <div class="container container-slim py-4">
+        <div class="d-flex flex-column align-items-center">
+          <div class="mb-3">
+            <a href="#" class="navbar-brand navbar-brand-autodark"><img src="{% static 'artiman-smart-logo.svg' %}" height="36" alt=""></a>
+          </div>
+          <div class="text-muted mb-3">Preparing application</div>
+          <div class="progress progress-sm w-25">
+            <div class="progress-bar progress-bar-indeterminate"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bootstrap</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+
+{% block extrajs %}
+
+  <script>
+      document.addEventListener('load', () => {
+
+              const toastLiveExample = document.getElementById('liveToast');
+              const toast_body = document.getElementsByClassName("toast-body")[0];
+              toast_body.innerHTML = "lklklkl";
+              const toast = new bootstrap.Toast(toastLiveExample);
+              toast.show();
+
+      })
+
+  </script>
+
+
+
+
+
+{#  <script>#}
+{##}
+{#      var amir_link = document.getElementById("amir");#}
+{#      amir_link.addEventListener("click", function (event) {#}
+{#          event.preventDefault();#}
+{#          fetch("{% url 'dashboard:amir' %}")#}
+{#              .then(response => response.json())#}
+{#              .then(data => {#}
+{#                  // data.rendered_template contains the rendered HTML string#}
+{#                  document.getElementById('right_side_card').innerHTML = data.rendered_template;#}
+{#              });#}
+{#      })#}
+{##}
+{#      var settings_button_link = document.getElementById("settings");#}
+{#      settings_button_link.addEventListener("click", function (event) {#}
+{#          event.preventDefault();#}
+{#          fetch("{% url 'dashboard:settings_button1' %}")#}
+{#              .then(response => response.json())#}
+{#              .then(data => {#}
+{#                  // data.rendered_template contains the rendered HTML string#}
+{#                  document.getElementById('right_side_card').innerHTML = data.rendered_template;#}
+{#              });#}
+{#      })#}
+{##}
+{#  </script>#}
+
+{#  <script>#}
+{#      /**#}
+{#       * General-purpose fetch function with CSRF token handling for Django.#}
+{#       *#}
+{#       * @param {string} url - The URL to fetch.#}
+{#       * @param {Object} options - Options for the fetch request.#}
+{#       * @param {string} responseType - The type of response expected ('json', 'text', 'blob', 'arrayBuffer', 'formData').#}
+{#       * @returns {Promise} - A promise that resolves with the response in the specified format.#}
+{#       */#}
+{#      async function fetchData(url, options = {}, responseType = 'json') {#}
+{#          // Function to get CSRF token from the meta tag#}
+{#          function getCsrfToken() {#}
+{#              return document.querySelector('meta[name="csrf-token"]').getAttribute('content');#}
+{#          }#}
+{##}
+{##}
+{##}
+{##}
+{#          // Set default options and include CSRF token for non-GET requests#}
+{#          const defaultOptions = {#}
+{#              method: 'GET', // GET, POST, PUT, DELETE, etc.#}
+{#              headers: {#}
+{#                  'Content-Type': 'application/json', // Default header#}
+{#              },#}
+{#              body: null, // Body data (for POST, PUT requests)#}
+{#              mode: 'cors', // 'cors', 'no-cors', 'same-origin'#}
+{#              credentials: 'same-origin', // 'omit', 'same-origin', 'include'#}
+{#              cache: 'no-cache', // 'default', 'no-cache', 'reload', 'force-cache', 'only-if-cached'#}
+{#              redirect: 'follow', // 'follow', 'manual', 'error'#}
+{#              referrer: 'no-referrer', // 'no-referrer', 'client'#}
+{#              referrerPolicy: 'no-referrer', // 'no-referrer', 'no-referrer-when-downgrade', 'origin', etc.#}
+{#              integrity: '', // Subresource integrity#}
+{#              keepalive: false, // Keep the connection alive#}
+{#              signal: null, // AbortController signal#}
+{#          };#}
+{##}
+{#          // Add CSRF token to headers for methods other than GET#}
+{#          if (options.method && options.method.toUpperCase() !== 'GET') {#}
+{#              defaultOptions.headers['X-CSRFToken'] = getCsrfToken();#}
+{#              const form = document.getElementById('home_setting_form');#}
+{#              const formData = new FormData(form);#}
+{#              defaultOptions.body = formData;#}
+{#          }#}
+{##}
+{#          // Merge user options with default options#}
+{#          const finalOptions = {...defaultOptions, ...options};#}
+{#          console.log(finalOptions)#}
+{##}
+{##}
+{##}
+{#          try {#}
+{#              const response = await fetch(url, finalOptions);#}
+{##}
+{#              if (!response.ok) {#}
+{#                  throw new Error(`HTTP error! status: ${response.status}`);#}
+{#              }#}
+{##}
+{#              switch (responseType.toLowerCase()) {#}
+{#                  case 'json':#}
+{#                      return await response.json();#}
+{#                  case 'text':#}
+{#                      return await response.text();#}
+{#                  case 'blob':#}
+{#                      return await response.blob();#}
+{#                  case 'arraybuffer':#}
+{#                      return await response.arrayBuffer();#}
+{#                  case 'formdata':#}
+{#                      return await response.formData();#}
+{#                  default:#}
+{#                      throw new Error('Unsupported response type');#}
+{#              }#}
+{#          } catch (error) {#}
+{#              console.error('Fetch error:', error);#}
+{#              throw error;#}
+{#          }#}
+{#      }#}
+{##}
+{##}
+      {#// Example usage:#}
+      {#fetchData('https://jsonplaceholder.typicode.com/posts', {method: 'GET'}, 'json')#}
+      {#    .then(data => console.log(data))#}
+      {#    .catch(error => console.error('Error:', error));#}
+      {##}
+      {#fetchData('https://example.com/api/endpoint', {method: 'POST', body: JSON.stringify({key: 'value'})}, 'json')#}
+      {#    .then(data => console.log(data))#}
+      {#    .catch(error => console.error('Error:', error));#}
+{#  </script>#}
+{##}
+{#  <script>#}
+{#  function show_page_loader_section(){#}
+{#      const right_side_card = document.getElementById("right_side_card");#}
+{#      right_side_card.innerHTML = document.getElementById("page-loader-section").innerHTML;#}
+{#  }#}
+{#  </script>#}
+{##}
+{#  <script>#}
+{#    function load_page(url, options={}, responseType = 'json'){#}
+{#        show_page_loader_section();#}
+{#        fetchData(url, options, responseType)#}
+{#        .then(data =>{#}
+{#            switch (responseType.toLowerCase()) {#}
+{#                  case 'json':#}
+{#                      console.log(data, responseType);#}
+{#                      document.getElementById('right_side_card').innerHTML = data.rendered_template;#}
+{#                      break;#}
+{#                  case 'text':#}
+{#                      console.log(data, responseType);#}
+{#                      break;#}
+{#                  case 'blob':#}
+{#                      console.log(data, responseType);#}
+{#                      break;#}
+{#                  case 'arraybuffer':#}
+{#                      console.log(data, responseType);#}
+{#                      break;#}
+{#                  case 'formdata':#}
+{#                      console.log(data, responseType);#}
+{#                      break;#}
+{#              }#}
+{##}
+{#        })#}
+{#        .catch(error => console.error('Error:', error));#}
+{##}
+{#    }#}
+{#    {% url 'dashboard:amir' %}#}
+{#    load_page("{% url 'dashboard:home_wizard_home_settings' project.uuid home.uuid %}",{method: 'GET'});#}
+{#  </script>#}
+
+{% endblock extrajs %}

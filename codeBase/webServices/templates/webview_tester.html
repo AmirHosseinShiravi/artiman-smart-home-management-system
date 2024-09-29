@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <p id="webViewInfo"></p>
+    
+    <script>
+        function getWebViewInfo() {
+            var ua = navigator.userAgent;
+            var webViewRegex = /WebView|wv/i;
+            var isWebView = webViewRegex.test(ua);
+            
+            if (isWebView) {
+                // Try to extract version information
+                var versionInfo = ua.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/);
+                var version = versionInfo ? versionInfo[1] : "Unknown";
+                
+                console.log("This is a WebView. Version: " + version);
+                document.getElementById('webViewInfo').textContent = "WebView Version: " + version;
+                return "WebView Version: " + version;
+            } else {
+                console.log("This is not a WebView.");
+                document.getElementById('webViewInfo').textContent = "Not a WebView";
+                return "Not a WebView";
+            }
+        }
+        
+        // Call the function
+        var webViewInfo = getWebViewInfo();
+        
+      </script>
+</body>
+</html>

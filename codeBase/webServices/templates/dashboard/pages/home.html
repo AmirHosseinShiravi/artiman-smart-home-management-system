@@ -1,0 +1,914 @@
+{% extends 'dashboard/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Artiman smart - Home {% endblock title %}
+{% block body %}layout-fluid{% endblock body %}
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}" />
+
+  <script src="{% static 'DataTables/jQuery-3.7.0/jquery-3.7.0.min.js' %}" xmlns="http://www.w3.org/1999/html"></script>
+
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/jquery.dataTables.min.css' %}">
+  <link rel="stylesheet" href="{% static 'DataTables/DataTables-1.13.6/css/dataTables.bootstrap.min.css' %}">
+{#  <link rel="stylesheet" href="{% static 'DataTables/Select-1.7.0/css/select.bootstrap.min.css' %}">#}
+
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'DataTables/DataTables-1.13.6/js/dataTables.bootstrap.min.js' %}"></script>
+{#  <script src="{% static 'DataTables/Select-1.7.0/js/dataTables.select.min.js' %}"></script>#}
+
+{#  <link href="{% static 'custom/tom-select.css' %}" rel="stylesheet"/>#}
+
+{#  <script src="{% static 'custom/tom-select.complete.min.js' %}" defer></script>#}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'dashboard/static/dist/libs/apexcharts/dist/apexcharts.css' %}">
+  <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/animate.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'dashboard/static/dist/css/dashboard/home_style.css' %}"/>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+
+
+  <style>
+    .animate__fadeIn{
+      animation-duration: 2s;
+      animation-delay: 1s;
+    }
+    .fadeInDownAnimation{
+      animation: fadeInDown;
+      animation-duration: 1s;
+    }
+    .fadeInUpAnimation{
+      animation: fadeInUp;
+      animation-duration: 1s;
+    }
+  
+  
+  </style>
+
+{% endblock extrahead %}
+
+{% block content %}
+
+  <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <ol class="breadcrumb breadcrumb-arrows" aria-label="breadcrumbs">
+          <li class="breadcrumb-item"><a href="#"></a></li>
+        </ol>
+        <div class="row g-2 align-items-center">
+          <div class="col animate__animated animate__fadeIn">
+              <!-- <h2 class="page-title">
+
+                  
+              </h2> -->
+              <!-- [-]: turning status-indicator color based on system network connection -->
+              <div class="row g-3 align-items-center">
+                  <div class="col-auto">
+                    <span class="status-indicator status-indicator-animated" id="status-indicator">
+                      <span class="status-indicator-circle"></span>
+                      <span class="status-indicator-circle"></span>
+                      <span class="status-indicator-circle"></span>
+                    </span>
+                  </div>
+                  <div class="col">
+                    <h2 class="page-title">
+                      System Status
+                    </h2>
+                    <div class="text-muted">
+                      <ul class="list-inline list-inline-dots mb-0">
+                        <li class="list-inline-item" ><span class="" id="status-indicator-text"></span></li>
+                        <li id="check-system-avalibility-period-text" class="list-inline-item"></li>
+                      </ul>
+                    </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+        <!-- Content here -->
+        <div class="row mb-3 summary-card-row">
+         
+          <div class="col-md-7">
+            <div class="row">
+
+              <div class="row">
+
+                <div class="col-md-4 mb-3">
+                  <div class="card shadow h-100" style="background-color: black;">
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                      <div class="content1">
+                        <h1 class="title1 bebas-neue-regular">Artiman Smart Home
+                          <div class="aurora">
+                            <div class="aurora__item"></div>
+                            <div class="aurora__item"></div>
+                            <div class="aurora__item"></div>
+                            <div class="aurora__item"></div>
+                          </div>
+                        </h1>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-8 mb-3">
+                  <div class="card shadow" style="background-color: #0d1b2a;">
+                    <div class="card-stamp">
+                      <div class="card-stamp-icon bg-white text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plug-connected" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <desc>Download more icon variants from https://tabler-icons.io/i/plug-connected</desc>
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M7 12l5 5l-1.5 1.5a3.536 3.536 0 1 1 -5 -5l1.5 -1.5z"></path>
+                          <path d="M17 12l-5 -5l1.5 -1.5a3.536 3.536 0 1 1 5 5l-1.5 1.5z"></path>
+                          <path d="M3 21l2.5 -2.5"></path>
+                          <path d="M18.5 5.5l2.5 -2.5"></path>
+                          <path d="M10 11l-2 2"></path>
+                          <path d="M13 14l-2 2"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="h3 text-muted mb-2">Currently up for</div>
+                      <div class="h4 M-1 text-white" id="uptime-div">در حال دریافت اطلاعات ...</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div class="row">
+                <div class="col-12 mb-3 fadeInDownAnimation">
+                  <div class="card fadeInUpAnimation shadow">
+                    <div class="card-body" id="runtime-card">
+                      <div class="row" id="runtime_card_title_row">
+                        <h3 class="card-title col">System runtime Statistics</h3>
+                      </div>
+
+                      <div id="runtime_chart_section" >
+                        <div id="runtime_heatmap_chart">
+                          <div id="chartDiva" style="height: 80px;"></div>
+                          <div style="overflow-x: scroll;margin-left: 15px;margin-right: 15px;scrollbar-width: thin;">
+                            <div id="chartDivb" style="width: 3000px;height: 150px;"></div>
+                          </div>
+                        </div>
+                      </div>   
+
+                    </div>  
+                  </div>
+                </div>
+              </div>
+
+              {% include 'monitor_system_resource/index.html' %}
+
+            </div>
+          </div>
+          
+          <div class="col-md-5">
+            
+            <div class="row overall-status-card-container shadow">
+
+              <div class="col-md-4">
+                <div class="card mb-3" style="background-color: black;border:0;box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);">
+                  
+                  <div class="card-body  align-items-center">
+                    {% comment %} <div class="system-statistics-title">System Statistics</div> {% endcomment %}
+                    <div class="content1">
+                      <h1 class="title1 system-statistics-title">System Status
+                        <div class="aurora">
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                        </div>
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #a2d2ff;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-house-building fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Active Projects</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_projects">50</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #ffafcc;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-regular fa-house fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Active Homes</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_homes">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #cdb4db;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-regular fa-user fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Active Users</div>
+
+                    <div class="summary-card-subtitle" id="all_active_users">0</div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #FCF6BD;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-wand-magic-sparkles fa-rotate-180 fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title">Active Rules</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_active_rules">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #D0F4DE;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-sharp fa-light fa-microchip fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Installed Controllers</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_installed_controllers">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow" style="background-color: #e9edc9;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-light-switch-off fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Installed Devices</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_installed_devices">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow" style="background-color: #faedcd;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-tablet fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Installed Tablets</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="all_installed_tablet">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="row mt-3 overall-status-card-container shadow">
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: black;border:0;box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);">
+                  
+                  <div class="card-body  align-items-center">
+                    <div class="content1">
+                      <h1 class="title1 system-statistics-title">MQTT Statistics
+                        <div class="aurora">
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                          <div class="aurora__item"></div>
+                        </div>
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #FCF6BD;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-circle-nodes fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Cluster Status</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="mqtt_broker_status">Running</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #a2d2ff;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-server fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Cluster Nodes</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="number_of_nodes">1</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #faedcd;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-cloud fa-flip-horizontal fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Connections</div>
+
+                    <div class="summary-card-subtitle" id="connections">0</div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #D0F4DE;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-handshake fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title">Sessions</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="sessions">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow mb-3" style="background-color: #ffafcc;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-hashtag fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Topics</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="topics">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow" style="background-color: #cdb4db;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-regular fa-bookmark fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Subscriptions</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="subscriptions">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card shadow" style="background-color: #e9edc9;">
+                  <div class="card-stamp">
+                    <div class="card-stamp-icon bg-white text-primary">
+                      <i class="fa-light fa-rectangle-vertical-history fa-sm"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-card-title" >Retained Messages</div>
+                    <!-- <div class="h5 m-1" >Firmware Version: {{ firmware_version }}</div> -->
+                    <div class="summary-card-subtitle" id="retained_messages">0</div>
+                    <!-- <div class="h5 m-1" >Config Created at: {{ config_created_at }}</div> -->
+                  </div>
+                </div>
+              </div>
+
+              
+
+            </div>
+
+          </div>
+
+          
+
+        </div>
+          
+         
+
+      </div>
+
+    </div>
+
+        
+  </div>
+
+  {% include 'dashboard/includes/footer.html' %}
+
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: var(--tblr-tertiary-bg)!important;color: var(--tblr-tertiary-color)!important;box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);">
+      <div class="toast-header">
+        <strong class="me-auto">Bootstrap</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        hello
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+{% endblock content %}
+
+{% block extrajs %}
+
+  <script>
+    var system_statistics_url = '{% url "monitor_system_resource:system_statistics" %}';
+  </script>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          let table = $("#illnesses_table").DataTable({
+              columnDefs: [
+                  {width: '13%', targets: 0, className: 'dt-head-center dt-body-center'},
+                  {width: "7%",  targets: 1, className: 'dt-head-center dt-body-center'},
+                  {width: "12%", targets: 2, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "11%", targets: 3, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 4, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 5, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 6, className: 'dt-head-center dt-body-center', orderable: false},
+                  {width: "5%",  targets: 7, className: 'dt-head-center dt-body-center'},
+                  {width: "15%", targets: 8, className: 'dt-head-center dt-body-center'},
+                  {width: "5%",  targets: 9, className: 'dt-head-center dt-body-center'},
+                  {width: "15%", targets: 10, className: 'dt-head-center dt-body-center'},
+                  {width: "2%", targets: 11, className: 'dt-head-center dt-body-center', orderable: false},
+
+              ],
+              fixedColumns: true,
+              scrollX: true,
+              order:[[8,'desc']]
+          });
+
+      });
+
+  </script>
+
+  <script type="text/javascript" src="{% static 'dashboard/static/dist/libs/apexcharts/dist/apexcharts.js' %}" defer=""></script>
+  <script type="text/javascript" src="{% static 'dashboard/static/dist/libs/jscharting/jsc/jscharting.js' %}"></script>
+  <script type="text/javascript" src="{% static 'dashboard/static/dist/libs/jscharting/jsc/modules/types.js' %}"></script>
+  <script type="text/javascript" src="{% static 'dashboard/static/dist/libs/jscharting/jsc/modules/toolbar.js' %}"></script>
+  <script type="text/javascript" src="{% static 'system_monitor_resource/scripts.js' %}"></script>
+  
+  <script>
+    {% if message %}
+    const toastLiveExample = document.getElementById('liveToast');
+    const toast_body = document.getElementsByClassName("toast-body")[0];
+    {% comment %} toast_body.innerHTML = {{ message }}; {% endcomment %}
+    toast_body.innerHTML = "hello";
+    const toast = new bootstrap.Toast(toastLiveExample);
+    toast.show();
+    {% endif %}
+  </script>
+
+  <script>
+  
+      {% for j in 'ab' %}
+    var chart{{j}};
+    
+        var statuses{{j}} = ['Healthy',   'Issue'   ,    "Reset"   ,  'DownTime' , 'No Data' ];
+        // [OK, NO_WATER, DOWN]
+        var palette{{j}} =  ['#00C853',  '#FFEA00'  ,   '#14adfa'  ,  '#ff2a2e'  , '#d5ebdb' ];
+      
+      {% if j == 'a' %}
+
+        JSC.fetch("{% url 'systemUptimeTracker:get_system_runtime_data_last_24hrs' %}")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            // var data = JSC.csv2Json(text);
+            chart{{j}} = renderChart{{j}}(makeSeries{{j}}(data.Data));
+          });
+          
+        {% else %}
+
+          JSC.fetch("{% url 'systemUptimeTracker:get_system_runtime_data' %}")
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            // var data = JSC.csv2Json(text);
+            chart{{j}} = renderChart{{j}}(makeSeries{{j}}(data.Data));
+          });
+
+      {% endif %}
+
+        function renderChart{{j}}(series) {
+          var chart{{j}} = JSC.chart('chartDiv{{j}}', {
+            type: 'heatmap solid',
+            {% if j == 'a' %}
+            title_label_text: 'Last 24hr RTU Status',
+            {% else %}
+            title_label_text: 'Selected Hour RTU Status',
+            {% endif %}
+            debug: false,
+            box: {
+              
+              {% if j == 'b' %}
+              padding: {left:-5,right:10, top: 20},
+              margin:{bottom: -10},
+              {% else %}
+              padding: {left:10, right:10},
+
+              {% endif %}
+
+              // outline: { color: '#5B9AE3', width: 2 },
+              radius: 5,
+              fill: 'var(--tblr-bg-surface)'
+          },
+          events_load: function(e){ $("g[cursor='pointer']").remove()},
+          {% if j == 'b' %}  
+          legend: {
+              margin_top: -28,
+              margin_left: 250,
+              position: 'inside top left',
+              defaultEntry: {
+                iconWidth: 25,
+                style: {
+                  color: '#3A5254',
+                  fontWeight: 'normal'
+                },
+                states: {
+                  hover_style: { color: '#FF5254' },
+                  hidden_style: { color: '#c2bec1' }
+                }
+              }
+            },
+            {%else %}
+            legend: {
+              margin_top: -28,
+              position: 'inside top right',
+              defaultEntry: {
+                iconWidth: 25,
+                style: {
+                  color: '#3A5254',
+                  fontWeight: 'normal'
+                },
+                states: {
+                  hover_style: { color: '#FF5254' },
+                  hidden_style: { color: '#c2bec1' }
+                }
+              }
+            },
+            {% endif %}
+            
+            
+            title_label_style: {
+              color: '#3A5254',
+              fontWeight: 'bold',
+            },
+            
+
+            palette: {
+              pointValue: function(p) {
+                return p.options('z');
+              },
+              ranges: makePaletteRanges{{j}}(palette{{j}})
+            },
+            yAxis_visible: false,
+            xAxis_scale_type: 'time',
+            defaultSeries_shape_innerPadding: 0.05,
+            defaultPoint: {
+              focusGlow_width: 1,
+              outline_width: 0,
+              tooltip: 'date:%datetime <br>Status: <b>%status</b> <br> Reason: %reason',
+              {% if j == 'a' %}
+              events_click: pointClick1,
+              {% endif %}
+            },
+            series: series,
+            
+          });
+
+          }     
+
+        function pointClick1(event){
+          console.log(event.currentTarget.x);
+          const controller = new AbortController()
+          // 5 second timeout:
+          const timeoutId = setTimeout(() => controller.abort(), 5000)
+          fetch("{% url 'systemUptimeTracker:get_system_runtime_data' %}"+ "?selectedtime=" + event.currentTarget.x , {
+                  headers: {
+                      'Accept': 'application/json',
+                      'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                  },
+                  signal: controller.signal
+              })
+                  .then(response => {
+                    var aa = response.json();
+                    console.log(aa)
+                      return aa //Convert response to JSON
+                  })
+                  .then(data => {
+                    // chartb.options({series: data})
+                    renderChartb(makeSeriesb(data.Data))
+                  })
+          
+          };
+
+        function makeSeries{{j}}(data) {
+          // console.log(data)
+          return [
+            {
+              points: data.map(function(item) {
+                return {
+                  x: item.datetime,
+                  y: 'Facebook',
+                  z: item.status,
+                  attributes: [ 
+                      ['status', statuses{{j}}[item.status]],
+                      ['datetime', item.datetime],
+                      ['reason', item.reason]
+                    ]
+                };
+              })
+            }
+          ];
+        }
+
+
+        function makePaletteRanges{{j}}(palette) {
+          return palette.map(function(item, i) {
+            return {
+              value: i,
+              color: item,
+              legendEntry_value: statuses{{j}}[i]
+            };
+          });
+        }
+        {% endfor %}
+    
+  </script>
+  
+  <script>
+    var get_system_data_period = 5000;
+    document.addEventListener("DOMContentLoaded", function () {
+
+  
+        var url = '{% url "dashboard:systemStatus" %}';
+        var cpu_data = [];
+        var ram_data = [];
+  
+        function get_system_data() {
+          const controller = new AbortController()
+          // 5 second timeout:
+          const timeoutId = setTimeout(() => controller.abort(), 5000)
+          fetch(url, {
+            headers: {
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+            },
+            signal: controller.signal
+          })
+            .then(response => {
+              return response.json() //Convert response to JSON
+            })
+            .then(data => {
+              ///////////////////// update status indicator ////////////////////////
+              if (data['system_status'] == 'Up') {
+                if ($('#status-indicator').hasClass('status-red')) {
+                  $('#status-indicator').removeClass('status-red');
+                  $('#status-indicator-text').removeClass('text-red');
+                }
+                $('#status-indicator').addClass('status-green');
+                $('#status-indicator-text').addClass('text-green');
+                $('#status-indicator-text').html('Up');
+  
+                
+              }
+              else if (data['system_status'] == 'Down') {
+                  if ($('#status-indicator').hasClass('status-green')) {
+                    $('#status-indicator').removeClass('status-green');
+                    $('#status-indicator-text').removeClass('text-green');
+                  }
+                  $('#status-indicator').addClass('status-red');
+                  $('#status-indicator-text').addClass('text-red');
+                  $('#status-indicator-text').html('Down');
+                
+              }
+  
+  
+              $('#uptime-div').html(data['uptime']);
+  
+             
+
+  
+            })
+            .catch(error => {
+              console.log('Error:', error);
+              if ($('#status-indicator').hasClass('status-green')) {
+                $('#status-indicator').removeClass('status-green')
+                $('#status-indicator-text').removeClass('text-green')
+              }
+              $('#status-indicator').addClass('status-red')
+              $('#status-indicator-text').addClass('text-red')
+              $('#status-indicator-text').html('Down')
+            })
+  
+  
+        }
+        // because get_system_data_period may be a long period time,
+        // we get system data immediately after load page, then get every get_system_data_period time.
+        get_system_data()
+  
+        setInterval(get_system_data, get_system_data_period);
+
+    });
+    $('#check-system-avalibility-period-text').html('Checked every ' + get_system_data_period / 1000 + ' Seconds');
+  
+  </script>
+
+
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+  </script>
+
+
+  <script>
+
+    var fadeInTime = 300;
+    var fadeOutTime = 500;
+
+    function get_mqtt_broker_statistics() {
+      const controller = new AbortController()
+      // 5 second timeout:
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      fetch("{% url 'dashboard:get_mqtt_broker_statistics' %}", {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+        },
+        signal: controller.signal
+      })
+      .then(response => {
+        return response.json() //Convert response to JSON
+      })
+      .then(data => {
+        $('#number_of_nodes').fadeOut(fadeOutTime, function() {
+          $(this).html(data['number_of_nodes']).fadeIn(fadeInTime);
+        });
+        $('#mqtt_broker_status').fadeOut(fadeOutTime, function() {
+          if (data['mqtt_broker_status'] == 'running') {
+            $(this).removeClass('text-danger').addClass('text-success').html('Running').fadeIn(fadeInTime);
+          } else {
+            $(this).removeClass('text-success').addClass('text-danger').html('Down').fadeIn(fadeInTime);
+          }
+        });
+        $('#topics').fadeOut(fadeOutTime, function() {
+          $(this).html(data['topics']).fadeIn(fadeInTime);
+        });
+        $('#subscriptions').fadeOut(fadeOutTime, function() {
+          $(this).html(data['subscriptions']).fadeIn(fadeInTime);
+        });
+        $('#sessions').fadeOut(fadeOutTime, function() {
+          $(this).html(data['sessions']).fadeIn(fadeInTime);
+        });
+        $('#connections').fadeOut(fadeOutTime, function() {
+          $(this).html(data['connections']).fadeIn(fadeInTime);
+        });
+        $('#retained_messages').fadeOut(fadeOutTime, function() {
+          $(this).html(data['retained_messages']).fadeIn(fadeInTime);
+        });
+
+      })
+    }
+    get_mqtt_broker_statistics();
+    setInterval(get_mqtt_broker_statistics, 5000);  
+  </script>
+
+  <script>
+    function get_dashboard_statistics() {
+      const controller = new AbortController()
+      // 5 second timeout:
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      fetch("{% url 'dashboard:dashboard_statistics' %}", {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+        },
+        signal: controller.signal
+      })
+      .then(response => {
+        return response.json() //Convert response to JSON
+      })
+      .then(data => {
+
+        $('#all_projects').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_projects']).fadeIn(fadeInTime);
+        });
+        $('#all_homes').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_homes']).fadeIn(fadeInTime);
+        });
+        $('#all_active_users').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_active_users']).fadeIn(fadeInTime);
+        });
+        $('#all_installed_controllers').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_installed_controllers']).fadeIn(fadeInTime);
+        });
+        $('#all_active_rules').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_active_rules']).fadeIn(fadeInTime);
+        });
+        $('#all_installed_devices').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_installed_devices']).fadeIn(fadeInTime);
+        });
+        $('#all_installed_tablet').fadeOut(fadeOutTime, function() {
+          $(this).html(data['all_installed_tablet']).fadeIn(fadeInTime);
+        });
+      })
+    }
+    get_dashboard_statistics();
+    setInterval(get_dashboard_statistics, 5000);
+
+  </script>
+
+{% endblock extrajs %}

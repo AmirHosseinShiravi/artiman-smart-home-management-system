@@ -1,0 +1,59 @@
+
+<div class="ms-3 me-3">
+    <div class="d-flex flex-column">
+        <form method="POST" autocomplete="on" id="edit-profile-form">
+            <div class="edit-profile-header mt-4 mb-4">
+                <a href="/web_app/v1/setting" class="back-link">back</a>
+                <div class="edit-profile-header-name">Edit Profile</div>
+            </div>
+
+            <div class="d-flex flex-column justify-content-center align-items-center mb-3">
+            <div>
+                <span class="avatar avatar-xl" id="avatar_preview" style="background-image: url({% if user.avatar_thumbnail %}{{ user.avatar_thumbnail.url }}{% endif %})"></span>
+            </div>
+            <div class="mt-3">
+                <label for="id_avatar" class="btn btn-primary">
+                Change Avatar
+                </label>
+                {{ edit_profile_home_user_form.avatar }}  
+            </div>
+            </div>
+
+            <div class="row g-3 mt-5 form-container">
+                {% comment %} <div class="col-md-4 mb-3">
+                    <div class="form-label">Username</div>
+                    {{ edit_profile_base_user_form.username }}
+                </div> {% endcomment %}
+                <div class="col-6 mb-3">
+                    <div class="form-label">First Name</div>
+                    {{ edit_profile_base_user_form.first_name }}
+                </div>
+                <div class="col-6 mb-3">
+                    <div class="form-label">Last Name</div>
+                    {{ edit_profile_base_user_form.last_name }}
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <div class="form-label">Current Password</div>
+                    {{ edit_profile_base_user_form.current_password }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="form-label">New Password</div>
+                    {{ edit_profile_base_user_form.new_password }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="form-label">Confirm New Password</div>
+                    {{ edit_profile_base_user_form.confirm_new_password }}
+                </div>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+            <div class="d-flex justify-content-center mt-5 mb-4 w-100">
+            <button type="button"  class="btn btn-success w-75" id="save-profile-button" onclick="save_profile()">
+                Update
+            </button>
+            </div>
+
+        </form>
+    </div>
+</div>
