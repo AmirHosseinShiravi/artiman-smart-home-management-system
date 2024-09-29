@@ -121,7 +121,7 @@
 {#                                        {% elif project.status == 'enable' %} bg-green#}
 {#                                        {% endif %} badge-blink me-1"></span>{{ project.status }}</td>#}
                   {% if perms.dashboard.delete_zone %}
-                    {% if zone.parent_project.project_lock %}
+                    {% if not zone.parent_project.project_lock %}
                       <td><a href="{% url 'dashboard:home_wizard_delete_zone' home.parent_project.uuid home.uuid zone.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
                     {% else %}
                       <td><i class="fa-light fa-trash-can" style="font-size: 20px"></i></td>
