@@ -34,7 +34,7 @@
               Home Users
             </h2>
           </div>
-        {% if perms.dashboard.add_homeUser %}
+        {% if perms.dashboard.add_homeuser %}
           {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
@@ -97,7 +97,7 @@
                   <td>{{ user.user.get_full_name }}</td>
                   <td>{{ user.is_tablet_user }}</td>
                   <td>{{ user.is_web_app_user }}</td>
-                  {% if perms.dashboard.change_homeUser %}
+                  {% if perms.dashboard.change_homeuser %}
                     {% if not project.project_lock %}
                       <td><a href="{% url 'dashboard:home_wizard_edit_user' project.uuid home.uuid user.uuid %}"><i class="fa-light fa-pen-to-square" style="font-size: 20px"></i></a></td>
                     {% else %}
@@ -118,7 +118,7 @@
 {#                                        {% elif project.status == 'in_construction' %} bg-yellow#}
 {#                                        {% elif project.status == 'enable' %} bg-green#}
 {#                                        {% endif %} badge-blink me-1"></span>{{ project.status }}</td>#}
-                  {% if perms.dashboard.delete_homeUser %}
+                  {% if perms.dashboard.delete_homeuser %}
                     {% if not project.project_lock %}
                       <td><a href="{% url 'dashboard:home_wizard_delete_user' home.parent_project.uuid home.uuid user.uuid %}"><i class="fa-light fa-trash-can" style="font-size: 20px"></i></a></td>
                     {% else %}
