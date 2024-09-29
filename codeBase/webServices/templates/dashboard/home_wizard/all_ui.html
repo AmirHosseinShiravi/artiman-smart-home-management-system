@@ -35,7 +35,7 @@
               Home UI Elements
             </h2>
           </div>
-
+        {% if perms.dashboard.add_uibase %}
           {% if not project.project_lock %}
           <div class="col-auto ms-auto d-print-none">
             <div class="btn-list">
@@ -64,6 +64,7 @@
             </div>
           </div>
           {% endif %}
+        {% endif %}
         </div>
       </div>
     </div>
