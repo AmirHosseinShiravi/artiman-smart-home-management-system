@@ -1,0 +1,109 @@
+{% extends 'web_app/layouts/base.html' %}
+{% load static %}
+
+
+{% block extrahead %}
+    <!-- Swiper 6.4.11 -->
+  {#    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">#}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+  <!-- Owl Carousel v2.3.4 -->
+  <link rel="stylesheet" href="{% static 'OwlCarousel2-2.3.4/dist/assets/owl.carousel.min.css' %}">
+
+{% endblock extrahead %}
+
+
+{% block content %}
+
+
+
+    <!-- Start em_loading -->
+{#    <section class="em_loading" id="loaderPage">#}
+{#        <div class="spinner_flash"></div>#}
+{#    </section>#}
+    <!-- End. em_loading -->
+
+    <div id="wrapper">
+        <div id="content">
+            <!-- Start main_haeder -->
+{#            <header class="main_haeder header-sticky multi_item d-lfex justify-content-end">#}
+{#                <div class="em_side_right">#}
+{#                    <a href="index.html"#}
+{#                        class="link__forgot d-block size-14 color-text text-decoration-none hover:color-secondary transition-all">#}
+{#                        صرف نظر#}
+{#                    </a>#}
+{#                </div>#}
+{#            </header>#}
+            <!-- End.main_haeder -->
+
+            <!-- Start npPage_introDefault -->
+            <div class="npPage_introDefault">
+                <div class="cover">
+                    <img src="{% static 'webapp/images/1724246042670qnnpx84a.png' %}"
+                         alt="">
+                </div>
+
+                <!-- Swiper -->
+                <div class="swiper-amir-container swiper-intro-default swiper__text padding-t-40">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="content_text">
+                                <h2 class="txt_gradient">از چک کردن تا خرید</h2>
+                                <p>
+                                     این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان
+                                </p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="content_text">
+                                <h2 class="txt_gradient">همه جا، در هر زمان متصل شوید</h2>
+                                <p>
+                                     این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان
+                                </p>
+                            </div>
+                        </div>
+{#                        <div class="swiper-slide">#}
+{#                            <div class="content_text">#}
+{#                                <h2 class="txt_gradient">تمام خدمات شما با سرعت نور</h2>#}
+{#                                <p>#}
+{#                                     این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان#}
+{#                                </p>#}
+{#                            </div>#}
+{#                        </div>#}
+                    </div>
+                    <!-- Add Pagination -->
+                    <div class="swiper-pagination"></div>
+                </div>
+
+                <div class="npButtons_networks env-pb margin-b-20">
+                    <a href="#" class="btn rounded-pill bg-primary border-snow">
+                        <div class="icon">
+                            <i class="fa-regular fa-right-to-bracket fa-rotate-180"></i>
+                        </div>
+                        <span class="color-secondary">login</span>
+                    </a>
+
+
+                </div>
+
+            </div>
+            <!-- End. npPage_introDefault -->
+
+
+        </div>
+    </div>
+
+{% endblock content %}
+
+
+{% block extrajs %}
+
+  <!-- Owl Carousel v2.3.4 -->
+  <script src="{% static 'OwlCarousel2-2.3.4/dist/owl.carousel.min.js' %}"></script>
+  <!-- Swiper 6.4.11 -->
+  {#    <script src="assets/js/vendor/swiper-bundle.min.js"></script>#}
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <script type="application/javascript" src="{% static 'webapp/js/ss.js' %}"></script>
+
+{% endblock extrajs %}

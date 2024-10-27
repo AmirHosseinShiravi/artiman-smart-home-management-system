@@ -16,6 +16,9 @@ load_dotenv()  # take environment variables from .env.
 
 def initialize_mqtt_connection():
     initialize_mqtt()
+    from web_app.views import mqtt_listener_for_get_and_set
+    subscribe_to_topic("#", mqtt_listener_for_get_and_set)
+    
 
 def generate_random_id(length: int = 8) -> str:
     characters = string.ascii_letters + string.digits
@@ -92,8 +95,239 @@ def get_mqtt_cluster_status():
         print(e)
         return {}
 
-    
 
+
+def generate_controller_config(controller_record):
+    
+    tablet = dashboard_models.Tablet.objects.filter(parent_project= controller_record.parent_project, parent_home= controller_record.parent_home).get()
+    controller_config = {
+        "general":{
+            "project_id": controller_record.parent_project.uuid,
+            "home_id": controller_record.parent_home.uuid,
+        },
+        "controller":{
+            "controller_id": controller_record.uuid,
+            "communication":{
+                "modbus":{
+                    "interface": "RS485",
+                    "interface_properties":{
+                        "baud_rate": controller_record.uart_baud_rate,
+                        "data_bits": controller_record.uart_data_bits ,
+                        "parity": controller_record.uart_parity ,
+                        "stop_bits": controller_record.uart_stop_bits ,
+                        "flow_control": controller_record.uart_flow_control ,
+                    },
+                },
+                "mqtt": {
+                    "connection":{
+                        "cloud": {
+                            "broker_host": os.environ.get("emqx_broker_controllers_host"),
+                            "transports": [
+                                {
+                                    "type": "tcp",
+                                    "port": os.environ.get("emqx_broker_tcp_port")
+                                },
+                                {
+                                    "type": "tls",
+                                    "port": os.environ.get("emqx_broker_tls_port")
+                                },
+                                {
+                                    "type": "ws",
+                                    "port": os.environ.get("emqx_broker_ws_port")
+                                },
+                                {
+                                    "type": "wss",
+                                    "port": os.environ.get("emqx_broker_wss_port")
+                                },
+                            ],
+                            "authentication":{
+                                "client_id": controller_record.mqtt_client_id,
+                                "username": controller_record.mqtt_username,
+                                "password": controller_record.mqtt_password,
+                            },
+                            "certificates": {
+                                "common_cert": "",
+                                "controller_cert": "",
+                                "controller_key": "",
+                            }
+                        },
+                        "local": {
+                            "broker_host": tablet.tablet_ip_address if tablet.tablet_has_internal_mqtt_broker else "",
+                            "transports": [
+                                {
+                                    "type": "tcp",
+                                    "port": 1883
+                                },
+                                {
+                                    "type": "ws",
+                                    "port": 8083
+                                }
+                            ],
+                            "authentication":{
+                                "client_id": f"client_{generate_random_id(length=10)}" if tablet.tablet_has_internal_mqtt_broker else "",
+                                "username": tablet.tablet_internal_mqtt_broker_username if tablet.tablet_has_internal_mqtt_broker else "",
+                                "password": tablet.tablet_internal_mqtt_broker_password if tablet.tablet_has_internal_mqtt_broker else "",
+                            }
+                        }
+                    },
+                    "LWT":{
+                        "action": "all",
+                        "topic": f"v1/controllers/{controller_record.uuid}/status",
+                        "retain": "true",
+                        "payload":{
+                            "online": "enable",
+                            "offline": "disable",
+                            "error": "error"
+                        }
+                    }
+                }
+            }
+        },
+    }
+
+    all_controller_child_devices = dashboard_models.DeviceProxy.objects.filter(device_base__parent_home=controller_record.parent_home,
+                                                                                device_base__parent_project=controller_record.parent_project,
+                                                                                device_base__parent_controller=controller_record).all()
+    
+    boolean_enum = ["ON", "OFF"]
+    thermostat_fct_enum = ["Auto", "Manual"]
+    thermostat_speed_enum = ["Low", "Medium", "High"]
+    thermostat_operation_mode_enum = ["Heat", "Cool"]
+    thermostat_temperature_range_enum = [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    
+    all_devices = []
+
+    for device in all_controller_child_devices:
+        device_type = device.content_type # .name/.model
+        device_object = device.device_base # name/parent_controller/parent_home/parent_project/parent_zone/uuid
+        device_functions = list(device.device_base.functions.all()) # display_name/functiion_name/value_type
+        device_data_points = []
+        for data_point in device_functions:
+            type_enum = []
+            if data_point.value_type == "BOOLEAN":
+                type_enum = boolean_enum
+            elif data_point.value_type == "STRING":
+                if data_point.thermostatdatapointfunction:
+                    if data_point.function_name == "fms":
+                        type_enum = thermostat_speed_enum
+                    elif data_point.function_name == "fct":
+                        type_enum = thermostat_fct_enum
+                    elif data_point.function_name == "hc":
+                        type_enum = thermostat_operation_mode_enum
+
+            elif data_point.value_type == "DECIMAL":
+                if data_point.thermostatdatapointfunction:
+                    type_enum = thermostat_temperature_range_enum
+                else:
+                    type_enum = ""
+            else:
+                type_enum = ""
+            
+
+            temp_dp = {
+                "display_name": data_point.display_name,
+                "function_name": data_point.function_name,
+                "value_type": data_point.value_type,
+                "value_type_enum": type_enum,
+                "io_permission": data_point.io_permission,
+                
+            }
+            temp_dp["mapping"] = dict()
+            if data_point.io_permission == "R":
+                temp_dp["mapping"]["mqtt"] = {
+                        "getter": {
+                            "action": "publish",
+                            "topic": f"/functions/{data_point.function_name}/get",
+                            "retain": "true"
+                        }
+                }
+                if device_type.model == "controllerdevice":
+                    temp_dp["mapping"]["internal_buffer"] = {
+                        "read_data_model": data_point.internal_buffer_read_data_model,
+                        "read_start_address": data_point.internal_buffer_read_start_address,
+                        "read_quantity": data_point.internal_buffer_read_quantity,
+                    }
+                else:
+                    temp_dp["mapping"]["modbus"] = {
+                        "read_data_model": data_point.modbus_read_data_model,
+                        "read_start_address": data_point.modbus_read_start_address,
+                        "read_quantity": data_point.modbus_read_quantity,
+                    }
+                
+            elif data_point.io_permission == "W":
+                temp_dp["mapping"]["mqtt"] = {
+                    "setter": {
+                        "action": "subscribe",
+                        "topic": f"/functions/{data_point.function_name}/set",
+                        "retain": "false"
+                    }
+                }
+                if device_type.model == "controllerdevice":
+                    temp_dp["mapping"]["internal_buffer"] = {
+                        "write_data_model": data_point.internal_buffer_write_data_model,
+                        "write_start_address": data_point.internal_buffer_write_start_address,
+                        "write_quantity": data_point.internal_buffer_write_quantity,
+                    }
+                else:
+                    temp_dp["mapping"]["modbus"] = {
+                        "write_data_model": data_point.modbus_write_data_model,
+                        "write_start_address": data_point.modbus_write_start_address,
+                        "write_quantity": data_point.modbus_write_quantity,
+                    }
+            
+            else :
+                temp_dp["mapping"]["mqtt"] = {
+                    "setter": {
+                        "action": "subscribe",
+                        "topic": f"/functions/{data_point.function_name}/set",
+                        "retain": "false"
+                    },
+                    "getter": {
+                        "action": "publish",
+                        "topic": f"/functions/{data_point.function_name}/get",
+                        "retain": "true"
+                    }
+                }
+                if device_type.model == "controllerdevice":
+                    temp_dp["mapping"]["internal_buffer"] = {
+                        "read_data_model": data_point.internal_buffer_read_data_model,
+                        "read_start_address": data_point.internal_buffer_read_start_address,
+                        "read_quantity": data_point.internal_buffer_read_quantity,
+                        "write_data_model": data_point.internal_buffer_write_data_model,
+                        "write_start_address": data_point.internal_buffer_write_start_address,
+                        "write_quantity": data_point.internal_buffer_write_quantity,
+                    }
+                else:
+                    temp_dp["mapping"]["modbus"] = {
+                        "read_data_model": data_point.modbus_read_data_model,
+                        "read_start_address": data_point.modbus_read_start_address,
+                        "read_quantity": data_point.modbus_read_quantity,
+                        "write_data_model": data_point.modbus_write_data_model,
+                        "write_start_address": data_point.modbus_write_start_address,
+                        "write_quantity": data_point.modbus_write_quantity,
+                    }
+
+            device_data_points.append(temp_dp)
+
+        all_devices.append({
+            "device_id": device_object.uuid,
+            "device_name": device_object.name,
+            "device_type": device_type.model,
+            "device_linkage":{
+                "type": "external" if device_type.model != "controllerdevice" else "internal",
+                "linkage_properties": {
+                    "protocol": "modbus" if device_type.model != "controllerdevice" else "",
+                    "modbus_id": device_object.modbus_id if device_type.model != "controllerdevice" else "",
+                    "modbus_channel": device_object.modbus_channel if device_type.model != "controllerdevice" else "",
+                }
+            },
+            "mqtt_base_topic": f"v1/controllers/{controller_record.uuid}/devices/{device_object.uuid}",
+            "data_point_functions": device_data_points
+        })
+
+    controller_config["devices"] = all_devices
+
+    return controller_config
 
 
 
@@ -308,6 +542,7 @@ def set_controller_client_rule_to_emqx_built_in_database_authorization_backend(p
                                                             "action": "all",
                                                             "topic": f"v1/controllers/{controller_uuid}/status",
                                                             "permission": "allow",
+                                                            "retain": "all"
                                                     })
 
                 # because we have list and with list append method, each new item added to the end of list, we can just add

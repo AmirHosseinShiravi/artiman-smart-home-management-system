@@ -11,6 +11,9 @@ class SceneWizardPageClass {
         this.decision_expr = "or";
         this.rule_name = "";
         this.rule_style_color = '#FFB5A7';
+        // this.ruleStyleImage = null;
+        this.showSceneRuleInZones = new Set();
+
         this.add_to_home_status = false;
 
         this.rule_config_type = "";
@@ -167,6 +170,10 @@ class SceneWizardPageClass {
         //                                             `
         //                                                 <div class="btn btn-success btn-lg w-100 " id="scene-wizard-save-button">Save</div>
         //                                             `;
+        const zone_buttons = all_home_zones.map(zone=>`
+            <input type="checkbox" id="zone-${zone.zone_name}" name="scene-wizard-zone-selection" value="${zone.zone_uuid}">
+                <label for="zone-${zone.zone_name}">${zone.zone_name}</label>
+            `).join("");
 
         const scene_wizard_dom = document.createElement('div');
         scene_wizard_dom.className = 'page scene-sub-page scene-wizard-page';
@@ -204,7 +211,7 @@ class SceneWizardPageClass {
 
           <div class="if-conditions-container">
             <div class="pb-1">
-            <div class="empty-if-condition-item text-center align-content-center" style="display: none;">Add Condition</div>
+            <div class="empty-if-condition-item" style="display: none;">Add Condition</div>
             </div>
             <ul class="if-conditions-sortable-list">
 
@@ -231,7 +238,7 @@ class SceneWizardPageClass {
 
           <div class="then-actions-container">
             <div class="pb-1">
-              <div class="empty-then-action-item text-center align-content-center" style="display: none;">Add Action</div>
+              <div class="empty-then-action-item" style="display: none;">Add Action</div>
             </div>
             <ul class="then-actions-sortable-list" >
 
@@ -257,16 +264,26 @@ class SceneWizardPageClass {
         </div>
         
         <div class="d-flex justify-content-between align-items-center mb-3 p-3" id="add-to-home-section">
-          <span class="mr-3 ">Show on Home Page</span>
+          <span class="mr-3">Show on Home Page</span>
           <div class="form-check form-switch">
             <input class="form-check-input" style="height: 30px;width: 50px;" type="checkbox" id="scene-wizard-add-to-home-switch">
           </div>
+        </div>
+        <div class="scene-wizard-select-zones-section p-3" id="add-to-zones-section">            
+            <div class="mt-2">
+              <p class="mb-4 fs-5 fw-bold">Select Zones(Applied for Home Dashboard)</p>
+              <div class="zone-checkbox-container">
+                ${zone_buttons}
+              </div>
+            </div>
+
         </div>
         <div class="mt-5 mb-4" id="scene-wizard-action-buttons-container">
             <div class="d-flex flex-row">
                 <div class="btn btn-danger btn w-100 me-2 ms-2" id="scene-wizard-delete-button" style="display:none;">Delete<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span></div> 
                 <div class="btn btn-success btn w-100 ms-2 me-2" id="scene-wizard-save-button">Save<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span></div> 
-            </div>
+            </div>            
+        </div>
         </div>
         `;
 
@@ -295,6 +312,19 @@ class SceneWizardPageClass {
             this.add_to_home_status = event.target.checked;
             return true;
         });
+
+        const linkage_rule_add_to_zones_buttons_element = scene_wizard_dom.querySelectorAll('.zone-checkbox-container input[name=scene-wizard-zone-selection]');
+        linkage_rule_add_to_zones_buttons_element.forEach(zone_button =>{
+            zone_button.addEventListener('change', (event) => {
+                if(event.target.checked){
+                    this.showSceneRuleInZones.add(event.target.value)
+                }
+                else {
+                    this.showSceneRuleInZones.delete(event.target.value)
+                }
+                return true;
+            });
+        })
 
         this.scene_wizard_save_button = scene_wizard_dom.querySelector('#scene-wizard-save-button');
         this.scene_wizard_save_button.addEventListener('click', this.handleSaveButtonClick);
@@ -507,7 +537,7 @@ class SceneWizardPageClass {
         const if_conditions_sortable_list_element = this.page_dom.querySelector('.if-conditions-sortable-list');
         const empty_if_condition_item_element = this.page_dom.querySelector('.empty-if-condition-item');
         if_conditions_sortable_list_element.style.display = 'none';
-        empty_if_condition_item_element.style.display = 'block';
+        empty_if_condition_item_element.style.display = 'flex';
     }
 
     show_if_actions_sortable_list() {
@@ -564,7 +594,7 @@ class SceneWizardPageClass {
         const then_actions_sortable_list_element = this.page_dom.querySelector('.then-actions-sortable-list');
         const empty_then_action_item_element = this.page_dom.querySelector('.empty-then-action-item');
         then_actions_sortable_list_element.style.display = 'none';
-        empty_then_action_item_element.style.display = 'block';
+        empty_then_action_item_element.style.display = 'flex';
     }
 
     show_then_actions_sortable_list() {
@@ -601,6 +631,9 @@ class SceneWizardPageClass {
         Coloris.setInstance('.instance1', {
             theme: 'pill',
             themeMode: 'dark',
+            focusInput: false,
+            // Select and focus the color value input when the color picker dialog is opened.
+            selectInput: false,
             formatToggle: true,
             closeButton: true,
             clearButton: true,
@@ -639,18 +672,23 @@ class SceneWizardPageClass {
     }
 
     handle_if_add_icon_click(e){
-        // if we have any condition in conditions list, we should disable tap-to-run option.
-        if (this.rule_config_type === "scene" || this.rule_config_type === "automation"){
-            this.disable_if_condition_tap_to_run_option();
+        e.stopPropagation();
+        if (e.target == this.page_dom.querySelector('.if-add-item-icon i') || e.target.classList.contains('empty-if-condition-item')) {
+            // if we have any condition in conditions list, we should disable tap-to-run option.
+            if (this.rule_config_type === "scene" || this.rule_config_type === "automation"){
+                this.disable_if_condition_tap_to_run_option();
+            }
+            if(this.if_conditions_list.length === 0 && this.rule_config_type !== "scene"){
+                this.enable_if_condition_tap_to_run_option();
+                this.disable_add_to_home();
+                this.disable_add_to_zones();
+            }    
+            if(this.rule_config_type !== "scene"){
+                // show condition options modal
+                this.if_condition_options_modal.show();
+                // console.log('handle_if_add_icon_click');
+            }  
         }
-        if(this.if_conditions_list.length === 0 && this.rule_config_type !== "scene"){
-            this.enable_if_condition_tap_to_run_option();
-            this.disable_add_to_home();
-        }
-
-        // show condition options modal
-        this.if_condition_options_modal.show();
-        // console.log('handle_if_add_icon_click');
     }
 
 
@@ -687,6 +725,7 @@ class SceneWizardPageClass {
                     this.rule_config_type = "";
                     this.enable_if_condition_tap_to_run_option();
                     this.disable_add_to_home();
+                    this.disable_add_to_zones();
                 }
 
                 listItem.remove();
@@ -839,13 +878,13 @@ class SceneWizardPageClass {
     // enable/disable if section add icon.
     disable_if_add_button(){
         const if_add_icon = this.page_dom.querySelector('.if-add-item-icon');
-        if_add_icon.classList.toggle('text-muted');
+        if_add_icon.classList.add('text-muted');
         this.remove_if_add_icon_event_listener();
     }
 
     enable_if_add_button(){
         const if_add_icon = this.page_dom.querySelector('.if-add-item-icon');
-        if_add_icon.classList.toggle('text-muted');
+        if_add_icon.classList.remove('text-muted');
         this.add_if_add_icon_event_listener();
     }
 
@@ -868,6 +907,44 @@ class SceneWizardPageClass {
     disable_add_to_home() {
         const add_to_home_section_element = document.querySelector('#add-to-home-section');
         add_to_home_section_element.classList.remove('active');
+    }
+
+
+    enable_add_to_zones() {
+        const add_to_zones_section_element = document.querySelector('#add-to-zones-section');
+        add_to_zones_section_element.classList.add('active');
+    }
+
+    disable_add_to_zones() {
+        const add_to_zones_section_element = document.querySelector('#add-to-zones-section');
+        add_to_zones_section_element.classList.remove('active');
+    }
+
+    reset_add_to_home_switch(){
+        const linkage_rule_add_to_home_switch_element = document.querySelector('#scene-wizard-add-to-home-switch');
+        linkage_rule_add_to_home_switch_element.checked = false;
+    }
+
+    reset_add_to_zones_checkboxes(){
+        const weekdayCheckboxes = document.querySelectorAll('.zone-checkbox-container input[name=scene-wizard-zone-selection][type="checkbox"]');
+        weekdayCheckboxes.forEach(cb => {
+            cb.checked = false;
+        });
+    }
+
+    init_add_to_zones_checkboxes(){
+        const zoneSelectionCheckboxes = document.querySelectorAll('.zone-checkbox-container input[name=scene-wizard-zone-selection][type="checkbox"]');
+        zoneSelectionCheckboxes.forEach(checkbox=>{
+            checkbox.checked = false;
+        });
+        this.showSceneRuleInZones.forEach(selected_zone =>{
+                zoneSelectionCheckboxes.forEach(checkbox=>{
+                    if (checkbox.value === selected_zone){
+                        checkbox.checked = true;
+                    }
+                    
+                });
+        });
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////\n
@@ -975,9 +1052,10 @@ class SceneWizardPageClass {
                     this.show_if_actions_sortable_list();
                     this.if_condition_options_modal.hide();
                     this.rule_config_type = "scene";
-                    this.update_event_listeners();
                     this.disable_if_add_button();
                     this.enable_add_to_home();
+                    this.enable_add_to_zones();
+                    this.update_event_listeners();
 
                 }
                 else if(option_type === 'schedule'){
@@ -999,6 +1077,7 @@ class SceneWizardPageClass {
                     this.if_condition_options_modal.hide();
                     this.scheduler_bootstrap_modal_instance.show();
                     this.disable_add_to_home();
+                    this.disable_add_to_zones();
 
                 }
                 else if(option_type === 'select-device-status'){
@@ -1006,6 +1085,7 @@ class SceneWizardPageClass {
                     this.if_condition_options_modal.hide();
                     this.showDeviceSelectionPage();
                     this.disable_add_to_home();
+                    this.disable_add_to_zones();
 
                 }
 
@@ -1646,15 +1726,35 @@ class SceneWizardPageClass {
     // Show DPF selection page
     showDPFSelectionPage() {
         const dpfSelectionList = document.getElementById("dpf-selection-list");
-        dpfSelectionList.innerHTML = this.selectedDevice.dataPointFunctions.map(dpf => `
-            <div class="dpf-card d-flex justify-content-between align-items-center p-3 border-0 rounded-10 mb-2" data-dpf-name="${dpf.function_name}" >
-              <span class="font-weight-bold">${dpf.display_name}</span>
-              <span class="d-flex align-items-center">
-                <span class="me-3 selected-value" data-dpf-value="" data-dpf-comparision-operator="=="></span>
-                <i class="fa-solid fa-angle-right fa-lg"></i>
-              </span>
-            </div>
-            `).join("");
+        
+        let output_string = ""
+        this.selectedDevice.dataPointFunctions.map(dpf =>{
+            if(this.currentMode == "then"){
+                if (dpf.io_permission === "W" | dpf.io_permission === "R/W"){
+                    output_string +=  `
+                    <div class="dpf-card d-flex justify-content-between align-items-center p-3 border-0 rounded-10 mb-2" data-dpf-name="${dpf.function_name}" >
+                      <span class="font-weight-bold">${dpf.display_name}</span>
+                      <span class="d-flex align-items-center">
+                        <span class="me-3 selected-value" data-dpf-value="" data-dpf-comparision-operator="=="></span>
+                        <i class="fa-solid fa-angle-right fa-lg"></i>
+                      </span>
+                    </div>
+                    `; 
+                }
+            }
+            else {
+                output_string +=  `
+                    <div class="dpf-card d-flex justify-content-between align-items-center p-3 border-0 rounded-10 mb-2" data-dpf-name="${dpf.function_name}" >
+                      <span class="font-weight-bold">${dpf.display_name}</span>
+                      <span class="d-flex align-items-center">
+                        <span class="me-3 selected-value" data-dpf-value="" data-dpf-comparision-operator="=="></span>
+                        <i class="fa-solid fa-angle-right fa-lg"></i>
+                      </span>
+                    </div>
+                    `; 
+            }
+        });
+        dpfSelectionList.innerHTML = output_string;
 
         dpfSelectionList.addEventListener("click", (e) => {
             if (e.target.closest(".dpf-card")) {
@@ -2079,6 +2179,7 @@ class SceneWizardPageClass {
                 "style": {
                     "color": `${this.rule_style_color}`
                 },
+                "show_scene_rule_in_zones": [...this.showSceneRuleInZones],
                 "decision_expr": `${this.decision_expr}`,
                 "effective_time": {
                     "start": "00:00:00",
@@ -2117,7 +2218,10 @@ class SceneWizardPageClass {
 
                         mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True', {qos:2});
 
-                        generateRuleCards();
+                        get_linkage_rules().then(() => {
+                            generateRuleCards();
+                            add_tap_to_run_rules_to_selected_zones();
+                        });
 
                     } else {
                         console.error('Error:', response.status);
@@ -2147,6 +2251,7 @@ class SceneWizardPageClass {
                 }
                 copy_object["type"] = `${this.rule_config_type}`;
                 copy_object["add_to_home_status"] = `${this.add_to_home_status}`;
+                copy_object["show_scene_rule_in_zones"] = [...this.showSceneRuleInZones];
                 copy_object["style"] = {
                     "color": `${this.rule_style_color}`
                 }
@@ -2182,6 +2287,7 @@ class SceneWizardPageClass {
                             }
                             matched_rule["type"] = `${this.rule_config_type}`;
                             matched_rule["add_to_home_status"] = `${this.add_to_home_status}`;
+                            matched_rule["show_scene_rule_in_zones"] = [...this.showSceneRuleInZones];
                             matched_rule["style"] = {
                                 "color": `${this.rule_style_color}`
                             }
@@ -2191,7 +2297,10 @@ class SceneWizardPageClass {
 
                             mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True', {qos:2});
 
-                            generateRuleCards();
+                            get_linkage_rules().then(() => {
+                                generateRuleCards();
+                                add_tap_to_run_rules_to_selected_zones();
+                            });
                         }
 
                     } else {
@@ -2241,7 +2350,10 @@ class SceneWizardPageClass {
                               linkage_rules.splice(rule_index, 1);
                             }
                             mqttClient.publish(`v1/projects/${project_uuid}/homes/${home_uuid}/linkage-rules/${result.rule_uuid}/actions/create-new-rule-event`, 'True');
-                            generateRuleCards();
+                            get_linkage_rules().then(() => {
+                                generateRuleCards();
+                                add_tap_to_run_rules_to_selected_zones();
+                                });
                         }
 
                     } else {
@@ -2311,6 +2423,7 @@ class SceneWizardPageClass {
             this.rule_name = "";
             this.rule_style_color = '#FFB5A7';
             this.add_to_home_status = false;
+            this.showSceneRuleInZones = new Set();
             this.rule_config_type = "";
             this.currentMode = "if"; // "if" or "then"
             this.selectedDevice = null;
@@ -2369,8 +2482,14 @@ class SceneWizardPageClass {
             this.show_if_condition_empty_item();
             this.show_then_actions_empty_item();
             this.enable_if_condition_tap_to_run_option();
-            // set page header name to "New Scene"
-            // 
+
+            this.disable_add_to_home();
+            this.disable_add_to_zones();
+
+            this.enable_if_add_button();
+
+            this.reset_add_to_home_switch();
+            this.reset_add_to_zones_checkboxes();
 
         }
         else {
@@ -2410,7 +2529,7 @@ class SceneWizardPageClass {
                 pageHeader.textContent = 'Edit Scene';
 
                 
-                this.scene_wizard_delete_button.style.display = "block";
+                this.scene_wizard_delete_button.style.display = "flex";
 
                 this.decision_expr = rule_config['decision_expr'];
                 const decision_expr_select_input_element = this.page_dom.querySelector('#decision_expr_select_input');
@@ -2446,11 +2565,32 @@ class SceneWizardPageClass {
                     linkage_rule_add_to_home_switch_element.value = false;
 
                 }
+                // check zone existance. it is possible to remove or changed one or more zone properties after creation of each linkage rules. so selected
+                // zone data in linkage rule json file not be valid and exist anymore.
+                this.showSceneRuleInZones = new Set();
+                all_home_zones.forEach(zone=>{
+                    if(rule_config.show_scene_rule_in_zones && rule_config.show_scene_rule_in_zones.length > 0){
+                        rule_config.show_scene_rule_in_zones.forEach(selected_zone=>{
+                            if(zone.zone_uuid === selected_zone){
+                                this.showSceneRuleInZones.add(selected_zone);
+                            }
+                        });
+                    }
+                });
+                if(rule_config.show_scene_rule_in_zones && rule_config.show_scene_rule_in_zones.length > 0){
+                    this.init_add_to_zones_checkboxes();
+                    this.enable_add_to_zones();
+                } else {
+                    this.reset_add_to_zones_checkboxes();
+                    this.disable_add_to_zones();
+                }
 
                 this.rule_config_type = rule_config.type;
 
+                // make linkage-rules error proof by checking device existance.
+                // TODO: check device_report elements and verify device is still exist. if not, don't copy it to if_conditions_list
                 this.if_conditions_list = rule_config.conditions;
-
+                // TODO: check device_issue elements and verify device is still exist. if not, don't copy it to then_actions_list
                 this.then_actions_list = rule_config.actions;
 
                 if (this.if_conditions_list.length === 0){
@@ -2485,13 +2625,16 @@ class SceneWizardPageClass {
                         this.rule_config_type = "scene";
                         // this.update_event_listeners();
                         // this.disable_if_add_button();
+                        this.disable_if_add_button();
                         this.enable_add_to_home();
+                        this.enable_add_to_zones();
                     }
                     else if (condition.entity_type === "timer"){
                         // this.scheduler_modal_reset_modal_values();
                         // this.if_condition_options_modal.hide();
                         // this.scheduler_bootstrap_modal_instance.show();
                         this.disable_add_to_home();
+                        this.disable_add_to_zones();
 
                         let scheduler_card_title = "";
                         let scheduler_card_sub_title = "";
@@ -2520,6 +2663,7 @@ class SceneWizardPageClass {
                         if_condition_sortable_list_el.appendChild(list_el);
                         this.show_if_actions_sortable_list();
                         this.rule_config_type = "automation";
+                        this.disable_if_condition_tap_to_run_option();
                         // add condition to rule config
                         // this.update_event_listeners();
                     }
@@ -2550,7 +2694,8 @@ class SceneWizardPageClass {
                         this.show_if_actions_sortable_list();
                         this.rule_config_type = "automation";
                         this.disable_add_to_home();
-
+                        this.disable_add_to_zones();
+                        this.disable_if_condition_tap_to_run_option();
                     }
                 })
 

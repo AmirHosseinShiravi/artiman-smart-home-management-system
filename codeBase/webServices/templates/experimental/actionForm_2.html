@@ -11,7 +11,7 @@
 <form method="post">
     {% csrf_token %}
 
-    <!-- Switch Actions Formset -->
+    {% comment %} <!-- Switch Actions Formset -->
     <div id="switch-formset-container">
         {{ switch_formset.management_form }}
         {% for form in switch_formset %}
@@ -21,21 +21,39 @@
             </div>
         {% endfor %}
     </div>
-    <button type="button" id="add-switch-form">Add Switch Action</button>
+    <button type="button" id="add-switch-form">Add Switch Action</button> {% endcomment %}
 
     <!-- Status Actions Formset -->
-    <div id="status-formset-container">
+    <div class="" id="status-formset-container">
         {{ status_formset.management_form }}
         {% for form in status_formset %}
-            <div class="status-formset-form d-flex flex-row">
-                {{ form.as_p }}
-                <button type="button" class="remove-status-formset-form">Remove</button>
-            </div>
+
+                <div class="status-formset-form mt-3 ms-3 mb-3">
+                    
+                    <div class="d-flex flex-row">
+
+                        {%  for field in form %}
+                            {% if field.label != "Id" %}
+                                <div class="me-3">
+                                    <label class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-danger remove-status-formset-form">Remove</button>
+                        </div>
+                    </div>
+                </div>
         {% endfor %}
     </div>
-    <button type="button" id="add-status-form">Add Status Action</button>
 
-    <button type="submit">Submit</button>
+
+    <div class="m-3">
+        <button type="button" id="add-status-form">Add Status Action</button>
+        <button type="submit">Submit</button>
+    </div>
 </form>
 
 <script>
@@ -99,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons(containerId);
     }
 
-    addFormHandler('switch-formset-container', 'switch-formset', 'add-switch-form', '#id_switch-TOTAL_FORMS', 'switch');
     addFormHandler('status-formset-container', 'status-formset', 'add-status-form', '#id_status-TOTAL_FORMS', 'status');
 });
 </script>

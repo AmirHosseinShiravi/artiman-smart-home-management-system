@@ -30,6 +30,7 @@ if not SECRET_KEY:
 
 # Enable/Disable DEBUG Mode
 DEBUG = str2bool(os.environ.get('DEBUG'))
+# DEBUG = 0
 #print(' DEBUG -> ' + str(DEBUG) ) 
 
 
@@ -38,16 +39,20 @@ in_task_mode = False
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['http://192.168.65.150:8000', 'http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:100', 'http://127.0.0.1:5085']
+CSRF_TRUSTED_ORIGINS = ['https://political-decent-packing-pct.trycloudflare.com','http://192.168.65.150:8000', 'http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:100', 'http://127.0.0.1:5085']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:    
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+# CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
+
+
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_tabler.apps.AdminTablerConfig',
+    # 'admin_tabler.apps.AdminTablerConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -126,6 +131,17 @@ else:
         }
     }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+#         "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+#         "USER": os.environ.get("SQL_USER", "user"),
+#         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+#         "HOST": os.environ.get("SQL_HOST", "localhost"),
+#         "PORT": os.environ.get("SQL_PORT", "5432"),
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -175,7 +191,7 @@ STATICFILES_DIRS = (
 
 # Media files (user uploaded files)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Path to media file storage
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles/')  # Path to media file storage
 
 
 # Default primary key field type

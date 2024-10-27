@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 import uuid
 import os
 from admin_tabler.forms import LoginForm
 from django.contrib.auth.views import LoginView as AuthLoginView
-from django.http import JsonResponse, HttpResponse
+from django.http import FileResponse, HttpResponseNotFound, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from dashboard.models import Project, Home, HomeUser, Controller, Zone, DeviceProxy, UIProxy
 from .models import LinkageRule
@@ -159,7 +160,12 @@ def edit_profile_view(request):
             "edit_profile_home_user_form": edit_profile_home_user_form,
             "user": home_user
         }
-        rendered_html = render_to_string("web_app/pages/edit-profile.html", context)
+        user_agent = get_user_agent(request)
+        if user_agent.is_tablet:
+            rendered_html = render_to_string("web_app/pages/edit-profile.html", context)
+        else:
+            rendered_html = render_to_string("tablet_webapp/pages/edit-profile.html", context)
+
         return JsonResponse({"status": "success", "html": rendered_html})
     elif request.method == "POST":
 
@@ -180,6 +186,29 @@ def edit_profile_view(request):
 
 
 
+@login_required(login_url=reverse_lazy("web_app:login"))
+def serve_service_worker_file(request):
+    user_agent = get_user_agent(request)
+    if user_agent.is_mobile:
+        file_path = os.path.join(settings.STATICFILES_DIRS[0], Path("webapp/service-worker/service-worker.js"))
+        if os.path.exists(file_path):
+            response = FileResponse(open(file_path, 'rb'), content_type='application/javascript')
+            response['Content-Disposition'] = f'attachment; filename="service-worker.js"'
+            response['Content-Type'] = 'text/javascript; charset=utf-8'
+            return response
+        else:
+            return HttpResponseNotFound('<h1>File not found</h1>')
+    else:
+        file_path = os.path.join(settings.STATICFILES_DIRS[0], Path("tablet_webapp/service-worker/service-worker.js"))
+        if os.path.exists(file_path):
+            response = FileResponse(open(file_path, 'rb'), content_type='application/javascript')
+            response['Content-Disposition'] = f'attachment; filename="service-worker.js"'
+            response['Content-Type'] = 'text/javascript; charset=utf-8'
+            return response
+        else:
+            return HttpResponseNotFound('<h1>File not found</h1>')
+    
+
 
 
 boolean_enum = ["ON", "OFF"]
@@ -196,7 +225,7 @@ def home_page_view(request):
         return redirect(reverse("web_app:login"))
     user = HomeUser.objects.filter(user=request.user).get()
     home_controllers = Controller.objects.filter(parent_home=user.parent_home, parent_project=user.parent_project).all()
-    home_zones = Zone.objects.filter(parent_project=user.parent_project, parent_home=user.parent_home).all()
+    home_zones = Zone.objects.filter(parent_project=user.parent_project, parent_home=user.parent_home).exclude(zone_name="Global").all()
     home_devices = DeviceProxy.objects.filter(device_base__parent_project=user.parent_project, device_base__parent_home=user.parent_home).all()
     all_devices = []
     for device in home_devices:
@@ -224,7 +253,8 @@ def home_page_view(request):
                 "display_name": data_point.display_name,
                 "function_name": data_point.function_name,
                 "type": data_point.value_type,
-                "typeEnum": type_enum
+                "typeEnum": type_enum,
+                "io_permission": data_point.io_permission
             })
         all_devices.append({
             "device_uuid": device_object.uuid,
@@ -255,6 +285,8 @@ def home_page_view(request):
             "on_icon": ui_base.on_icon,
             "off_icon": ui_base.off_icon,
             "add_to_home": ui_base.add_to_home,
+            "background_image": ui_base.tablet_mode_background_image.background_image.url,
+            "background_image_style": ui_base.tablet_mode_background_image.style_options,
             "button_type": specific_ui.button_type,
             "zone_uuid": str(ui_base.parent_zone.uuid),
             "ui_type": ui_type,
@@ -331,8 +363,14 @@ def home_page_view(request):
         "all_devices": all_devices,
         "all_home_ui_elements": all_home_ui_elements_dict
     }
+
+    user_agent = get_user_agent(request)
+    if user_agent.is_mobile:
+        return render(request, 'web_app/home_page.html', context=context)
+    else:
+        return render(request, 'tablet_webapp/home_page.html', context=context)
     # when user authenticate, redirect to this view to load pwa app.
-    return render(request, 'web_app/home_page.html', context=context)
+    # return render(request, 'web_app/home_page.html', context=context)
 
 
 def home_page_view1(request):
@@ -469,7 +507,23 @@ def delete_linkage_rule_view(request, linkage_rule_uuid=None):
                 linkage_rule_creator_instance = LinkageRuleCreator(rule_uuid=rule.uuid)
                 deletion_status = linkage_rule_creator_instance.delete_linkage_rule_file_from_rule_engine_rules_folder()
                 if deletion_status:
+                    parent_project = rule.parent_project
+                    parent_home = rule.parent_home
                     rule.delete()
+                    rules = LinkageRule.objects.filter(parent_project=parent_project, parent_home=parent_home).all()
+                    if rules:
+                        # two process, one for automation rules and one for scenes
+                        scene_rules_counter = 0
+                        automation_rules_counter = 0
+                        for rule in rules:
+                            if rule.rule_config["type"] == "scene":
+                                rule.rule_config["index"] = scene_rules_counter
+                                scene_rules_counter += 1
+                                rule.save()
+                            elif rule.rule_config["type"] == "automation":
+                                rule.rule_config["index"] = automation_rules_counter
+                                automation_rules_counter += 1
+                                rule.save()
                     return JsonResponse({"status": "success", "rule_uuid": linkage_rule_uuid})
                 else:
                     return JsonResponse({"status": "error", "rule_uuid": linkage_rule_uuid, "error": "rule file deletion error"})
@@ -489,5 +543,5 @@ def mqtt_listener_for_get_and_set(topic, payload):
         correspond_topic = topic.replace("/set", "/get")
         publish_message(correspond_topic, payload, retain=True, qos=1)
 
-if not settings.in_task_mode:
-    subscribe_to_topic("#", mqtt_listener_for_get_and_set)
+# if not settings.in_task_mode:
+#     subscribe_to_topic("#", mqtt_listener_for_get_and_set)

@@ -1,0 +1,51 @@
+{%load static%}
+<nav class="bottom-navbar-container">
+        <ul>
+            <li style="margin-top:20px;">
+            {% comment %} <li> {% endcomment %}
+                <a class="nav-button active" data-page="home-page" href="/web_app/v1/home">
+                    <i class="fa-solid fa-house fa-2xl"></i>
+                    <div class="link-text home">
+                        Home
+                    </div>
+                </a>
+                
+            </li>
+            <li>
+                <a class="nav-button" data-page="devices-page" href="/web_app/v1/devices">
+                    <i class="fa-solid fa-grid-2 fa-2xl"></i>
+                    <div class="link-text devices">
+                        Devices
+                    </div>
+                </a>
+                
+            </li>
+            <li>
+                <a class="nav-button" data-page="scene-page" href="/web_app/v1/scene">
+                    <i class="fa-solid fa-layer-group fa-2xl"></i>
+                    <div class="link-text scene">
+                        Scene
+                    </div>
+                </a>
+                
+            </li>
+            <li>
+                <a class="nav-button" data-page="setting-page" href="/web_app/v1/setting">
+                    {% comment %} <i class="fa-solid fa-user fa-2xl"></i> {% endcomment %}
+                    <i class="fa-solid fa-gear fa-2xl"></i>
+                    <div class="link-text setting">
+                        {% comment %} Profile {% endcomment %}
+                        Settings
+                    </div>
+                </a>
+                
+            </li>
+            <li style="margin-top: -80px">
+                <div>
+                    <img id="avatar1" src="{% static 'tablet_webapp/images/logo.png' %}">
+                </div>
+            </li> 
+            
+        </ul>
+    
+    </nav>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blended Circular Gradient Background</title>
+    <style>
+        html, body {
+            height: 100%;
+            background-color: black;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars if overflow happens */
+        }
+        
+        .gradient-background {
+            width: 100%;
+            height: 100%;
+            
+            z-index: 1; /* Send it to the background */
+            pointer-events: none; /* Make sure it's not interactive */
+        }
+
+        .b1 {
+            position: absolute;
+            top: 0%;
+            left: -5%;
+            background: radial-gradient(circle, #FFD84B, rgba(255, 255, 255, 0) 45%);
+        }
+
+        .b2 {
+            position: absolute;
+            top: 20%;
+            left: 3%;
+            background: radial-gradient(circle, #9207FF, rgba(255, 255, 255, 0) 35%);
+        }
+
+        .b3 {
+            position: absolute;
+            top: -13%;
+            left: 7%;
+            background: radial-gradient(circle, #5AE9FD, rgba(255, 255, 255, 0) 30%);
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            /* Content styling */
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="gradient-background b1"></div>
+    <div class="gradient-background b2"></div>
+    <div class="gradient-background b3"></div>
+<div class="content">
+    <!-- Your page content goes here -->
+</div>
+
+</body>
+</html>

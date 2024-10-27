@@ -1,3 +1,4 @@
+
 const brokerUrl = `${mqtt_transport}://${mqtt_broker_host}:${mqtt_port}`;
 const mqttClient = new MQTTClient(brokerUrl, {
     clientId: mqtt_client,

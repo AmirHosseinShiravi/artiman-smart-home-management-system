@@ -159,18 +159,38 @@ class Controller(models.Model):
         ERROR = 'error', 'error'
 
     class UartBaudRateChoices(models.TextChoices):
-        BAUD_75 = 'BAUD_75', '75'
-        BAUD_300 = 'BAUD_300', '300'
-        BAUD_1200 = 'BAUD_1200', '1200'
-        BAUD_2400 = 'BAUD_2400', '2400'
-        BAUD_4800 = 'BAUD_4800', '4800'
-        BAUD_9600 = 'BAUD_9600', '9600'
-        BAUD_14400 = 'BAUD_14400', '14400'
-        BAUD_19200 = 'BAUD_19200', '19200'
-        BAUD_28800 = 'BAUD_28800', '28800'
-        BAUD_38400 = 'BAUD_38400', '38400'
-        BAUD_57600 = 'BAUD_57600', '57600'
-        BAUD_115200 = 'BAUD_115200', '115200'
+        BAUD_75 = '75', '75'
+        BAUD_300 = '300', '300'
+        BAUD_1200 = '1200', '1200'
+        BAUD_2400 = '2400', '2400'
+        BAUD_4800 = '4800', '4800'
+        BAUD_9600 = '9600', '9600'
+        BAUD_14400 = '14400', '14400'
+        BAUD_19200 = '19200', '19200'
+        BAUD_28800 = '28800', '28800'
+        BAUD_38400 = '38400', '38400'
+        BAUD_57600 = '57600', '57600'
+        BAUD_115200 = '115200', '115200'
+    
+    class DataBitsChoices(models.TextChoices):
+        DATA_BIT_5 = "5", "5"
+        DATA_BIT_6 = "6", "6"
+        DATA_BIT_7 = "7", "7"
+        DATA_BIT_8 = "8", "8"
+    
+    class ParityChoices(models.TextChoices):
+        NONE = "None", "None"
+        ODD = "Odd", "Odd"
+        EVEN = "Even", "Even"
+
+    class StopBitsChoices(models.TextChoices):
+        STOP_BIT_1 = "1", "1"
+        STOP_BIT_2 = "2", "2"
+
+    class FlowControlChoices(models.TextChoices):
+        NONE = "None", "None"
+        RTS_CTS = "RTS/CTS", "RTS/CTS"
+        XON_XOFF = "Xon/Xoff", "Xon/Xoff"
 
     status = models.CharField(max_length=50, choices=ControllerStatusChoices.choices, default=ControllerStatusChoices.DISABLE)
     descriptions = models.CharField(max_length=1000, blank=True, null=True)
@@ -190,6 +210,10 @@ class Controller(models.Model):
     port_number = models.IntegerField(blank=True, null=True)
     # internal properties
     uart_baud_rate = models.CharField(max_length=50, blank=False, null=False, choices=UartBaudRateChoices.choices, default=UartBaudRateChoices.BAUD_9600)
+    uart_data_bits = models.CharField(max_length=50, blank=False, null=False, choices=DataBitsChoices.choices, default=DataBitsChoices.DATA_BIT_7)
+    uart_parity = models.CharField(max_length=50, blank=False, null=False, choices=ParityChoices.choices, default=ParityChoices.NONE)
+    uart_stop_bits = models.CharField(max_length=50, blank=False, null=False, choices=StopBitsChoices.choices, default=StopBitsChoices.STOP_BIT_1)
+    uart_flow_control = models.CharField(max_length=50, blank=False, null=False, choices=FlowControlChoices.choices, default=FlowControlChoices.NONE)
 
     # mqtt properties
     # credential
@@ -239,6 +263,7 @@ class DeviceBase(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     modbus_id = models.IntegerField(blank=True, null=True)
+    modbus_channel = models.IntegerField(blank=True, null=True)
     # device_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True)
     # object_id = models.PositiveIntegerField()
     # content_object = GenericForeignKey('device_type', 'object_id')
@@ -268,6 +293,24 @@ class FunctionTypes(models.TextChoices):
     SWITCH = 'switch', 'switch'
     THERMOSTAT = 'thermostat', 'thermostat'
 
+class FunctionIOPermissionChoices(models.TextChoices):
+    READ_ONLY = "R", "Read Only"
+    WRITE_ONLY = "W", "Write Only"
+    READ_WRITE = "R/W", "Read/Write" 
+
+class ModbusDataModelChoices(models.TextChoices):
+    DISCRETE_INPUT = "discrete_input", "Discrete input"
+    COIL = "coil", "coil"
+    INPUT_REGISTER = "input_register", "Input register"
+    HOLDING_REGISTER = "holding_register", "Holding register"
+
+class InternalBufferDataModelChoices(models.TextChoices):
+    BIT_1 = "1b", "1 Bit"
+    BIT_4 = "4b", "4 bit"
+    BIT_8 = "8b", "8 bit"
+    BIT_16 = "16b", "16 bit"
+    BIT_32 = "32b", "32 bit"
+    BIT_64 = "64b", "64 bit"
 
 class DataPointFunction(models.Model):
     device_base = models.ForeignKey(DeviceBase, on_delete=models.CASCADE, related_name='functions')
@@ -275,6 +318,22 @@ class DataPointFunction(models.Model):
     function_name = models.CharField(max_length=255, blank=False, null=False)  # e.g., "spt" or "temp"
     value = models.CharField(max_length=255, default='null')
     value_type = models.CharField(max_length=255, choices=ValueTypes.choices, default=ValueTypes.STRING)
+    io_permission = models.CharField(max_length=20, choices=FunctionIOPermissionChoices.choices, default=FunctionIOPermissionChoices.READ_WRITE)
+    
+    modbus_read_data_model = models.CharField(max_length=30, choices=ModbusDataModelChoices.choices, default=ModbusDataModelChoices.INPUT_REGISTER)
+    modbus_read_start_address = models.IntegerField(blank=True, null=True)
+    modbus_read_quantity = models.IntegerField(blank=True, null=True)
+    modbus_write_data_model = models.CharField(max_length=30, choices=ModbusDataModelChoices.choices, default=ModbusDataModelChoices.HOLDING_REGISTER)
+    modbus_write_start_address = models.IntegerField(blank=True, null=True)
+    modbus_write_quantity = models.IntegerField(blank=True, null=True)
+
+    internal_buffer_read_data_model = models.CharField(max_length=30, choices=InternalBufferDataModelChoices.choices, default=InternalBufferDataModelChoices.BIT_1)
+    internal_buffer_read_start_address = models.IntegerField(blank=True, null=True)
+    internal_buffer_read_quantity = models.IntegerField(blank=True, null=True)
+    internal_buffer_write_data_model = models.CharField(max_length=30, choices=InternalBufferDataModelChoices.choices, default=InternalBufferDataModelChoices.BIT_1)
+    internal_buffer_write_start_address = models.IntegerField(blank=True, null=True)
+    internal_buffer_write_quantity = models.IntegerField(blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.device_base.name} - {self.function_name}"
@@ -297,6 +356,21 @@ class ThermostatDataPointFunction(DataPointFunction):
 
     def __str__(self):
         return f"{self.device_base.name} - {self.display_name}"
+
+# # this is the standard way to create distict class for dataPoint functions modbus properties, because it is possible some datapoint in some devices have not 
+# # correspond modbus properties
+# class ModbusDataModelChoices(models.TextChoices):
+#     DISCRETE_INPUT = "discrete_input", "Discrete input"
+#     COIL = "coil", "coil"
+#     INPUT_REGISTER = "input_register", "Input register"
+#     HOLDING_REGISTER = "holding_register", "Holding register"
+
+# class DataPointFunctionModbusProperties(models.Model):
+#     data_point_function_base = models.ForeignKey(DataPointFunction, on_delete=models.CASCADE, related_name="modbus_properties")
+#     modbus_data_model_type = models.CharField(max_length=30, choices=ModbusDataModelChoices.choices, default=ModbusDataModelChoices.INPUT_REGISTER)
+#     start_address = models.IntegerField(blank=True, null=True)
+#     quantity = models.IntegerField(blank=True, null=True)
+
 
 
 class Switch(DeviceBase):
@@ -333,6 +407,12 @@ class TenPoleThermostat(DeviceBase):
     # current_temperature = models.FloatField()
     def __str__(self):
         return f"{self.name} - Thermostat"
+    
+class ControllerDevice(DeviceBase):
+    # set_point_temperature = models.FloatField()
+    # current_temperature = models.FloatField()
+    def __str__(self):
+        return f"{self.name} - controller device"
 
 
 class DeviceProxy(models.Model):
@@ -359,6 +439,14 @@ class DeviceSwitchActions(models.Model):
 
 
 ####################### UI Section #########################
+
+class UIElementBackgroundImage(models.Model):
+    background_image = models.ImageField(upload_to="ui_elements_background_images/", blank=True, null=True)
+    background_image_thumbnail = AdvanceThumbnailField(source_field='background_image', upload_to='ui_elements_background_images/thumbnail_files/',
+                                                       null=True, blank=True, size=(200, 200))
+    style_options = models.CharField(max_length=1000, blank=True, null=True)
+
+
 
 class UIBase(models.Model):
 
@@ -389,6 +477,8 @@ class UIBase(models.Model):
     on_icon = models.CharField(max_length=255, blank=False, null=False)
     off_icon = models.CharField(max_length=255, blank=False, null=False)
     add_to_home = models.BooleanField(blank=False, null=False, default=False)
+    tablet_mode_background_image = models.ForeignKey(UIElementBackgroundImage, on_delete=models.CASCADE)
+
 
 
 class SwitchUI(UIBase):
@@ -426,6 +516,8 @@ class UIProxy(models.Model):
 
     def __str__(self):
         return f"{self.ui_base.name} ({self.content_type})"
+
+
 
 
 # class FourPoleSwitch(models.Model):

@@ -88,6 +88,7 @@ urlpatterns = [
     path('actionForm2/', views.manage_device_actions, name='action2'),
 
     path('create_user/', views.create_user, name='create_user1'),
+    path('pyodide/', views.pyodide, name='create_user1'),
 
 
 ]

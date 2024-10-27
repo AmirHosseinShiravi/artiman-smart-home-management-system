@@ -45,9 +45,9 @@
       <h4 class="text-muted mt-5"> Internal Properties:</h4>
 
         {% for field in controller_form %}
-          {% if field.name == 'uart_baud_rate' %}
+          {% if field.name == 'uart_baud_rate' or field.name == 'uart_data_bits' or field.name == 'uart_parity' or field.name == 'uart_stop_bits' or field.name == 'uart_flow_control' %}
 
-            <div class="col-3">
+            <div class="col-2">
               <label class="form-label">{{ field.label }}</label>
               {{ field }}
             </div>

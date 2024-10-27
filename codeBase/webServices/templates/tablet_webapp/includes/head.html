@@ -1,0 +1,59 @@
+{% load static %}
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"/>
+<meta content="yes" name="mobile-web-app-capable">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="transparent">
+<meta name="theme-color" content="#000000">
+<meta content="Artiman Smart Home" name="application-name">
+<meta content="Artiman Smart Home" name="apple-mobile-web-app-title">
+<meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+<meta name="csrf-token" content="{{ csrf_token }}">
+<link rel="shortcut icon" type="image/jpg" href="{% static 'static/favicon.ico' %}"/>
+
+
+
+{% comment %} <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"> {% endcomment %}
+{#<link rel="manifest" href="./manifest.json">#}
+<!-- favicon -->
+<link rel="manifest" href='{% static "tablet_webapp/service-worker/manifest.json" %}'>
+<!-- favicon -->
+<link rel="icon" type="image/png" href="{% static 'logo.png' %}">
+<link rel="apple-touch-icon" href="{% static 'logo.png' %}">
+<link rel="shortcut icon" type="image/png" href="{% static 'logo.png' %}"/>
+
+<link rel="stylesheet" href="{% static 'tablet_webapp/libs/bootstrap-5.0.2/bootstrap.min.css' %}">
+
+{#<link href="{% static 'dist/css/tabler.min.css' %}?1684106062" rel="stylesheet"/>#}
+
+
+
+    <link rel="stylesheet" href="{% static 'tablet_webapp/home/css/main.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'tablet_webapp/css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'tablet_webapp/css/custom2.css' %}">
+
+
+
+<link rel="stylesheet" href="{% static 'font-awesome-6-pro-main/css/all.css' %}">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Playfair+Display&display=swap"
+      rel="stylesheet">
+
+
+<style>
+  {#@import url('https://rsms.me/inter/inter.css');#}
+  :root {
+      --tblr-font-sans-serif: 'Roboto', 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+  }
+
+  body {
+  {#font-feature-settings: "cv03", "cv04", "cv11";#}
+  }
+</style>

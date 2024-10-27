@@ -1,6 +1,8 @@
+from io import BytesIO
 import json
 import time
 from typing import Any
+from uuid import UUID
 from core import settings
 import datetime as dt
 
@@ -9,13 +11,13 @@ from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import engines
 from django.template.loader import render_to_string
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
 
 
-from .utils import (generate_random_username,
+from .utils import (generate_controller_config, generate_random_username,
                     generate_random_password,
                     generate_controller_credentials,
                     add_user_to_emqx_password_based_built_in_database_authentication_backend,
@@ -32,7 +34,7 @@ from .utils import (generate_random_username,
                     get_mqtt_cluster_status,
                     get_mqtt_cluster_statistics)
 
-from .models import (Project,
+from .models import (ControllerDevice, Project,
                      Home,
                      Tablet,
                      HomeUser,
@@ -56,7 +58,7 @@ from .models import (Project,
 
 from web_app.models import LinkageRule
 
-from .forms import (ProjectForm,
+from .forms import (ControllerDeviceForm, ProjectForm,
                     HomeForm,
                     TabletForm,
                     UserForm,
@@ -84,17 +86,25 @@ from .forms import (ProjectForm,
                     four_pole_switch_data_point_function_formset_initial,
                     five_pole_switch_data_point_function_formset_initial,
                     switches_of_ten_pole_thermostat_data_point_function_formset_initial,
-                    thermostat_data_point_formset_initial)
+                    thermostat_data_point_formset_initial,
+                    controller_device_dataPointFunction_formSet,
+                    controller_device_data_point_function_formset_initial)
 
 
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
-
 from django.contrib.auth.views import LoginView as dashboardLogin
 from .forms import  LoginForm
 from django.contrib.auth import logout
-
 import psutil
+
+
+# ############### MQTT manager ###################
+
+if not settings.in_task_mode:
+    initialize_mqtt_connection()
+
+##################################################
 
 class LoginView(dashboardLogin):
     template_name = 'dashboard/pages/sign-in.html'
@@ -315,9 +325,21 @@ def create_or_edit_home(request, project_uuid=None, home_uuid=None):
                 home_instance.last_edited_by = request.user  # Set the creator field for new homes
 
             home_instance.save()
-            return redirect("dashboard:project_all_homes", project_uuid=project_uuid)
 
-        return JsonResponse({'response': form.errors})
+            # create global zone for each home
+            # We create this zone to can add controllers device(which ones that defined in device section) to it
+            if not Zone.objects.filter(parent_project__uuid=project_uuid, parent_home__uuid=home_instance.uuid).exists():
+                Zone.objects.create(zone_name="Global", 
+                                    parent_project=home_instance.parent_project,
+                                    parent_home=home_instance,
+                                    created_by=request.user,
+                                    last_edited_by=request.user)
+            else:
+                print("This home have Global zone")
+
+            return redirect("dashboard:project_all_homes", project_uuid=project_uuid)
+        else:
+            return JsonResponse({'response': form.errors})
 
 
 @login_required(login_url=reverse_lazy("dashboard:login"))
@@ -342,7 +364,7 @@ def delete_home(request, project_uuid=None, home_uuid=None):
 def home_overview_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
-    zones = Zone.objects.filter(parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).all()
+    zones = Zone.objects.filter(parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).exclude(zone_name="Global").all()
 
     context = {
         "home": home,
@@ -525,7 +547,7 @@ def home_tablet_section_view(request, project_uuid=None, home_uuid=None):
 def home_all_zones_view(request, project_uuid=None, home_uuid=None):
     home = Home.objects.get(uuid=home_uuid, parent_project__uuid=project_uuid)
     project = Project.objects.get(uuid=project_uuid)
-    zones = Zone.objects.filter(parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).all()
+    zones = Zone.objects.filter(parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).exclude(zone_name="Global").all()
     zone_form = ZoneForm()
     context = {
         'segment': 'zones',
@@ -543,7 +565,7 @@ def create_or_edit_home_zone_view(request, project_uuid=None, home_uuid=None, zo
         # Edit existing project
         home = get_object_or_404(Home, uuid=home_uuid, parent_project__uuid=project_uuid)
         project = get_object_or_404(Project, uuid=project_uuid)
-        zone = get_object_or_404(Zone, uuid=zone_uuid, parent_project__uuid=project_uuid, parent_home__uuid=home_uuid)
+        zone = Zone.objects.filter(uuid=zone_uuid, parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).exclude(zone_name="Global").get()
 
     else:
         # Create new home
@@ -930,7 +952,30 @@ def delete_home_controller_view(request, project_uuid=None, home_uuid=None, cont
 def download_home_controller_config_view(request, project_uuid=None, home_uuid=None, controller_uuid=None):
     # based on controller modal and all related device and datapoint functions, generate a json config file for controller that cover all settings that controller need to work
     # this file will be used to download on controller to setup all settings
-    pass
+    controller_record = Controller.objects.filter(uuid=controller_uuid, parent_project__uuid=project_uuid, parent_home__uuid=home_uuid).get()
+    if controller_record:
+        controller_config = generate_controller_config(controller_record)
+
+        # Convert UUIDs to strings
+        def uuid_serializer(obj):
+            if isinstance(obj, UUID):
+                return str(obj)
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+        # Convert the dictionary to a JSON string and encode it as bytes
+        json_content = json.dumps(controller_config, default=uuid_serializer).encode('utf-8')
+
+        # Create an in-memory file-like object
+        file_content = BytesIO(json_content)
+
+        # Create a FileResponse and set the content type and headers
+        response = FileResponse(file_content, content_type='application/json')
+        response['Content-Disposition'] = 'attachment; filename="controller-config.json"'
+        response['Content-Type'] = 'application/json; charset=utf-8'
+        
+        return response
+    else:
+        return JsonResponse({"status":"error", "message":"controller not found"}, status=404)
 
 
 @login_required(login_url=reverse_lazy("dashboard:login"))
@@ -940,7 +985,7 @@ def home_all_devices_view(request, project_uuid=None, home_uuid=None):
     devices = DeviceProxy.objects.filter(device_base__parent_home__uuid=home_uuid,
                                          device_base__parent_project__uuid=project_uuid).all()
 
-    device_types = ['fourpoleswitch', 'fivepoleswitch', 'fourpolethermostat', 'tenpolethermostat']
+    device_types = ['fourpoleswitch', 'fivepoleswitch', 'fourpolethermostat', 'tenpolethermostat', 'controllerdevice']
     context = {
         'segment': 'devices',
         'home': home,
@@ -1032,6 +1077,22 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                         'switch_formset': switches_of_ten_pole_thermostat_data_point_function_formset,
                     }
                     return render(request, 'dashboard/home_wizard/device_settings.html', context=context)
+                
+                elif selected_device_type == 'controllerdevice':
+                    controller_device_form = ControllerDeviceForm(home_uuid=home.uuid, project_uuid=project.uuid)
+                    controller_device_dataPointFunction_formSet_form = controller_device_dataPointFunction_formSet(
+                        initial=controller_device_data_point_function_formset_initial)
+                    
+                    context = {
+                        'segment': 'devices',
+                        'home': home,
+                        'project': project,
+                        'form_type': 'create_new_device',
+                        'device_type': selected_device_type,
+                        'switch_form': controller_device_form,
+                        'switch_formset': controller_device_dataPointFunction_formSet_form,
+                    }
+                    return render(request, 'dashboard/home_wizard/device_settings.html', context=context)
         else:
             device_type = device.content_type.model
             if device_type == 'fourpoleswitch':
@@ -1104,6 +1165,23 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                     'switch_formset': switches_of_ten_pole_thermostat_data_point_function_formset,
                 }
                 return render(request, 'dashboard/home_wizard/device_settings.html', context=context)
+            
+            elif device_type == 'controllerdevice':
+                controller_device_form = ControllerDeviceForm(home_uuid=home.uuid, project_uuid=project.uuid,
+                                                           instance=device.content_object)
+                controller_device_data_point_form = controller_device_dataPointFunction_formSet(
+                    instance=device.content_object)
+                context = {
+                    'segment': 'devices',
+                    'home': home,
+                    'project': project,
+                    'device': device,
+                    'form_type': 'edit_device',
+                    'device_type': device_type,
+                    'switch_form': controller_device_form,
+                    'switch_formset': controller_device_data_point_form
+                }
+                return render(request, 'dashboard/home_wizard/device_settings.html', context=context)
 
     if request.method == "POST":
         post_device_type = request.GET.get('device_type', None)
@@ -1156,7 +1234,7 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                     DeviceProxy.objects.create(device_base=five_pole_switch_instance,
                                                content_type=ContentType.objects.get_for_model(FivePoleSwitch),
                                                object_id=five_pole_switch_instance.id)
-                    five_pole_switch_data_point_form = fourPoleSwitch_dataPointFunction_formSet(request.POST,
+                    five_pole_switch_data_point_form = fivePoleSwitch_dataPointFunction_formSet(request.POST,
                                                                                                 instance=five_pole_switch_instance)
                     if five_pole_switch_data_point_form.is_valid():
                         five_pole_switch_data_point_form.save(commit=True)
@@ -1165,6 +1243,44 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                         project_uuid=project.uuid,
                         home_uuid=home.uuid,
                         controller_uuid=five_pole_switch_instance.parent_controller.uuid)
+
+                    all_home_users = HomeUser.objects.filter(parent_project__uuid=project.uuid,
+                                                             parent_home__uuid=home.uuid).all()
+                    for home_user in all_home_users:
+                        if home_user.is_web_app_user:
+                            set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(
+                                home_user_uuid=home_user.uuid)
+                        elif home_user.is_tablet_user:
+                            set_tablet_client_client_rule_to_emqx_built_in_database_authorization_backend(
+                                tablet_user_uuid=home_user.uuid)
+                        else:
+                            set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(
+                                home_user_uuid=home_user.uuid)
+
+                return redirect('dashboard:home_wizard_all_devices', project_uuid=project.uuid, home_uuid=home.uuid)
+            
+
+            elif post_device_type == 'controllerdevice':
+                controller_device_form = ControllerDeviceForm(request.POST, home_uuid=home.uuid, project_uuid=project.uuid)
+                if controller_device_form.is_valid():
+                    controller_device_instance = controller_device_form.save(commit=False)
+                    controller_device_instance.parent_project = project
+                    controller_device_instance.parent_home = home
+                    controller_device_instance.created_by = request.user
+                    controller_device_instance.last_edited_by = request.user
+                    controller_device_instance.save()
+                    DeviceProxy.objects.create(device_base=controller_device_instance,
+                                               content_type=ContentType.objects.get_for_model(ControllerDevice),
+                                               object_id=controller_device_instance.id)
+                    controller_device_data_point_form = controller_device_dataPointFunction_formSet(request.POST,
+                                                                                                instance=controller_device_instance)
+                    if controller_device_data_point_form.is_valid():
+                        controller_device_data_point_form.save(commit=True)
+
+                    set_controller_client_rule_to_emqx_built_in_database_authorization_backend(
+                        project_uuid=project.uuid,
+                        home_uuid=home.uuid,
+                        controller_uuid=controller_device_instance.parent_controller.uuid)
 
                     all_home_users = HomeUser.objects.filter(parent_project__uuid=project.uuid,
                                                              parent_home__uuid=home.uuid).all()
@@ -1305,7 +1421,7 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                     five_pole_switch_instance.last_edited_by = request.user
                     five_pole_switch_instance.save()
 
-                    five_pole_switch_data_point_form = fourPoleSwitch_dataPointFunction_formSet(request.POST,
+                    five_pole_switch_data_point_form = fivePoleSwitch_dataPointFunction_formSet(request.POST,
                                                                                                 instance=five_pole_switch_instance)
                     if five_pole_switch_data_point_form.is_valid():
                         five_pole_switch_data_point_form.save(commit=True)
@@ -1329,6 +1445,39 @@ def create_or_edit_home_device_view(request, project_uuid=None, home_uuid=None, 
                                 home_user_uuid=home_user.uuid)
 
                 return redirect('dashboard:home_wizard_all_devices', project_uuid=project.uuid, home_uuid=home.uuid)
+            
+            elif post_device_type == 'controllerdevice':
+                controller_device_switch_form = ControllerDeviceForm(request.POST, instance=device.device_base, home_uuid=home.uuid, project_uuid=project.uuid)
+                if controller_device_switch_form.is_valid():
+                    controller_device_instance = controller_device_switch_form.save(commit=False)
+                    controller_device_instance.last_edited_by = request.user
+                    controller_device_instance.save()
+
+                    controller_device_data_point_form = controller_device_dataPointFunction_formSet(request.POST,
+                                                                                                instance=controller_device_instance)
+                    if controller_device_data_point_form.is_valid():
+                        controller_device_data_point_form.save(commit=True)
+
+                    set_controller_client_rule_to_emqx_built_in_database_authorization_backend(
+                        project_uuid=project.uuid,
+                        home_uuid=home.uuid,
+                        controller_uuid=controller_device_instance.parent_controller.uuid)
+
+                    all_home_users = HomeUser.objects.filter(parent_project__uuid=project.uuid,
+                                                             parent_home__uuid=home.uuid).all()
+                    for home_user in all_home_users:
+                        if home_user.is_web_app_user:
+                            set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(
+                                home_user_uuid=home_user.uuid)
+                        elif home_user.is_tablet_user:
+                            set_tablet_client_client_rule_to_emqx_built_in_database_authorization_backend(
+                                tablet_user_uuid=home_user.uuid)
+                        else:
+                            set_web_app_client_rule_to_emqx_built_in_database_authorization_backend(
+                                home_user_uuid=home_user.uuid)
+
+                return redirect('dashboard:home_wizard_all_devices', project_uuid=project.uuid, home_uuid=home.uuid)
+
 
             elif post_device_type == 'fourpolethermostat':
                 four_pole_thermostat_form = FourPoleThermostatForm(request.POST, instance=device.device_base)
@@ -1697,9 +1846,7 @@ def delete_home_ui_element_view(request, project_uuid=None, home_uuid=None, ui_e
     return redirect('dashboard:home_wizard_all_ui_elements', project.uuid, home.uuid)
 
 
-# ############### MQTT manager ###################
-if not settings.in_task_mode:
-    initialize_mqtt_connection()
+
 
 ############### Users Section ##################
 
@@ -1910,7 +2057,7 @@ def manage_multiple_device_switch_actions(request):
 
 
 def manage_device_actions(request):
-    specific_ref_data_point = DataPointFunction.objects.get(id=1)
+    specific_ref_data_point = DataPointFunction.objects.get(id=66)
     if request.method == 'POST':
         switch_formset = DeviceSwitchActionsFormSet(request.POST, prefix='switch')
         status_formset = DeviceSwitchActionsFormSet(request.POST, prefix='status')
@@ -1920,10 +2067,12 @@ def manage_device_actions(request):
             status_formset.save()
             return redirect('some_success_url')
     else:
-        switch_formset = DeviceSwitchActionsFormSet(queryset=DeviceSwitchActions.objects.none(), prefix='switch')
+        switch_formset = DeviceSwitchActionsFormSet(queryset=DeviceSwitchActions.objects.none(), prefix='status')
         for form in switch_formset:
             form.fields['ref_data_point'].initial = specific_ref_data_point.id
         status_formset = DeviceSwitchActionsFormSet(queryset=DeviceSwitchActions.objects.none(), prefix='status')
+        for form in status_formset:
+            form.fields['ref_data_point'].initial = specific_ref_data_point.id
 
     return render(request, 'experimental/actionForm_2.html', {
         'switch_formset': switch_formset,
@@ -1956,3 +2105,8 @@ def create_user(request):
         'user_form': user_form,
         'permissions_form': permissions_form
     })
+
+
+def pyodide(request):
+    
+    return render(request, 'dashboard/pages/pyodide.html')

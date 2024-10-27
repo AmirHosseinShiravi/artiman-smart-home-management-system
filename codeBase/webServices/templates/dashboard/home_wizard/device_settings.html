@@ -15,11 +15,17 @@
 
         {{ switch_form.management_form }}
         {% for field in switch_form %}
-
-{#            <div class="col-6">#}
-            <label class="form-label mt-4">{{ field.label }}</label>
-            {{ field }}
-
+            {% if device_type == "controllerdevice" %}
+              {% if field.name == "parent_zone" or field.name == 'modbus_id' or field.name == 'modbus_channel' %}
+                {{ field }}
+              {% else %}
+                <label class="form-label mt-4">{{ field.label }}</label>
+                {{ field }}
+              {% endif %}
+            {% else %}
+              <label class="form-label mt-4">{{ field.label }}</label>
+              {{ field }}
+            {% endif %}
 
         {% endfor %}
 
@@ -57,23 +63,120 @@
               </h2>
               <div id="collapse-switch-form-{{ forloop.counter }}" class="accordion-collapse collapse " data-bs-parent="#switch-formset-accordion">
                 <div class="accordion-body pt-3" style="background-color: rgba(255,249,187,0.15)">
-                   <div class="row">
-                  {% for field in form1 %}
-
-                    {% if switch_formset and  thermostat_formset %}
-                      <div class="col-4 pt-3">
-                    {% else %}
-                      <div class="col-3 pt-3">
-                    {% endif %}
-                      {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
-                      {% else %}
-                        <label class="form-label ">{{ field.label }}</label>
-                      {% endif %}
-                      {{ field }}
+                  <div class="row">
+                    {% for field in form1 %}
+                        {% if field.name in "device_base display_name function_name value_type switch_id io_permission" %}
+                          {% if switch_formset and  thermostat_formset %}
+                            <div class="col-4 pt-3">
+                          {% else %}
+                            <div class="col-3 pt-3">
+                          {% endif %}
+                            {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                            {% else %}
+                              <label class="form-label ">{{ field.label }}</label>
+                            {% endif %}
+                            {{ field }}
+                          </div>
+                        {% endif %}
+                    {% endfor %}
+                  </div>
+                  
+                  {% if device_type == "controllerdevice" %}
+                    <div class="row mt-4">
+                      {% for field in form1 %}
+                          {% if field.name in "internal_buffer_read_data_model internal_buffer_read_start_address internal_buffer_read_quantity" %}
+                            {% if switch_formset and  thermostat_formset %}
+                              <div class="col-4 pt-3">
+                            {% else %}
+                              <div class="col-3 pt-3">
+                            {% endif %}
+                              {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                              {% else %}
+                                <label class="form-label ">{{ field.label }}</label>
+                              {% endif %}
+                              {{ field }}
+                            </div>
+                          {% else %}
+                            {% if field.name in 'modbus_read_data_model modbus_read_start_address modbus_read_quantity' %} 
+                            <div class="col-3 pt-3" style="display:none">
+                              {{ field }}
+                            </div>
+                            {% endif %}
+                          {% endif %}
+                      {% endfor %}
                     </div>
+                    <div class="row mt-4">
+                      {% for field in form1 %}
+                        {% if field.name in "internal_buffer_write_data_model internal_buffer_write_start_address internal_buffer_write_quantity" %}
+                          {% if switch_formset and  thermostat_formset %}
+                            <div class="col-4 pt-3">
+                          {% else %}
+                            <div class="col-3 pt-3">
+                          {% endif %}
+                              {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                              {% else %}
+                                <label class="form-label ">{{ field.label }}</label>
+                              {% endif %}
+                                  {{ field }}
+                            </div>
+                        {% else %}
+                          {% if field.name in 'modbus_write_data_model modbus_write_start_address modbus_write_quantity' %}
+                          <div class="col-3 pt-3" style="display:none">
+                            {{ field }}
+                          </div>
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="row mt-4">
+                      {% for field in form1 %}
+                          {% if field.name in 'modbus_read_data_model modbus_read_start_address modbus_read_quantity' %}
+                            {% if switch_formset and  thermostat_formset %}
+                              <div class="col-4 pt-3">
+                            {% else %}
+                              <div class="col-3 pt-3">
+                            {% endif %}
+                              {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                              {% else %}
+                                <label class="form-label ">{{ field.label }}</label>
+                              {% endif %}
+                              {{ field }}
+                            </div>
+                          {% else %}
+                            {% if field.name in "internal_buffer_read_data_model internal_buffer_read_start_address internal_buffer_read_quantity" %}
+                            <div class="col-3 pt-3" style="display:none">
+                              {{ field }}
+                            </div>
+                            {% endif %}
+                          {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="row mt-4">
+                      {% for field in form1 %}
+                        {% if field.name in 'modbus_write_data_model modbus_write_start_address modbus_write_quantity' %}
+                          {% if switch_formset and  thermostat_formset %}
+                            <div class="col-4 pt-3">
+                          {% else %}
+                            <div class="col-3 pt-3">
+                          {% endif %}
+                            {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                            {% else %}
+                              <label class="form-label ">{{ field.label }}</label>
+                            {% endif %}
+                            {{ field }}
+                          </div>
+                        {% else %}
+                          {% if field.name in "internal_buffer_write_data_model internal_buffer_write_start_address internal_buffer_write_quantity" %}
+                            <div class="col-3 pt-3" style="display:none">
+                              {{ field }}
+                            </div>
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
 
-                  {% endfor %}
-                </div>
 
                 </div>
               </div>
@@ -113,16 +216,49 @@
                 <div class="accordion-body" style="background-color: rgba(208,244,222,0.21) ">
                    <div class="row">
                   {% for field in form %}
-
-
-                    <div class="col-4 pt-3">
-                      {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
-                      {% else %}
-                        <label class="form-label ">{{ field.label }}</label>
+                    {% if field.name in "device_base display_name function_name value_type  io_permission" %}
+                      <div class="col-3 pt-3">
+                        {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                        {% else %}
+                          <label class="form-label ">{{ field.label }}</label>
+                        {% endif %}
+                        {{ field }}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <div class="row mt-4">
+                  {% for field in form %}
+                      {% if field.name in 'read_data_model read_start_address read_quantity' %}
+                        {% if switch_formset and  thermostat_formset %}
+                          <div class="col-4 pt-3">
+                        {% else %}
+                          <div class="col-3 pt-3">
+                        {% endif %}
+                          {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                          {% else %}
+                            <label class="form-label ">{{ field.label }}</label>
+                          {% endif %}
+                          {{ field }}
+                        </div>
                       {% endif %}
-                      {{ field }}
-                    </div>
-
+                  {% endfor %}
+                </div>
+                <div class="row mt-4">
+                  {% for field in form %}
+                    {% if field.name in 'write_data_model write_start_address write_quantity' %}
+                      {% if switch_formset and  thermostat_formset %}
+                        <div class="col-4 pt-3">
+                      {% else %}
+                        <div class="col-3 pt-3">
+                      {% endif %}
+                        {% if field.label == 'Datapointfunction ptr' or field.label == 'Device base' %}
+                        {% else %}
+                          <label class="form-label ">{{ field.label }}</label>
+                        {% endif %}
+                        {{ field }}
+                      </div>
+                    {% endif %}
                   {% endfor %}
                 </div>
 
@@ -139,15 +275,6 @@
       </div>
 
 
-
-
-
-
-
-
-
-
-
     </form>
   </div>
   <div class="card-footer bg-transparent mt-auto">
@@ -159,3 +286,12 @@
 
 {% endblock right_side_card_content %}
 
+
+{% block extrajs %}
+
+{% comment %} <script>
+  const parent_zone_select_el = document.getElementById("id_parent_zone");
+  parent_zone_select_el.option
+</script> {% endcomment %}
+
+{% endblock extrajs %}

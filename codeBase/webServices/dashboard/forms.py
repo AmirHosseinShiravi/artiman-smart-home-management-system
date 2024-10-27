@@ -6,10 +6,10 @@ from django.forms import BaseInlineFormSet, inlineformset_factory, modelformset_
 from django.contrib.auth.models import User, Group
 
 from core import settings
-from .models import Project, Home, HomeUser, Tablet, Controller, Zone, \
+from .models import Project, Home, HomeUser, Tablet, Controller, UIElementBackgroundImage, Zone, \
     DeviceBase, DataPointFunction, SwitchDataPointFunction, ThermostatDataPointFunction, Switch, \
     FourPoleSwitch, FivePoleSwitch, Thermostat, FourPoleThermostat, TenPoleThermostat, \
-    DeviceSwitchActions, UIBase, UIProxy, SwitchUI, PushButtonUI, CurtainUI, ThermostatUI, DashboardUser
+    DeviceSwitchActions, UIBase, UIProxy, SwitchUI, PushButtonUI, CurtainUI, ThermostatUI, DashboardUser, ControllerDevice
 
 from .utils import generate_random_username, generate_random_password
 
@@ -209,13 +209,16 @@ class ControllerForm(forms.ModelForm):
     class Meta:
         model = Controller
         fields = ['name', 'descriptions', 'enable_internal_server', 'ip_address', 'port_number', 'uart_baud_rate',
-                  'mqtt_client_id', 'mqtt_username', 'mqtt_password']
+                  'uart_data_bits', 'uart_parity', 'uart_stop_bits', 'uart_flow_control', 'mqtt_client_id', 
+                  'mqtt_username', 'mqtt_password']
 
     def __init__(self, *args, **kwargs):
         super(ControllerForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
+        for field_name, field in self.fields.items():
             if field.label == 'Enable internal server':
                 field.widget.attrs.update({"class": "form-check-input", "type": "checkbox"})
+            elif field_name in ['uart_baud_rate', 'uart_data_bits', 'uart_parity', 'uart_stop_bits', 'uart_flow_control']:
+                field.widget.attrs.update({'class': 'form-select'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -234,23 +237,23 @@ class ControllerCredentialForm(forms.ModelForm):
 class DeviceBaseForm(forms.ModelForm):
     class Meta:
         model = DeviceBase
-        fields = ['name', 'descriptions', 'parent_zone', 'parent_controller', 'modbus_id']
+        fields = ['name', 'descriptions', 'parent_zone', 'parent_controller', 'modbus_id', 'modbus_channel']
 
     def __init__(self, *args, **kwargs):
-        home_uuid = kwargs.get('home_uuid', None)
-        if home_uuid:
+        self.home_uuid = kwargs.get('home_uuid', None)
+        if self.home_uuid:
             del kwargs['home_uuid']
-        project_uuid = kwargs.get('project_uuid', None)
-        if project_uuid:
+        self.project_uuid = kwargs.get('project_uuid', None)
+        if self.project_uuid:
             del kwargs['project_uuid']
-
+        
         super(DeviceBaseForm, self).__init__(*args, **kwargs)
 
-        if home_uuid and project_uuid:
-            self.fields['parent_zone'].queryset = Zone.objects.filter(parent_home__uuid=home_uuid,
-                                                                      parent_project__uuid=project_uuid).all()
-            self.fields['parent_controller'].queryset = Controller.objects.filter(parent_home__uuid=home_uuid,
-                                                                            parent_project__uuid=project_uuid).all()
+        if self.home_uuid and self.project_uuid:
+            self.fields['parent_zone'].queryset = Zone.objects.filter(parent_home__uuid=self.home_uuid,
+                                                                      parent_project__uuid=self.project_uuid).exclude(zone_name="Global").all()
+            self.fields['parent_controller'].queryset = Controller.objects.filter(parent_home__uuid=self.home_uuid,
+                                                                            parent_project__uuid=self.project_uuid).all()
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 
@@ -264,23 +267,35 @@ class DataPointFunctionForm(forms.ModelForm):
 class SwitchFunctionForm(forms.ModelForm):
     class Meta:
         model = SwitchDataPointFunction
-        fields = ['display_name', 'function_name', 'value_type', 'switch_id']
+        fields = ['display_name', 'function_name', 'value_type', 'switch_id', "io_permission", 
+                  "modbus_read_data_model", "modbus_read_start_address", "modbus_read_quantity", "modbus_write_data_model", 
+                  "modbus_write_start_address", "modbus_write_quantity",
+                  "internal_buffer_read_data_model", "internal_buffer_read_start_address", "internal_buffer_read_quantity", 
+                  "internal_buffer_write_data_model", "internal_buffer_write_start_address", "internal_buffer_write_quantity"]
 
     def __init__(self, *args, **kwargs):
         super(SwitchFunctionForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+        for field_name, field in self.fields.items():
+            if field_name in ["value_type", "io_permission", "read_data_model", "write_data_model"]:
+                field.widget.attrs.update({'class': 'form-select'})
+            else:     
+                field.widget.attrs.update({'class': 'form-control'})
 
 
 class ThermostatFunctionForm(forms.ModelForm):
     class Meta:
         model = ThermostatDataPointFunction
-        fields = ['display_name', 'function_name', 'value_type']
+        fields = ['display_name', 'function_name', 'value_type', "io_permission",
+                  "modbus_read_data_model", "modbus_read_start_address", "modbus_read_quantity", 
+                  "modbus_write_data_model", "modbus_write_start_address", "modbus_write_quantity"]
 
     def __init__(self, *args, **kwargs):
         super(ThermostatFunctionForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+        for field_name, field in self.fields.items():
+            if field_name in ["value_type", "io_permission", "read_data_model", "write_data_model"]:
+                field.widget.attrs.update({'class': 'form-select'})
+            else:     
+                field.widget.attrs.update({'class': 'form-control'})
 
 
 class FourPoleSwitchForm(DeviceBaseForm):
@@ -313,6 +328,28 @@ class TenPoleThermostatForm(DeviceBaseForm):
         fields = DeviceBaseForm.Meta.fields
 
 
+class ControllerDeviceForm(DeviceBaseForm):
+    class Meta(DeviceBaseForm.Meta):
+        model = ControllerDevice
+        fields = ['name', 'descriptions', 'parent_zone', 'parent_controller', 'modbus_id', 'modbus_channel']
+    
+    def __init__(self, *args, **kwargs):
+        super(ControllerDeviceForm, self).__init__(*args, **kwargs)
+        self.fields['parent_zone'].queryset = Zone.objects.filter(parent_home__uuid=self.home_uuid,
+                                                                      parent_project__uuid=self.project_uuid).all()
+        for field_name, field in self.fields.items():
+            if field_name == "parent_zone":
+                home_global_zone = Zone.objects.filter(parent_home__uuid=self.home_uuid,
+                                                        parent_project__uuid=self.project_uuid).filter(zone_name="Global").get()
+                field.widget.attrs.update({'class': 'form-select', "style":"display:none;"})
+                self.initial["parent_zone"] = str(home_global_zone.id)
+                field.required = False
+            elif field_name in ['modbus_id', 'modbus_channel']:
+                field.widget.attrs.update({'class': 'form-control', "style":"display:none;", "value":"0"})
+            else:     
+                field.widget.attrs.update({'class': 'form-control'})
+
+
 
 # class DeviceSwitchActionsForm(forms.ModelForm):
 #     class Meta:
@@ -331,17 +368,22 @@ class DeviceSwitchActionsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DeviceSwitchActionsForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control m-3'})
+            field.widget.attrs.update({'class': 'form-control'})
 
 
 DeviceSwitchActionsFormSet = modelformset_factory(DeviceSwitchActions, form=DeviceSwitchActionsForm, extra=1)
 
 
 class UIBaseForm(forms.ModelForm):
+    tablet_mode_background_image = forms.ModelChoiceField(
+        queryset=UIElementBackgroundImage.objects.all(),
+        widget=forms.RadioSelect,
+        empty_label=None
+    )
     class Meta:
         model = UIBase
         fields = ['name', 'descriptions', 'parent_zone', 'button_name', 'on_icon', 'off_icon', 'on_text', 'off_text',
-                  'on_color', 'off_color', 'add_to_home']
+                  'on_color', 'off_color', 'add_to_home', 'tablet_mode_background_image']
 
     def __init__(self, *args, **kwargs):
         home_uuid = kwargs.get('home_uuid', None)
@@ -355,8 +397,13 @@ class UIBaseForm(forms.ModelForm):
 
         if home_uuid and project_uuid:
             self.fields['parent_zone'].queryset = Zone.objects.filter(parent_home__uuid=home_uuid,
-                                                                      parent_project__uuid=project_uuid).all()
-
+                                                                      parent_project__uuid=project_uuid).exclude(zone_name="Global").all()
+        
+        self.fields['tablet_mode_background_image'].choices = [
+            (obj.id, {'id': obj.id, 'url': obj.background_image_thumbnail.url if obj.background_image_thumbnail else ''})
+            for obj in UIElementBackgroundImage.objects.all()
+        ]
+        
 
 
 
@@ -389,6 +436,8 @@ class SwitchUIForm(UIBaseForm):
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
             elif field_name == 'off_icon':
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
+            elif field_name == "tablet_mode_background_image":
+                field.widget.attrs.update({"class": "form-imagecheck-input", "type": "radio"})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -426,6 +475,8 @@ class PushButtonUIForm(UIBaseForm):
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
             elif field_name == 'off_icon':
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
+            elif field_name == "tablet_mode_background_image":
+                field.widget.attrs.update({"class": "form-imagecheck-input", "type": "radio"})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -471,6 +522,8 @@ class CurtainUIForm(UIBaseForm):
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
             elif field_name == 'animation_duration':
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'in miliseconds'})
+            elif field_name == "tablet_mode_background_image":
+                field.widget.attrs.update({"class": "form-imagecheck-input", "type": "radio"})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -528,6 +581,8 @@ class ThermostatUIForm(UIBaseForm):
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
             elif field_name == 'off_icon':
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': 'please select an icon then paste here'})
+            elif field_name == "tablet_mode_background_image":
+                field.widget.attrs.update({"class": "form-imagecheck-input", "type": "radio"})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
@@ -572,6 +627,14 @@ thermostat_dataPointFunction_formSet = inlineformset_factory(Thermostat, Thermos
                                                              max_num=6,
                                                              can_delete=False)
 
+controller_device_dataPointFunction_formSet = inlineformset_factory(ControllerDevice,
+                                                                    SwitchDataPointFunction,
+                                                                    formset=BaseInlineFormSet,
+                                                                    form=SwitchFunctionForm,
+                                                                    extra=12,
+                                                                    max_num=12,
+                                                                    can_delete=False)
+
 # switches_of_fourPoleThermostat_dataPointFunction_formSet = inlineformset_factory(FourPoleThermostat,
 #                                                                                  SwitchDataPointFunction,
 #                                                                                  formset=BaseInlineFormSet,
@@ -603,29 +666,34 @@ thermostat_of_tenPoleThermostat_dataPointFunction_formSet = inlineformset_factor
                                                                                   can_delete=False)
 
 
+
 four_pole_switch_data_point_function_formset_initial = [
     {
         "display_name": "Switch 1",
         "function_name": "switch_1",
         "switch_id": 1,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 2",
         "function_name": "switch_2",
         "switch_id": 2,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 6",
         "function_name": "switch_6",
         "switch_id": 6,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 7",
         "function_name": "switch_7",
         "switch_id": 7,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     }
 ]
@@ -635,30 +703,35 @@ five_pole_switch_data_point_function_formset_initial = [
         "display_name": "Switch 1",
         "function_name": "switch_1",
         "switch_id": 1,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 2",
         "function_name": "switch_2",
         "switch_id": 2,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 4",
         "function_name": "switch_4",
         "switch_id": 4,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 6",
         "function_name": "switch_6",
         "switch_id": 6,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 7",
         "function_name": "switch_7",
         "switch_id": 7,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     }
 ]
@@ -668,36 +741,130 @@ switches_of_ten_pole_thermostat_data_point_function_formset_initial = [
         "display_name": "Switch 5",
         "function_name": "switch_5",
         "switch_id": 5,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 6",
         "function_name": "switch_6",
         "switch_id": 6,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 7",
         "function_name": "switch_7",
         "switch_id": 7,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 8",
         "function_name": "switch_8",
         "switch_id": 8,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 9",
         "function_name": "switch_9",
         "switch_id": 9,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "Switch 10",
         "function_name": "switch_10",
         "switch_id": 10,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    }
+]
+
+
+controller_device_data_point_function_formset_initial = [
+    {
+        "display_name": "Digital Output 1",
+        "function_name": "DigitalOutput_1",
+        "switch_id": 1,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 2",
+        "function_name": "DigitalOutput_2",
+        "switch_id": 2,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 3",
+        "function_name": "DigitalOutput_3",
+        "switch_id": 3,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 4",
+        "function_name": "DigitalOutput_4",
+        "switch_id": 4,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 5",
+        "function_name": "DigitalOutput_5",
+        "switch_id": 5,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 6",
+        "function_name": "DigitalOutput_6",
+        "switch_id": 6,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 7",
+        "function_name": "DigitalOutput_7",
+        "switch_id": 7,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 8",
+        "function_name": "DigitalOutput_8",
+        "switch_id": 8,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 9",
+        "function_name": "DigitalOutput_9",
+        "switch_id": 9,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 10",
+        "function_name": "DigitalOutput_10",
+        "switch_id": 10,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 11",
+        "function_name": "DigitalOutput_11",
+        "switch_id": 11,
+        "io_permission": "R/W",
+        "value_type": 'BOOLEAN'
+    },
+    {
+        "display_name": "Digital Output 12",
+        "function_name": "DigitalOutput_12",
+        "switch_id": 12,
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     }
 ]
@@ -706,31 +873,37 @@ thermostat_data_point_formset_initial = [
     {
         "display_name": "power status",
         "function_name": "status",
+        "io_permission": "R/W",
         "value_type": 'BOOLEAN'
     },
     {
         "display_name": "current temperature",
         "function_name": "tmp",
+        "io_permission": "R",
         "value_type": 'DECIMAL'
     },
     {
         "display_name": "target temperature",
         "function_name": "spt",
+        "io_permission": "R/W",
         "value_type": 'DECIMAL'
     },
     {
         "display_name": "speed",
         "function_name": "fms",
+        "io_permission": "R/W",
         "value_type": 'STRING'
     },
     {
         "display_name": "control mode",
         "function_name": "fct",
+        "io_permission": "R/W",
         "value_type": 'STRING'
     },
     {
         "display_name": "operation mode",
         "function_name": "hc",
+        "io_permission": "R/W",
         "value_type": 'STRING'
     },
 ]

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Micropip Usage</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/v0.23.0/full/pyodide.js"></script> {% endcomment %}
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/pyodide@0.24.1/pyodide.min.js"></script> {% endcomment %}
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/pyodide@0.24.1/pyodide.asm.min.js"></script> {% endcomment %}
+
+
+</head>
+<body>
+    <div id="output"></div>
+
+    <script>
+        async function main() {
+            let pyodide = await loadPyodide();
+            await pyodide.loadPackage("micropip");
+            await pyodide.loadPackage("ssl")
+            await pyodide.loadPackage("pyyaml");
+            await pyodide.loadPackage("cryptography");
+            
+
+            try {
+                let result = await pyodide.runPythonAsync(`
+import micropip
+import sys
+print(sys.version)
+
+
+await micropip.install('{% static "docopt-0.6.2-py2.py3-none-any.whl" %}', keep_going=True)
+
+
+await micropip.install('hbmqtt', keep_going=True)
+
+# List installed packages
+print("Installed packages:")
+installed = micropip.list()
+for pkg in installed:
+    print(f"- {pkg}")
+
+
+import logging
+import asyncio
+import os
+from hbmqtt.broker import Broker
+
+logger = logging.getLogger(__name__)
+
+config = {
+    'listeners': {
+        'default': {
+            'type': 'tcp',
+            'bind': '0.0.0.0:1883',
+        },
+        'ws-mqtt': {
+            'bind': '127.0.0.1:8080',
+            'type': 'ws',
+            'max_connections': 10,
+        },
+    },
+    'sys_interval': 10,
+    'auth': {
+        'allow-anonymous': True,
+        'password-file': os.path.join(os.path.dirname(os.path.realpath(__file__)), "passwd"),
+        'plugins': [
+            'auth_file', 'auth_anonymous'
+        ]
+    },
+    'topic-check': {
+        'enabled': False
+    }
+}
+
+broker = Broker(config)
+
+
+
+async def test_coro():
+    await broker.start()
+    #yield from asyncio.sleep(5)
+    #yield from broker.shutdown()
+
+
+if __name__ == '__main__':
+    formatter = "[%(asctime)s] :: %(levelname)s :: %(name)s :: %(message)s"
+    #formatter = "%(asctime)s :: %(levelname)s :: %(message)s"
+    logging.basicConfig(level=logging.INFO, format=formatter)
+    print("start broker")
+    asyncio.get_event_loop().run_until_complete(test_coro())
+    asyncio.get_event_loop().run_forever()
+
+                `);
+                document.getElementById('output').textContent = result;
+            } catch (error) {
+                console.error("Python error:", error);
+                document.getElementById('output').textContent = "Error: " + error;
+            }
+        }
+        main();
+    </script>
+</body>
+</html>

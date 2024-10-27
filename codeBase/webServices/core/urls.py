@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from . import settings
 from django.conf.urls.static import static
-
+from web_app import views as web_app_views
 urlpatterns = [
     path("dashboard/v1/", include('dashboard.urls', namespace="dashboard")),
     path("web_app/v1/", include('web_app.urls', namespace="web_app")),
@@ -25,6 +25,7 @@ urlpatterns = [
     path("monitor_system_resource/v1/", include('monitor_system_resource.urls', namespace="monitor_system_resource")),
     path("admin/", admin.site.urls),
     path('tabler/', include('admin_tabler.urls')),
+    path('service-worker.js', web_app_views.serve_service_worker_file, name="service-worker-file"),
 ]
 
 if settings.DEBUG:

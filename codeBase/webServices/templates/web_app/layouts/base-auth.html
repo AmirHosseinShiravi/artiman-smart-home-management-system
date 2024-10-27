@@ -12,13 +12,13 @@
   <head>
     <title>{% block title %}{% endblock title %} Artiman Smart Home </title>
     {% block extrastyle %}{% endblock extrastyle %}
-    {% include 'includes/head.html' %}
+    {% include 'dashboard/includes/head.html' %}
   </head>
   <body  class="{% block body %}{% endblock body %} ">
-    <script src="{% static 'dist/js/demo-theme.min.js' %}?1684106062"></script>
+    <script src="{% static 'dashboard/static/dist/js/demo-theme.min.js' %}?1684106062"></script>
     {% block content %}{% endblock content %}
     <!-- Libs JS -->
-    {% include 'includes/scripts.html' %}
+    {% include 'web_app/includes/scripts.html' %}
     {% block extrajs %}{% endblock extrajs %}
   </body>
 </html>

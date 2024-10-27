@@ -1,0 +1,6 @@
+art==6.3
+click==8.1.7
+py2exe==0.13.0.2
+pyadb==0.1.1
+pyinstaller==5.2
+rich==13.9.2

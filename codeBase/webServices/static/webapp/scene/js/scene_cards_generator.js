@@ -156,7 +156,7 @@ function add_home_page_enabled_tap_to_run_rules_to_home_page(){
     if(all_tap_to_run_rules_with_add_to_home_flag){
         all_tap_to_run_rules_with_add_to_home_flag.forEach(rule => {
             const button = document.createElement('button');
-            button.className = "btn btn-lg me-2 main_page_favorite_scene_shortcut";
+            button.className = "btn btn-lg main_page_favorite_scene_shortcut";
             button.dataset.sceneSceneRuleId = rule.index;
             button.textContent = rule.name;
             button.style.backgroundColor = rule.style.color;

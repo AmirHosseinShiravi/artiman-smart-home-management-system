@@ -27,7 +27,7 @@
           padding-top: 20px;
       }
 
-      i {
+      .icon-container i {
           font-size: 2em;
           cursor: pointer;
           text-align: center;
@@ -62,7 +62,7 @@
             {{ form.management_form }}
             {% for field in form %}
               {% if field.name == 'add_to_home' %}
-                {% comment %} <div class="col-12">
+                <div class="col-12">
 
                   <div class="mt-5">
                     <div class="form-label mb-3">{{ field.label }}</div>
@@ -71,7 +71,7 @@
                       <span class="form-check-label">If enabled, this UI element added to home page</span>
                     </label>
                   </div>
-                </div> {% endcomment %}
+                </div>
               {% elif field.name == 'on_color' or field.name == 'off_color' %}
                 <div class="col-lg-6 col-md-6 col-sm-12">
                   <label class="form-label mt-4">{{ field.label }}</label>
@@ -82,6 +82,27 @@
                   <label class="form-label mt-4">{{ field.label }} (in miliseconds)</label>
                   {{ field }}
                 </div>
+              {% elif field.name == "tablet_mode_background_image" %}
+                <div class="col-12 mb-3 mt-4">
+                  <label class="form-label">{{ form.tablet_mode_background_image.label }}</label>
+                  <div class="row g-2">
+                      {% for radio in form.tablet_mode_background_image %}
+                          <div class="col-6 col-sm-4">
+                              <label class="form-imagecheck mb-3">
+                                  {{ radio.tag }}
+                                  <span class="form-imagecheck-figure" style="display:flex!important;
+                                                                                      width: 250px!important;
+                                                                                      height: 250px!important;
+                                                                                      justify-content: center!important;
+                                                                                      align-items: center!important;">
+                                                                                      
+                                    <img src="{{ radio.choice_label.url }}" alt="Background Image {{ radio.choice_label.id }}" class="form-imagecheck-image">
+                                  </span>
+                              </label>
+                          </div>
+                      {% endfor %}
+                  </div>
+              </div>
               {% else %}
                 <div class="col-12">
                   <label class="form-label mt-4">{{ field.label }}</label>

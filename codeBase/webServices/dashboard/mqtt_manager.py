@@ -19,7 +19,7 @@ class MQTTManager:
                  transport: Literal["tcp", "websockets", "unix"] = "tcp", websocket_path: str = "/mqtt"):
         self.broker = broker
         self.port = port
-        self.client_id = client_id or f'python-mqtt-{uuid.uuid4().hex[:8]}'
+        self.client_id = client_id or f'dashboard-client-{uuid.uuid4().hex[:8]}'
         self.transport = transport
         self.websocket_path = websocket_path
         self.client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2,
@@ -129,7 +129,7 @@ class MQTTManager:
             if not self.client.is_connected():
                 if self.transport == "websockets":
                     self.client.ws_set_options(path=self.websocket_path)
-                self.client.connect(self.broker, self.port)
+                self.client.connect(self.broker, self.port, clean_start=mqtt_client.MQTT_CLEAN_START_FIRST_ONLY)
                 self.client.loop_start()
         except Exception as e:
             print(f"Occur error when making connection to MQTT broker with error:: {e}")
@@ -186,13 +186,12 @@ def initialize_mqtt():
     emqx_broker_port = int(os.environ.get('emqx_broker_port'))
     emqx_broker_ws_path = os.environ.get('emqx_broker_ws_path')
     emqx_broker_transport = os.environ.get('emqx_broker_transport')
-    dashboard_mqtt_client_id = os.environ.get('dashboard_mqtt_clientId')
+    # dashboard_mqtt_client_id = os.environ.get('dashboard_mqtt_clientId')
     dashboard_mqtt_username = os.environ.get('dashboard_mqtt_username')
     dashboard_mqtt_password = os.environ.get('dashboard_mqtt_password')
 
     mqtt_manager = MQTTManager(broker=emqx_broker_host,
                                port=emqx_broker_port,
-                               client_id=dashboard_mqtt_client_id,
                                username=dashboard_mqtt_username,
                                password=dashboard_mqtt_password,
                                transport=emqx_broker_transport,
