@@ -1,0 +1,95 @@
+###########
+# BUILDER #
+###########
+
+# pull official base image
+FROM python:3.9-slim-bookworm as builder
+
+# set work directory
+WORKDIR /usr/src/app
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install psycopg2 dependencies
+# we need apk add build-base linux-headers to can compile psutil package wheel
+# RUN apk update \
+#     && apk add postgresql-dev gcc python3-dev musl-dev 
+RUN apt-get update
+RUN apt install -y python3-pip netcat-openbsd
+
+# lint
+RUN pip install --upgrade pip
+
+# install dependencies
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels HABApp pytz
+
+
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.9-slim-bookworm
+
+# create directory for the app user
+RUN mkdir -p /home/app
+
+# create the app user
+# RUN addgroup -S app && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
+# create the appropriate directories
+ENV HOME=/home/app
+
+ENV HABApp_HOME=/home/app/RuleEngineService
+
+RUN mkdir $HABApp_HOME
+RUN mkdir $HABApp_HOME/rules
+
+
+# Install gettext to use envsubst
+RUN apt-get update && apt-get install -y gettext
+
+WORKDIR $HABApp_HOME
+
+COPY ./RuleEngineService/config.tpl config.tpl
+# RUN envsubst < config.tpl > config.yml
+RUN chown -R app:app $HABApp_HOME
+
+
+
+# install dependencies
+# RUN apt update && apt install libpq
+RUN apt-get update
+RUN apt install -y python3-pip netcat-openbsd htop
+
+COPY --from=builder /usr/src/app/wheels /wheels
+RUN pip install --no-cache /wheels/* pytz habapp
+
+
+COPY ./RuleEngineService/venv venv
+
+USER root 
+
+RUN cp -r /home/app/RuleEngineService/venv/Lib/site-packages/eascheduler/* /usr/local/lib/python3.9/site-packages/eascheduler/ && \
+    cp -r /home/app/RuleEngineService/venv/Lib/site-packages/pendulum/* /usr/local/lib/python3.9/site-packages/pendulum/ && \
+    cp -r /home/app/RuleEngineService/venv/Lib/site-packages/HABApp/* /usr/local/lib/python3.9/site-packages/HABApp/
+
+WORKDIR $HABApp_HOME
+
+# copy entrypoint.prod.sh
+COPY ./RuleEngineService/entrypoint.prod.sh .
+RUN sed -i 's/\r$//g'  $HABApp_HOME/entrypoint.prod.sh
+RUN chmod +x  $HABApp_HOME/entrypoint.prod.sh
+
+
+# chown all the files to the app user
+RUN chown -R app:app $HABApp_HOME
+
+# change to the app user
+USER app
+
+
+# run entrypoint.prod.sh
+ENTRYPOINT ["/home/app/RuleEngineService/entrypoint.prod.sh"]

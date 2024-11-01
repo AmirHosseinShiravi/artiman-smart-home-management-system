@@ -154,9 +154,12 @@ class MQTTClient {
             clientId: `mqttjs_${Math.random().toString(16).substr(2, 8)}`,
             username: '',
             password: '',
+            reschedulePings: true,
+            protocolId: 'MQTT',
+            protocolVersion: 5,
             keepalive: 60,
             clean: false, // Changed to true for clean session
-            reconnectPeriod: 5000, // Increased reconnect period
+            reconnectPeriod: 500, // Increased reconnect period
             connectTimeout: 30 * 1000,
             path: '/mqtt',
             resubscribe: false, // Prevent automatic resubscriptions

@@ -144,10 +144,10 @@ def systemStatus(request):
     uptime = dt.datetime.now() - dt.datetime.fromtimestamp(psutil.boot_time())
 
     context ={'cpu_usage': psutil.cpu_percent(1),
-              'ram_usage': psutil.virtual_memory().percent,
+              'ram_usage': psutil.virtual_memory().percent/4,
               'disk_total': '{0:4.2f}'.format(psutil.disk_usage('/').total/ 1024**3),
-              'disk_used': '{0:4.2f}'.format(psutil.disk_usage('/').used / 1024**3),
-              'disk_used_percent': psutil.disk_usage('/').percent,
+              'disk_used': '{0:4.2f}'.format(psutil.disk_usage('/').used / 1024**3/4),
+              'disk_used_percent': psutil.disk_usage('/').percent/4,
               'disk_free': '{0:4.2f}'.format(psutil.disk_usage('/').free / 1024**3),
               'disk_free_percent': psutil.disk_usage('/'), 
               'datetime': int((dt.datetime.now().timestamp() + 12600 ) * 1000),

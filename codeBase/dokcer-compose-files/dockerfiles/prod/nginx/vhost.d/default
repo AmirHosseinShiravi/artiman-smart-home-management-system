@@ -8,7 +8,7 @@ location /media/ {
   add_header Access-Control-Allow-Origin *;
 }
 
-# location /emqx-dashboard/ {
-#   proxy_pass http://emqx-mqtt-broker:18083;
-#   set $upstream_keepalive false;
-# }
+location /emqx-dashboard/ {
+  proxy_pass http://emqx-mqtt-broker:18083;
+  set $upstream_keepalive false;
+}

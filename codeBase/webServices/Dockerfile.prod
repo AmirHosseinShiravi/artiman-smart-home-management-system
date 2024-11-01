@@ -22,12 +22,12 @@ RUN apt install -y python3-pip python3-dev libpq-dev postgresql postgresql-contr
 # lint
 RUN pip install --upgrade pip
 RUN pip install flake8==3.9.2
-COPY . .
+COPY ./webServices .
 # RUN flake8 --ignore=E501,F401 .
 RUN flake8 --max-line-length=200 --ignore=E111,E114,E121,E122,E124,E125,E126,E127,E128,E129,E131,E201,E202,E203,E221,E222,E225,E226,E227,E231,E241,E251,E261,E262,E265,E266,E271,E272,E301,E302,E303,E304,E305,E306,E401,E402,E501,E502,E701,E702,E703,E704,E711,E712,E713,E714,E721,E722,E731,F401,F403,F405,F811,F812,F821,F822,F823,F841,W291,W292,W293,W391,W503,W504,W505,W601,W602,W603,W604,W605,W606 --select=E9,F63,F7,F82 .
 
 # install dependencies
-COPY ./requirements.txt .
+COPY ./webServices/requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 
@@ -47,9 +47,22 @@ RUN groupadd -r app && useradd -r -g app app
 # create the appropriate directories
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
+# ENV HABApp_HOME=/home/app/RuleEngineService
 RUN mkdir $APP_HOME
+# RUN mkdir $HABApp_HOME
+# RUN mkdir $HABApp_HOME/rules
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/mediafiles
+
+# Install gettext to use envsubst
+# RUN apt-get update && apt-get install -y gettext
+
+# WORKDIR $HABApp_HOME
+
+# COPY ./RuleEngineService/config.tpl config.tpl
+# RUN envsubst < config.tpl > config.yml
+# RUN chown -R app:app $HABApp_HOME
+
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -61,19 +74,25 @@ COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
 
+# # replace eascheduler and pendulum modules with corrected ones
+# COPY ./webServices/venv/Lib/site-packages/eascheduler /usr/local/lib/python3.9/site-packages/eascheduler
+# COPY ./webServices/venv/Lib/site-packages/pendulum /usr/local/lib/python3.9/site-packages/pendulum
+
+# copy project
+COPY ./webServices $APP_HOME
+
 # copy entrypoint.prod.sh
-COPY ./entrypoint.prod.sh .
+COPY ./webServices/entrypoint.prod.sh .
 RUN sed -i 's/\r$//g'  $APP_HOME/entrypoint.prod.sh
 RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 
-# copy project
-COPY . $APP_HOME
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
 
 # change to the app user
 USER app
+
 
 # run entrypoint.prod.sh
 ENTRYPOINT ["/home/app/web/entrypoint.prod.sh"]

@@ -229,7 +229,7 @@
                 </div>
                 <div class="row mt-4">
                   {% for field in form %}
-                      {% if field.name in 'read_data_model read_start_address read_quantity' %}
+                      {% if field.name in 'modbus_read_data_model modbus_read_start_address modbus_read_quantity' %}
                         {% if switch_formset and  thermostat_formset %}
                           <div class="col-4 pt-3">
                         {% else %}
@@ -246,7 +246,7 @@
                 </div>
                 <div class="row mt-4">
                   {% for field in form %}
-                    {% if field.name in 'write_data_model write_start_address write_quantity' %}
+                    {% if field.name in 'modbus_write_data_model modbus_write_start_address modbus_write_quantity' %}
                       {% if switch_formset and  thermostat_formset %}
                         <div class="col-4 pt-3">
                       {% else %}

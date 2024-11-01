@@ -47,9 +47,18 @@ RUN groupadd -r app && useradd -r -g app app
 # create the appropriate directories
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
+ENV HABApp_HOME=/home/app/RuleEngineService
 RUN mkdir $APP_HOME
+RUN mkdir $HABApp_HOME
+RUN mkdir $HABApp_HOME/rules
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/mediafiles
+
+WORKDIR $HABApp_HOME
+COPY ../RuleEngineService/config.tpl config.tpl
+# RUN envsubst < config.tpl > config.yml
+RUN chown -R app:app $HABApp_HOME
+
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -74,6 +83,7 @@ RUN chown -R app:app $APP_HOME
 
 # change to the app user
 USER app
+
 
 # run entrypoint.prod.sh
 ENTRYPOINT ["/home/app/web/entrypoint.prod.sh"]

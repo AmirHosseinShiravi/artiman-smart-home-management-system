@@ -1,0 +1,217 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: webServices/Dockerfile.prod
+    command: sh -c "echo $PWD && \
+                    python3 manage.py makemigrations --noinput && \
+                    python3 manage.py migrate --noinput && \
+                    python3 manage.py collectstatic --noinput && \
+                    python manage.py create_superuser || true && \
+                    python3 manage.py system_runtime_tracker_task & \
+                    gunicorn core.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+      - habapp_volume:/home/app/RuleEngineService/rules
+    expose:
+      - 8000
+    env_file:
+      - ./envs/prod/django/.env
+    depends_on:
+      - db 
+      - habapp
+    networks:
+      main-service-network:
+
+  habapp:
+    build:
+      context: ..
+      dockerfile: RuleEngineService/Dockerfile.prod
+    command: sh -c "python3 -m HABApp -c config.yml"
+    volumes:
+      - habapp_volume:/home/app/RuleEngineService/rules
+    env_file:
+      - ./envs/prod/HABApp/.env
+    depends_on:
+      - emqx-mqtt-broker
+    networks:
+      main-service-network:
+
+
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data_volume:/var/lib/postgresql/data/
+    env_file:
+      - ./envs/prod/db/.env
+    networks:
+      main-service-network:
+
+  # db:
+  #   build:
+  #     context: ./dockerfiles/prod/db/
+  #   volumes:
+  #     - postgres_data_volume:/var/lib/postgresql/data/
+  #   env_file:
+  #     - ./envs/prod/db/.env
+  #   restart: always
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'pg_isready -U postgres']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # nginx:
+  #   container_name: nginx
+  #   build:
+  #     context: ./dockerfiles/prod/nginx/
+  #   restart: always
+  #   env_file:
+  #     - ./envs/prod/nginx/.env
+  #   ports:
+  #     - 443:443
+  #     - 80:80
+  #   volumes:
+  #     - static_volume:/home/app/web/staticfiles
+  #     - media_volume:/home/app/web/mediafiles
+  #     - certbot_www_volume:/vol/www/
+  #     - proxy_dhparams:/vol/proxy
+  #     - certbot_certs_volume:/etc/letsencrypt/
+
+  #   depends_on:
+  #     - backend
+
+  # certbot:
+  #   build: 
+  #     context: ./dockerfiles/prod/certbot/
+  #   command: echo "Skipping..."
+  #   container_name: certbot
+  #   env_file:
+  #     - ./envs/prod/nginx/.env
+  #   volumes: 
+  #     - certbot_www_volume:/vol/www/
+  #     - certbot_certs_volume:/etc/letsencrypt/
+  #   depends_on:
+  #     - nginx
+
+  nginx-proxy:
+    container_name: nginx-proxy
+    build:
+      context: ./dockerfiles/prod/nginx/
+      dockerfile: Dockerfile
+    # command: sh -c "bash /etc/nginx/config_templates/entrypoint.sh && \
+    #                 nginx -s reload"
+    restart: always
+    env_file:
+      - ./envs/prod/nginx/.env
+    ports:
+      - 80:80
+      - 443:443
+      - 18083:18083
+      - 1883:1883
+      - 8883:8883
+      - 8083:8083 
+      - 8084:8084
+      - 8884:8884
+      - 8888:8888 # nginx status
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      # - toplevel_nginx_conf:/etc/nginx/toplevel.conf.d/
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    depends_on:
+      - web
+    networks:
+      main-service-network:
+  
+  acme-companion:
+    image: nginxproxy/acme-companion
+    env_file:
+      - ./envs/prod/proxy-companion/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - acme:/etc/acme.sh
+    depends_on:
+      - nginx-proxy
+    networks:
+      main-service-network:
+
+
+  emqx-mqtt-broker:
+    image: emqx/emqx:5.8
+    container_name: emqx-mqtt-broker
+    # env_file:
+    #   - ./envs/prod/emqx-broker/.env
+    environment:
+      - "EMQX_NODE_NAME=emqx@node1.emqx.com"
+    
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+
+    expose:
+      - 18083
+      - 1883
+      - 8883
+      - 8083 
+      - 8884
+      - 8084
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+      # - certs:/etc/nginx/certs
+      # - html:/usr/share/nginx/html
+      # - vhost:/etc/nginx/vhost.d
+      # - acme:/etc/acme.sh
+      # - toplevel_nginx_conf:/etc/nginx/toplevel.conf.d/
+      - vol-emqx-broker-data:/opt/emqx/data
+      - vol-emqx-broker-log:/opt/emqx/log
+    networks:
+      main-service-network:
+        aliases:
+          - node1.emqx.com
+
+  
+
+volumes:
+  postgres_data_volume:
+    name: postgres-data
+  static_volume:
+    name: web-staticfiles-directory
+  media_volume:
+    name: web-mediafiles-directory
+  certs:
+  html:
+  vhost:
+  acme:
+  toplevel_nginx_conf:
+  vol-emqx-broker-data:
+    # name: emqx-broker-data
+  vol-emqx-broker-log:
+    # name: emqx-broker-log
+  habapp_volume:
+    name: habapp-service-directory
+
+# networks:
+#   db_network:
+#     driver: bridge
+#   web_network:
+#     driver: bridge
+#   mqtt_network:
+#     driver: bridge
+
+networks:
+  main-service-network:
+    name: main-service-network
+    driver: bridge
+    external: true
